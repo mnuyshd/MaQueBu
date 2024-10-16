@@ -1,0 +1,4 @@
+repository "MaQuiaoBu@mnuyshd@cloud"
+  path "/"
+    smartbranch "/main"       
+     
