@@ -148,6 +148,7 @@ namespace Maqiao
         private Text[] goYi;
         private Text[] goFanShu;
         private Text[] goDianBang;
+        private Text[] goFeng;
         private Text[] goShouQu;
         private Text[] goShouQuGongTuo;
         private Text[] goMingQian;
@@ -268,6 +269,7 @@ namespace Maqiao
             goYi = new Text[0x10];
             goFanShu = new Text[goYi.Length];
             goDianBang = new Text[4];
+            goFeng = new Text[4];
             goShouQu = new Text[4];
             goShouQuGongTuo = new Text[4];
             goMingQian = new Text[4];
@@ -1314,12 +1316,7 @@ namespace Maqiao
         private void DrawJu()
         {
             float x = 0;
-            float y = paiWidth * 2.5f + paiHeight * 6.5f;
-            if (orientation != ScreenOrientation.Portrait)
-            {
-                x = -(paiWidth * 13f);
-                y = paiWidth * 6f;
-            }
+            float y = paiHeight * 5.5f;
             string value;
             switch (eventStatus)
             {
@@ -1329,20 +1326,17 @@ namespace Maqiao
                 case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
                     value = "フォロー";
                     break;
-                case Event.CHANG_JUE:
-                    value = "場決";
-                    break;
-                case Event.QIN_JUE:
-                    value = "親決";
-                    break;
                 case Event.ZHUANG_ZHONG_LE:
                     value = "荘終了";
                     break;
                 default:
                     value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
-                    if (orientation == ScreenOrientation.Portrait)
+                    x = -(paiWidth * 4.5f);
+                    y = paiHeight * 8.2f;
+                    if (orientation != ScreenOrientation.Portrait)
                     {
-                        x = -(paiWidth * 4.5f);
+                        x = -(paiWidth * 13f);
+                        y = paiHeight * 4f;
                     }
                     break;
             }
@@ -1511,7 +1505,6 @@ namespace Maqiao
             isChangJueCoroutine = true;
 
             ClearScreen();
-            DrawJu();
 
             int[] fengPai = new int[Pai.FENG_PAI.Length - (4 - Chang.MIAN_ZI)];
             for (int i = 0; i < Pai.FENG_PAI.Length - (4 - Chang.MIAN_ZI); i++)
@@ -1588,7 +1581,6 @@ namespace Maqiao
             isQinJueCoroutine = true;
 
             ClearScreen();
-            DrawJu();
             DrawMingQian();
 
             int sai1 = 1;
@@ -1921,8 +1913,8 @@ namespace Maqiao
             {
                 int jia = (Chang.qin + i) % Chang.MIAN_ZI;
                 QiaoShi shi = Chang.qiaoShi[jia];
-                string value = Pai.FENG_PAI_MING[shi.feng - 0x31].ToString() + " " + shi.dianBang.ToString();
-                DrawText(ref goDianBang[i], value, Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
+                DrawText(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 1.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
+                DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x + paiWidth * 0.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
 
                 if (shi.liZhi)
                 {
@@ -3873,6 +3865,7 @@ namespace Maqiao
             ClearGameObject(ref goYi);
             ClearGameObject(ref goFanShu);
             ClearGameObject(ref goDianBang);
+            ClearGameObject(ref goFeng);
             ClearGameObject(ref goLizhiBang);
             ClearGameObject(ref goShouQu);
             ClearGameObject(ref goShouQuGongTuo);
