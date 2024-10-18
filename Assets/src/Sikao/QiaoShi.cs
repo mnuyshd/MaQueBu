@@ -1,5 +1,6 @@
 using System;
 using UnityEngine.UI;
+using TMPro;
 
 using Gongtong;
 
@@ -298,12 +299,12 @@ namespace Sikao
         internal int[] daiPai;
         internal Button[] goDaiPai;
         // 残牌数
-        internal Text[] goCanPaiShu;
+        internal TextMeshProUGUI[] goCanPaiShu;
         // 待牌数
         internal int daiPaiShu;
         // 向聴数
         internal int xiangTingShu;
-        internal Text goXiangTingShu;
+        internal TextMeshProUGUI goXiangTingShu;
         // 対子
         internal int[][] duiZi;
         // 対子数
@@ -425,7 +426,7 @@ namespace Sikao
             tongShunPai = new int[0x20];
             daiPai = new int[13];
             goDaiPai = new Button[daiPai.Length];
-            goCanPaiShu = new Text[daiPai.Length];
+            goCanPaiShu = new TextMeshProUGUI[daiPai.Length];
             duiZi = new int[7][];
             for (int i = 0; i < duiZi.Length; i++)
             {

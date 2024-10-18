@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using TMPro;
 
 using Gongtong;
 using Sikao;
@@ -123,7 +124,7 @@ namespace Maqiao
 
         // Game Object
         private Button goScreen;
-        private Text goText;
+        private TextMeshProUGUI goText;
         private Button goButton;
         private Button goFast;
         private Button goReproduction;
@@ -136,22 +137,22 @@ namespace Maqiao
         private GameObject[] goPais;
         private Sprite goJiXieShouPai;
 
-        private Text goTitle;
-        private Text goStart;
-        private Text goJu;
-        private Text goBenChangText;
-        private Text goGongTouText;
-        private Text goCanShanPaiShu;
-        private Text goFu;
+        private TextMeshProUGUI goTitle;
+        private TextMeshProUGUI goStart;
+        private TextMeshProUGUI goJu;
+        private TextMeshProUGUI goBenChangText;
+        private TextMeshProUGUI goGongTouText;
+        private TextMeshProUGUI goCanShanPaiShu;
+        private TextMeshProUGUI goFu;
         private Button goPai;
         private Button[] goSheng;
-        private Text[] goYi;
-        private Text[] goFanShu;
-        private Text[] goDianBang;
-        private Text[] goFeng;
-        private Text[] goShouQu;
-        private Text[] goShouQuGongTuo;
-        private Text[] goMingQian;
+        private TextMeshProUGUI[] goYi;
+        private TextMeshProUGUI[] goFanShu;
+        private TextMeshProUGUI[] goDianBang;
+        private TextMeshProUGUI[] goFeng;
+        private TextMeshProUGUI[] goShouQu;
+        private TextMeshProUGUI[] goShouQuGongTuo;
+        private TextMeshProUGUI[] goMingQian;
         private Button[] goQiaoShi;
         private Button[] goYao;
         private Image[] goLizhiBang;
@@ -188,21 +189,21 @@ namespace Maqiao
         private GameObject goDataBackCanvas;
         private GameObject goGuiZeBackCanvas;
 
-        private Text goJiJuMingQian;
-        private Text goJiLuBanZhuangShu;
-        private Text goJiLuDuiJuShu;
-        private Text goJiLuJiJiDian;
-        private Text goJiLuShunWei1Shuai;
-        private Text goJiLuShunWei2Shuai;
-        private Text goJiLuShunWei3Shuai;
-        private Text goJiLuShunWei4Shuai;
-        private Text goJiLuHeLeShuai;
-        private Text goJiLuFangChongShuai;
-        private Text goJiLuTingPaiShuai;
-        private Text goJiLuPingJunHeLeDian;
-        private Text goJiLuPingJunFangChongDian;
-        private Text[] goYiManShu;
-        private Text[] goYiShu;
+        private TextMeshProUGUI goJiJuMingQian;
+        private TextMeshProUGUI goJiLuBanZhuangShu;
+        private TextMeshProUGUI goJiLuDuiJuShu;
+        private TextMeshProUGUI goJiLuJiJiDian;
+        private TextMeshProUGUI goJiLuShunWei1Shuai;
+        private TextMeshProUGUI goJiLuShunWei2Shuai;
+        private TextMeshProUGUI goJiLuShunWei3Shuai;
+        private TextMeshProUGUI goJiLuShunWei4Shuai;
+        private TextMeshProUGUI goJiLuHeLeShuai;
+        private TextMeshProUGUI goJiLuFangChongShuai;
+        private TextMeshProUGUI goJiLuTingPaiShuai;
+        private TextMeshProUGUI goJiLuPingJunHeLeDian;
+        private TextMeshProUGUI goJiLuPingJunFangChongDian;
+        private TextMeshProUGUI[] goYiManShu;
+        private TextMeshProUGUI[] goYiShu;
 
         // 雀士名前
         private readonly Dictionary<string, bool> qiaoShiMingQian = new()
@@ -264,15 +265,15 @@ namespace Maqiao
         private void SetGameObject()
         {
             // テキスト
-            goText = GameObject.Find("Text").GetComponent<Text>();
+            goText = GameObject.Find("Text").GetComponent<TextMeshProUGUI>();
             goSheng = new Button[4];
-            goYi = new Text[0x10];
-            goFanShu = new Text[goYi.Length];
-            goDianBang = new Text[4];
-            goFeng = new Text[4];
-            goShouQu = new Text[4];
-            goShouQuGongTuo = new Text[4];
-            goMingQian = new Text[4];
+            goYi = new TextMeshProUGUI[0x10];
+            goFanShu = new TextMeshProUGUI[goYi.Length];
+            goDianBang = new TextMeshProUGUI[4];
+            goFeng = new TextMeshProUGUI[4];
+            goShouQu = new TextMeshProUGUI[4];
+            goShouQuGongTuo = new TextMeshProUGUI[4];
+            goMingQian = new TextMeshProUGUI[4];
             // スクリーン
             goScreen = GameObject.Find("Screen").GetComponent<Button>();
             goScreen.onClick.AddListener(delegate {
@@ -347,20 +348,19 @@ namespace Maqiao
             }
             paiHeight = rtPai.rect.height * scale.y;
 
-            Text text = goText.GetComponent<Text>();
+            TextMeshProUGUI text = goText.GetComponent<TextMeshProUGUI>();
             RectTransform rtText = text.GetComponent<RectTransform>();
             rtText.localScale *= scale.x;
 
             RectTransform rtButton = goButton.GetComponent<RectTransform>();
-            Text buttonText = goButton.GetComponentInChildren<Text>();
-            TextGenerator tgText = new();
-            TextGenerationSettings gsText = buttonText.GetGenerationSettings(buttonText.rectTransform.rect.size);
-            float width = tgText.GetPreferredWidth(buttonText.text, gsText);
+            TextMeshProUGUI buttonText = goButton.GetComponentInChildren<TextMeshProUGUI>();
+            Vector2 preferredSize = buttonText.GetPreferredValues(buttonText.rectTransform.rect.size.x, buttonText.rectTransform.rect.size.y);
             RectTransform rtButtonText = buttonText.GetComponent<RectTransform>();
-            rtButtonText.sizeDelta = new Vector2(w, rtButtonText.sizeDelta.y);
-            rtButton.localScale *= scale.x;
-            rtButton.sizeDelta = new Vector2(w, rtButton.sizeDelta.y);
+            rtButtonText.sizeDelta = new Vector2(preferredSize.x, rtButtonText.sizeDelta.y);
 
+            // ボタンのスケールとサイズを設定
+            rtButton.localScale *= scale.x;
+            rtButton.sizeDelta = new Vector2(preferredSize.x, rtButton.sizeDelta.y);
             goDianBang100.GetComponent<RectTransform>().localScale *= scale.x;
             goDianBang1000.GetComponent<RectTransform>().localScale *= scale.x;
             goSpeech.GetComponent<RectTransform>().localScale *= scale.x;
@@ -489,7 +489,7 @@ namespace Maqiao
             etResetPanel.triggers.Add(eResetPanel);
 
             goSettingDialogPanel.SetActive(false);
-            Text message = Instantiate(goText, goSettingDialogPanel.transform);
+            TextMeshProUGUI message = Instantiate(goText, goSettingDialogPanel.transform);
             DrawText(ref message, "全ての設定をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goSettingDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
@@ -516,7 +516,7 @@ namespace Maqiao
             goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
             goDaPaiFangFa.onClick.AddListener(delegate {
                 sheDing.daPaiFangFa = (SheDing.DaPaiFangFa)((int)(sheDing.daPaiFangFa + 1) % Enum.GetValues(typeof(SheDing.DaPaiFangFa)).Length);
-                goDaPaiFangFa.GetComponentInChildren<Text>().text = labelDaPaiFangFa[(int)sheDing.daPaiFangFa];
+                goDaPaiFangFa.GetComponentInChildren<TextMeshProUGUI>().text = labelDaPaiFangFa[(int)sheDing.daPaiFangFa];
                 WriteSheDing();
             });
             DrawButton(ref goDaPaiFangFa, labelDaPaiFangFa[(int)sheDing.daPaiFangFa], new Vector2(-x, y));
@@ -525,7 +525,7 @@ namespace Maqiao
             goLiZhiAuto = Instantiate(goButton, goSettingPanel.transform);
             goLiZhiAuto.onClick.AddListener(delegate {
                 sheDing.liZhiAuto = !sheDing.liZhiAuto;
-                goLiZhiAuto.GetComponentInChildren<Text>().text = sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1];
+                goLiZhiAuto.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1];
                 WriteSheDing();
             });
             DrawButton(ref goLiZhiAuto, sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1], new Vector2(x, y));
@@ -535,7 +535,7 @@ namespace Maqiao
             goXuanShangYin = Instantiate(goButton, goSettingPanel.transform);
             goXuanShangYin.onClick.AddListener(delegate {
                 sheDing.xuanShangYin = !sheDing.xuanShangYin;
-                goXuanShangYin.GetComponentInChildren<Text>().text = sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1];
+                goXuanShangYin.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1];
                 WriteSheDing();
             });
             DrawButton(ref goXuanShangYin, sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1], new Vector2(-x, y));
@@ -544,7 +544,7 @@ namespace Maqiao
             goZiMoQieBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goZiMoQieBiaoShi.onClick.AddListener(delegate {
                 sheDing.ziMoQieBiaoShi = !sheDing.ziMoQieBiaoShi;
-                goZiMoQieBiaoShi.GetComponentInChildren<Text>().text = sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1];
+                goZiMoQieBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1];
                 WriteSheDing();
             });
             DrawButton(ref goZiMoQieBiaoShi, sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1], new Vector2(x, y));
@@ -554,7 +554,7 @@ namespace Maqiao
             goDaiPaiBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goDaiPaiBiaoShi.onClick.AddListener(delegate {
                 sheDing.daiPaiBiaoShi = !sheDing.daiPaiBiaoShi;
-                goDaiPaiBiaoShi.GetComponentInChildren<Text>().text = sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1];
+                goDaiPaiBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1];
                 WriteSheDing();
             });
             DrawButton(ref goDaiPaiBiaoShi, sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1], new Vector2(-x, y));
@@ -563,7 +563,7 @@ namespace Maqiao
             goXiangTingShuBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goXiangTingShuBiaoShi.onClick.AddListener(delegate {
                 sheDing.xiangTingShuBiaoShi = !sheDing.xiangTingShuBiaoShi;
-                goXiangTingShuBiaoShi.GetComponentInChildren<Text>().text = sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1];
+                goXiangTingShuBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1];
                 WriteSheDing();
             });
             DrawButton(ref goXiangTingShuBiaoShi, sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1], new Vector2(x, y));
@@ -675,7 +675,7 @@ namespace Maqiao
             etResetPanel.triggers.Add(eResetPanel);
 
             goScoreDialogPanel.SetActive(false);
-            Text message = Instantiate(goText, goScoreDialogPanel.transform);
+            TextMeshProUGUI message = Instantiate(goText, goScoreDialogPanel.transform);
             DrawText(ref message, "全員の得点をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goScoreDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
@@ -747,42 +747,42 @@ namespace Maqiao
 
             float x = -(paiWidth * 3f);
             y -= paiHeight;
-            DrawData(ref goJiLuJiJiDian, RPad("集計点"), x, y);
+            DrawData(ref goJiLuJiJiDian, "集計点", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuBanZhuangShu, RPad("半荘数"), x, y);
+            DrawData(ref goJiLuBanZhuangShu, "半荘数", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuDuiJuShu, RPad("対局数"), x, y);
+            DrawData(ref goJiLuDuiJuShu, "対局数", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei1Shuai, RPad("１位"), x, y);
+            DrawData(ref goJiLuShunWei1Shuai, "１位", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei2Shuai, RPad("２位"), x, y);
+            DrawData(ref goJiLuShunWei2Shuai, "２位", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei3Shuai, RPad("３位"), x, y);
+            DrawData(ref goJiLuShunWei3Shuai, "３位", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei4Shuai, RPad("４位"), x, y);
+            DrawData(ref goJiLuShunWei4Shuai, "４位", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuHeLeShuai, RPad("和了率"), x, y);
+            DrawData(ref goJiLuHeLeShuai, "和了率", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuFangChongShuai, RPad("放銃率"), x, y);
+            DrawData(ref goJiLuFangChongShuai, "放銃率", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuTingPaiShuai, RPad("聴牌率"), x, y);
+            DrawData(ref goJiLuTingPaiShuai, "聴牌率", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuPingJunHeLeDian, RPad("平均和了点"), x, y);
+            DrawData(ref goJiLuPingJunHeLeDian, "平均和了点", x, y);
             y -= paiHeight;
-            DrawData(ref goJiLuPingJunFangChongDian, RPad("平均放銃点"), x, y);
+            DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", x, y);
             y -= paiHeight;
-            goYiShu = new Text[QiaoShi.YI_MING.Length];
+            goYiShu = new TextMeshProUGUI[QiaoShi.YI_MING.Length];
             for (int i = 0; i < goYiShu.Length; i++)
             {
                 y -= paiHeight;
-                DrawData(ref goYiShu[i], RPad(QiaoShi.YI_MING[i]), x, y);
+                DrawData(ref goYiShu[i], QiaoShi.YI_MING[i], x, y);
             }
             y -= paiHeight;
-            goYiManShu = new Text[QiaoShi.YI_MAN_MING.Length];
+            goYiManShu = new TextMeshProUGUI[QiaoShi.YI_MAN_MING.Length];
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 y -= paiHeight;
-                DrawData(ref goYiManShu[i], RPad(QiaoShi.YI_MAN_MING[i]), x, y);
+                DrawData(ref goYiManShu[i], QiaoShi.YI_MAN_MING[i], x, y);
             }
 
             RectTransform rtDataContent = goDataContent.GetComponent<RectTransform>();
@@ -794,16 +794,16 @@ namespace Maqiao
         }
 
         // 【描画】データ
-        private void DrawData(ref Text go, string ming, float x, float y)
+        private void DrawData(ref TextMeshProUGUI go, string ming, float x, float y)
         {
             if (ming != "")
             {
-                Text goMing = Instantiate(goText, goDataContent.transform);
-                DrawText(ref goMing, ming, new Vector2(x, y), 0, 25);
+                TextMeshProUGUI goMing = Instantiate(goText, goDataContent.transform);
+                DrawText(ref goMing, ming, new Vector2(x, y), 0, 25, TextAlignmentOptions.Left);
             }
 
             go = Instantiate(goText, goDataContent.transform);
-            DrawText(ref go, "", new Vector2(x + paiWidth * 7f, y), 0, 25);
+            DrawText(ref go, "", new Vector2(x + paiWidth * 6f, y), 0, 25);
         }
 
         // 得点パネル 雀士名クリック
@@ -818,57 +818,43 @@ namespace Maqiao
             }
 
             goJiJuMingQian.text = mingQian;
-            goJiLuJiJiDian.text = LPad(jiLu.jiJiDian) + "点";
-            goJiLuBanZhuangShu.text = LPad(jiLu.banZhuangShu) + "回";
-            goJiLuDuiJuShu.text = LPad(jiLu.duiJuShu) + "回";
-            goJiLuShunWei1Shuai.text = jiLu.banZhuangShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.shunWei1 / jiLu.banZhuangShu * 100)) + "％";
-            goJiLuShunWei2Shuai.text = jiLu.banZhuangShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.shunWei2 / jiLu.banZhuangShu * 100)) + "％";
-            goJiLuShunWei3Shuai.text = jiLu.banZhuangShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.shunWei3 / jiLu.banZhuangShu * 100)) + "％";
-            goJiLuShunWei4Shuai.text = jiLu.banZhuangShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.shunWei4 / jiLu.banZhuangShu * 100)) + "％";
-            goJiLuHeLeShuai.text = jiLu.duiJuShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.heLeShu / jiLu.duiJuShu * 100)) + "％";
-            goJiLuFangChongShuai.text = jiLu.duiJuShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.fangChongShu / jiLu.duiJuShu * 100)) + "％";
-            goJiLuTingPaiShuai.text = jiLu.liuJuShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.tingPaiShu / jiLu.liuJuShu * 100)) + "％";
-            goJiLuPingJunHeLeDian.text = jiLu.heLeShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.heLeDian / jiLu.heLeShu)) + "点";
-            goJiLuPingJunFangChongDian.text = jiLu.fangChongShu == 0 ? "" : LPad((int)Math.Floor((double)jiLu.fangChongDian / jiLu.fangChongShu)) + "点";
+            goJiLuJiJiDian.text = jiLu.jiJiDian + "点";
+            goJiLuJiJiDian.alignment = TextAlignmentOptions.Right;
+            goJiLuBanZhuangShu.text = jiLu.banZhuangShu + "回";
+            goJiLuBanZhuangShu.alignment = TextAlignmentOptions.Right;
+            goJiLuDuiJuShu.text = jiLu.duiJuShu + "回";
+            goJiLuDuiJuShu.alignment = TextAlignmentOptions.Right;
+            goJiLuShunWei1Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei1 / jiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei1Shuai.alignment = TextAlignmentOptions.Right;
+            goJiLuShunWei2Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei2 / jiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei2Shuai.alignment = TextAlignmentOptions.Right;
+            goJiLuShunWei3Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei3 / jiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei3Shuai.alignment = TextAlignmentOptions.Right;
+            goJiLuShunWei4Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei4 / jiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei4Shuai.alignment = TextAlignmentOptions.Right;
+            goJiLuHeLeShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeShu / jiLu.duiJuShu * 100) + "％";
+            goJiLuHeLeShuai.alignment = TextAlignmentOptions.Right;
+            goJiLuDuiJuShu.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongShu / jiLu.duiJuShu * 100) + "％";
+            goJiLuDuiJuShu.alignment = TextAlignmentOptions.Right;
+            goJiLuTingPaiShuai.text = jiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.tingPaiShu / jiLu.liuJuShu * 100) + "％";
+            goJiLuTingPaiShuai.alignment = TextAlignmentOptions.Right;
+            goJiLuPingJunHeLeDian.text = jiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeDian / jiLu.heLeShu) + "点";
+            goJiLuPingJunHeLeDian.alignment = TextAlignmentOptions.Right;
+            goJiLuPingJunFangChongDian.text = jiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongDian / jiLu.fangChongShu) + "点";
+            goJiLuPingJunFangChongDian.alignment = TextAlignmentOptions.Right;
             for (int i = 0; i < goYiShu.Length; i++)
             {
-                goYiShu[i].text = LPad(jiLu.yiShu[i]) + "回";
+                goYiShu[i].text = jiLu.yiShu[i] + "回";
+                goYiShu[i].alignment = TextAlignmentOptions.Right;
             }
             for (int i = 0; i < goYiManShu.Length; i++)
             {
-                goYiManShu[i].text = LPad(jiLu.yiManShu[i]) + "回";
+                goYiManShu[i].text = jiLu.yiManShu[i] + "回";
+                goYiManShu[i].alignment = TextAlignmentOptions.Right;
             }
 
             goDataScrollView.SetActive(true);
             goDataBackCanvas.SetActive(true);
-        }
-
-        // 右詰
-        private string RPad(string val, int len = 7, string pad = "　")
-        {
-            string str = val;
-            int l = len - str.Length;
-            for (int i = 0; i < l; i++)
-            {
-                str += pad;
-            }
-            return str;
-        }
-
-        // 左詰
-        private string LPad(int val, int len = 9)
-        {
-            string str = val.ToString();
-            int l = len - str.Length;
-            for (int i = 0; i < l / 2; i++)
-            {
-                str = "　" + str;
-            }
-            if (l % 2 == 1)
-            {
-                str = " " + str;
-            }
-            return str;
         }
 
         // 【描画】ルール画面
@@ -910,32 +896,31 @@ namespace Maqiao
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
 
             float y = paiHeight * 8.5f;
-            float x = 0;
-            Text title = Instantiate(goText, goGuiZeContent.transform);
-            DrawText(ref title, "ルール", new Vector2(x, y), 0, 25);
+            float x = -(paiWidth * 5f);
+            TextMeshProUGUI title = Instantiate(goText, goGuiZeContent.transform);
+            DrawText(ref title, "ルール", new Vector2(0, y), 0, 25);
             y -= paiHeight;
-            int len = 22;
             List<string> guiZe = new();
-            guiZe.Add(RPad("半荘戦（" + Number2Full(GuiZe.kaiShiDian) + "点開始、" + Number2Full(GuiZe.fanDian) + "点返し）", len));
-            guiZe.Add(RPad("ピンヅモ" + (GuiZe.ziMoPingHe ? "有り" : "無し"), len));
-            guiZe.Add(RPad("食いタン" + (GuiZe.shiDuan ? "有り" : "無し"), len));
-            guiZe.Add(RPad("後づけ有り", len));
-            guiZe.Add(RPad("食い替え" + (GuiZe.shiTi ? "有り" : "無し（食い替えの場合、チョンボ）"), len));
-            guiZe.Add(RPad("ダブロン、トリプルロン" + (GuiZe.wRongHe ? "有り" : "無し（頭ハネ）"), len));
-            guiZe.Add(RPad("供託あがりどり" + (GuiZe.wRongHe ? "（ダブロン以上は上家どり）" : ""), len));
-            guiZe.Add(RPad("パオ（責任払い）" + (GuiZe.baoZe ? "有り" : "無し"), len));
-            guiZe.Add(RPad("赤ドラ（萬子" + Number2Full(GuiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(GuiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(GuiZe.chiPaiShu[2]) + "枚）", len));
-            guiZe.Add(RPad("九種九牌は" + (GuiZe.jiuZhongJiuPaiLianZhuang ? "親の連荘" : "流局（親流れ）"), len));
-            guiZe.Add(RPad("四家立直は" + (GuiZe.siJiaLiZhiLianZhuang ? "親の連荘" : "流局（親流れ）"), len));
-            guiZe.Add(RPad("四風子連打は" + (GuiZe.siFengZiLianDaLianZhuang ? "親の連荘" : "流局（親流れ）"), len));
-            guiZe.Add(RPad("四開槓は" + (GuiZe.siKaiGangLianZhuang ? "親の連荘" : "流局（親流れ）"), len));
-            guiZe.Add(RPad("箱（０点以下で終了）" + (GuiZe.xiang ? "有り" : "無し"), len));
-            guiZe.Add(RPad("流し満貫" + (GuiZe.liuManGuan ? "有り（親は連荘）" : "無し"), len));
-            guiZe.Add(RPad("１０００点未満のリーチ" + (GuiZe.jieJinLiZhi ? "可能" : "不可"), len));
+            guiZe.Add("半荘戦（" + Number2Full(GuiZe.kaiShiDian) + "点開始、" + Number2Full(GuiZe.fanDian) + "点返し）");
+            guiZe.Add("ピンヅモ" + (GuiZe.ziMoPingHe ? "有り" : "無し"));
+            guiZe.Add("食いタン" + (GuiZe.shiDuan ? "有り" : "無し"));
+            guiZe.Add("後づけ有り");
+            guiZe.Add("食い替え" + (GuiZe.shiTi ? "有り" : "無し（食い替えの場合、チョンボ）"));
+            guiZe.Add("ダブロン、トリプルロン" + (GuiZe.wRongHe ? "有り" : "無し（頭ハネ）"));
+            guiZe.Add("供託あがりどり" + (GuiZe.wRongHe ? "（ダブロン以上は上家どり）" : ""));
+            guiZe.Add("パオ（責任払い）" + (GuiZe.baoZe ? "有り" : "無し"));
+            guiZe.Add("赤ドラ（萬子" + Number2Full(GuiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(GuiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(GuiZe.chiPaiShu[2]) + "枚）");
+            guiZe.Add("九種九牌は" + (GuiZe.jiuZhongJiuPaiLianZhuang ? "親の連荘" : "流局（親流れ）"));
+            guiZe.Add("四家立直は" + (GuiZe.siJiaLiZhiLianZhuang ? "親の連荘" : "流局（親流れ）"));
+            guiZe.Add("四風子連打は" + (GuiZe.siFengZiLianDaLianZhuang ? "親の連荘" : "流局（親流れ）"));
+            guiZe.Add("四開槓は" + (GuiZe.siKaiGangLianZhuang ? "親の連荘" : "流局（親流れ）"));
+            guiZe.Add("箱（０点以下で終了）" + (GuiZe.xiang ? "有り" : "無し"));
+            guiZe.Add("流し満貫" + (GuiZe.liuManGuan ? "有り（親は連荘）" : "無し"));
+            guiZe.Add("１０００点未満のリーチ" + (GuiZe.jieJinLiZhi ? "可能" : "不可"));
             foreach (string g in guiZe)
             {
-                Text t = Instantiate(goText, goGuiZeContent.transform);
-                DrawText(ref t, g, new Vector2(x, y), 0, 20);
+                TextMeshProUGUI t = Instantiate(goText, goGuiZeContent.transform);
+                DrawText(ref t, g, new Vector2(x, y), 0, 20, TextAlignmentOptions.Left);
                 y -= paiHeight;
             }
 
@@ -1355,7 +1340,7 @@ namespace Maqiao
             goMingWu.onClick.AddListener(delegate
             {
                 sheDing.mingWu = !sheDing.mingWu;
-                goMingWu.GetComponentInChildren<Text>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
+                goMingWu.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
                 WriteSheDing();
             });
             float x = -paiWidth * 8f;
@@ -1462,7 +1447,7 @@ namespace Maqiao
         // 名前色設定
         private void SetQiaoShiColor(string mingQian, int pos)
         {
-            Text text = goQiaoShi[pos].GetComponentInChildren<Text>();
+            TextMeshProUGUI text = goQiaoShi[pos].GetComponentInChildren<TextMeshProUGUI>();
             text.color = qiaoShiMingQian[mingQian] ? Color.black : Color.gray;
         }
 
@@ -2577,7 +2562,7 @@ namespace Maqiao
             }
             if (shi.follow && (shi.ziJiaYao != yao || shi.ziJiaYao == QiaoShi.Yao.WU))
             {
-                Text text = go.GetComponentInChildren<Text>();
+                TextMeshProUGUI text = go.GetComponentInChildren<TextMeshProUGUI>();
                 text.color = Color.gray;
             }
             DrawButton(ref go, value, xy, paiWidth);
@@ -2676,7 +2661,7 @@ namespace Maqiao
             string value = shi.YaoMingButton(yao);
             if (shi.follow && shi.taJiaYao != yao)
             {
-                Text text = go.GetComponentInChildren<Text>();
+                TextMeshProUGUI text = go.GetComponentInChildren<TextMeshProUGUI>();
                 text.color = Color.gray;
             }
             DrawButton(ref go, value, xy);
@@ -2823,7 +2808,7 @@ namespace Maqiao
                     }
                     if (sheDing.xuanShangYin)
                     {
-                        shi.goShouPai[i].GetComponentInChildren<Text>().text = shi.shouPaiXuanShang[i] ? "▼" : "";
+                        shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = shi.shouPaiXuanShang[i] ? "▼" : "";
                     }
                 }
                 if (p != 0xff)
@@ -3131,8 +3116,8 @@ namespace Maqiao
                     {
                         if (ming && i == shi.shePaiWei - 1)
                         {
-                            shi.goShePai[i].GetComponentInChildren<Text>().text = "▼";
-                            shi.goShePai[i].GetComponentInChildren<Text>().color = Color.red;
+                            shi.goShePai[i].GetComponentInChildren<TextMeshProUGUI>().text = "▼";
+                            shi.goShePai[i].GetComponentInChildren<TextMeshProUGUI>().color = Color.red;
                         }
                         DrawPai(ref shi.goShePai[i], p, Cal(x, y, playOrder), 90 * GetDrawOrder(playOrder));
                     }
@@ -3163,7 +3148,7 @@ namespace Maqiao
             {
                 goSheng[jia] = Instantiate(goSpeech, goSpeech.transform.parent);
             }
-            Text goText = goSheng[jia].GetComponentInChildren<Text>();
+            TextMeshProUGUI goText = goSheng[jia].GetComponentInChildren<TextMeshProUGUI>();
             goText.text = text;
             goText.fontSize = 23;
             goSheng[jia].transform.SetAsLastSibling();
@@ -3484,8 +3469,10 @@ namespace Maqiao
                     {
                         text += "　";
                     }
-                    DrawText(ref goYi[i], text, new Vector2(-paiWidth, y), 0, 25);
-                    DrawText(ref goFanShu[i], shi.fanShu[i].ToString(), new Vector2(paiWidth * 3.5f, y), 0, 25);
+                    goYi[i] = Instantiate(goText, goText.transform.parent);
+                    DrawText(ref goYi[i], text, new Vector2(-paiWidth * 0.5f, y), 0, 25, TextAlignmentOptions.Left);
+                    goFanShu[i] = Instantiate(goText, goText.transform.parent);
+                    DrawText(ref goFanShu[i], shi.fanShu[i].ToString(), new Vector2(paiWidth * 0.5f, y), 0, 25, TextAlignmentOptions.Right);
                 }
             }
         }
@@ -3605,7 +3592,7 @@ namespace Maqiao
 
             // 描画
             ClearScreen();
-            DrawJuZhong();
+            DrawZhuangZhong();
 
             yield return Pause(ForwardMode.FAST_FORWARD);
 
@@ -3675,8 +3662,8 @@ namespace Maqiao
             Chang.qiaoShi[top].jiJiDian -= geHe;
         }
 
-        // 【描画】局終了
-        private void DrawJuZhong()
+        // 【描画】荘終了
+        private void DrawZhuangZhong()
         {
             DrawJu();
 
@@ -3720,15 +3707,19 @@ namespace Maqiao
                     deDian = " " + deDian;
                 }
 
-                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 5), y), 0, 30);
-                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3, y), 0, 30);
-                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7, y), 0, 25);
+                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 5), y), 0, 30, TextAlignmentOptions.Left);
+                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3, y), 0, 30, TextAlignmentOptions.Right);
+                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7, y), 0, 25, TextAlignmentOptions.Right);
                 y -= paiHeight * 2;
             }
         }
 
         // 【描画】テキスト
-        private void DrawText(ref Text obj, string value, Vector2 xy, int quaternion, int fontSize)
+        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize)
+        {
+            DrawText(ref obj, value, xy, quaternion, fontSize, TextAlignmentOptions.Center);
+        }
+        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize, TextAlignmentOptions align)
         {
             if (obj == null)
             {
@@ -3736,6 +3727,7 @@ namespace Maqiao
             }
             obj.text = value;
             obj.fontSize = fontSize;
+            obj.alignment = align;
             obj.rectTransform.rotation = Quaternion.Euler(0, 0, quaternion);
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.anchoredPosition = xy;
@@ -3753,11 +3745,11 @@ namespace Maqiao
             {
                 obj = Instantiate(goButton, goButton.transform.parent);
             }
-            obj.GetComponentInChildren<Text>().text = value;
+            obj.GetComponentInChildren<TextMeshProUGUI>().text = value;
             obj.GetComponent<RectTransform>().anchoredPosition = xy;
 
             RectTransform rt = obj.GetComponent<RectTransform>();
-            Text text = obj.GetComponentInChildren<Text>();
+            TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
             if (width == -1)
             {
                 rt.sizeDelta = new Vector2(text.preferredWidth + paiWidth / 2, rt.sizeDelta.y);
@@ -3873,7 +3865,7 @@ namespace Maqiao
         }
 
         // テキストクリア
-        private void ClearGameObject(ref Text go)
+        private void ClearGameObject(ref TextMeshProUGUI go)
         {
             if (go == null)
             {
@@ -3905,7 +3897,7 @@ namespace Maqiao
         }
 
         // テキストクリア
-        private void ClearGameObject(ref Text[] go)
+        private void ClearGameObject(ref TextMeshProUGUI[] go)
         {
             for (int i = 0; i < go.Length; i++)
             {
