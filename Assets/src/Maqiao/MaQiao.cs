@@ -125,6 +125,7 @@ namespace Maqiao
         // Game Object
         private Button goScreen;
         private TextMeshProUGUI goText;
+        private Image goFrame;
         private Button goButton;
         private Button goFast;
         private Button goReproduction;
@@ -142,14 +143,14 @@ namespace Maqiao
         private TextMeshProUGUI goJu;
         private TextMeshProUGUI goBenChangText;
         private TextMeshProUGUI goGongTouText;
-        private TextMeshProUGUI goCanShanPaiShu;
+        private Image goCanShanPaiShu;
         private TextMeshProUGUI goFu;
         private Button goPai;
         private Button[] goSheng;
         private TextMeshProUGUI[] goYi;
         private TextMeshProUGUI[] goFanShu;
         private TextMeshProUGUI[] goDianBang;
-        private TextMeshProUGUI[] goFeng;
+        private Image[] goFeng;
         private TextMeshProUGUI[] goShouQu;
         private TextMeshProUGUI[] goShouQuGongTuo;
         private TextMeshProUGUI[] goMingQian;
@@ -270,10 +271,12 @@ namespace Maqiao
             goYi = new TextMeshProUGUI[0x10];
             goFanShu = new TextMeshProUGUI[goYi.Length];
             goDianBang = new TextMeshProUGUI[4];
-            goFeng = new TextMeshProUGUI[4];
+            goFeng = new Image[4];
             goShouQu = new TextMeshProUGUI[4];
             goShouQuGongTuo = new TextMeshProUGUI[4];
             goMingQian = new TextMeshProUGUI[4];
+            // イメージ
+            goFrame = GameObject.Find("Frame").GetComponent<Image>();
             // スクリーン
             goScreen = GameObject.Find("Screen").GetComponent<Button>();
             goScreen.onClick.AddListener(delegate {
@@ -357,6 +360,9 @@ namespace Maqiao
             Vector2 preferredSize = buttonText.GetPreferredValues(buttonText.rectTransform.rect.size.x, buttonText.rectTransform.rect.size.y);
             RectTransform rtButtonText = buttonText.GetComponent<RectTransform>();
             rtButtonText.sizeDelta = new Vector2(preferredSize.x, rtButtonText.sizeDelta.y);
+
+            RectTransform rtFrame = goFrame.GetComponent<RectTransform>();
+            rtFrame.localScale *= scale.x;
 
             // ボタンのスケールとサイズを設定
             rtButton.localScale *= scale.x;
@@ -971,12 +977,6 @@ namespace Maqiao
                     case Event.QIAO_SHI_XUAN_ZE:
                     // フォロー雀士選択
                     case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                    // 場決
-                    case Event.CHANG_JUE:
-                    // 親決
-                    case Event.QIN_JUE:
-                    // 荘終了
-                    case Event.ZHUANG_ZHONG_LE:
                         DrawJu();
                         break;
 
@@ -1310,9 +1310,6 @@ namespace Maqiao
                     break;
                 case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
                     value = "フォロー";
-                    break;
-                case Event.ZHUANG_ZHONG_LE:
-                    value = "荘終了";
                     break;
                 default:
                     value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
@@ -1719,6 +1716,7 @@ namespace Maqiao
             ClearScreen();
             DrawJu();
             DrawJuOption();
+            DrawCanShanPaiShu(false);
             DrawSais(Chang.qin, Chang.sai1, Chang.sai2);
             DrawQiJia();
             DrawGongTuo();
@@ -1898,7 +1896,8 @@ namespace Maqiao
             {
                 int jia = (Chang.qin + i) % Chang.MIAN_ZI;
                 QiaoShi shi = Chang.qiaoShi[jia];
-                DrawText(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 1.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
+                Color background = shi.feng == 0x31 ? new Color(1f, 0.4f, 0.4f) : Color.black;
+                DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 1.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
                 DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x + paiWidth * 0.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
 
                 if (shi.liZhi)
@@ -1932,7 +1931,7 @@ namespace Maqiao
             }
             // 描画
             DrawShouPai(Chang.ziMoFan, QiaoShi.Yao.WU, -2, true, false);
-            DrawCanShanPaiShu();
+            DrawCanShanPaiShu(true);
             yield return new WaitForSeconds(waitTime);
             if (Chang.taJiaYao != QiaoShi.Yao.WU)
             {
@@ -2487,9 +2486,9 @@ namespace Maqiao
         /**
          * 【描画】残山牌数
          */
-        private void DrawCanShanPaiShu()
+        private void DrawCanShanPaiShu(bool isDrawShu)
         {
-            DrawText(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, 0), 0, 30);
+            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, 0), 0, 30, new Color(0, 0.6f, 0), isDrawShu ? new Color(1f, 1f, 1f) : new Color(1f, 1f, 1f, 0), paiWidth * 0.9f);
         }
 
         // 【描画】自家腰
@@ -3270,7 +3269,7 @@ namespace Maqiao
             DrawGongTuo();
             DrawXuanShangPai();
             DrawDianBang();
-            DrawCanShanPaiShu();
+            DrawCanShanPaiShu(true);
             DrawSais(Chang.qin, Chang.sai1, Chang.sai2);
             DrawMingQian();
             DrawQiJia();
@@ -3665,8 +3664,6 @@ namespace Maqiao
         // 【描画】荘終了
         private void DrawZhuangZhong()
         {
-            DrawJu();
-
             float y = paiHeight * 4;
             int maxMingQian = 0;
             int maxDianBang = 0;
@@ -3732,6 +3729,37 @@ namespace Maqiao
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.anchoredPosition = xy;
             rt.transform.SetSiblingIndex(0);
+        }
+
+        // 【描画】フレームテキスト
+        void DrawFrame(ref Image obj, string value, Vector2 xy, float quaternion, int fontSize, Color backgroundColor, Color foreColor)
+        {
+            DrawFrame(ref obj, value, xy, quaternion, fontSize, backgroundColor, foreColor, -1);
+        }
+        void DrawFrame(ref Image obj, string value, Vector2 xy, float quaternion, int fontSize, Color backgroundColor, Color foreColor, float width)
+        {
+            if (obj == null)
+            {
+                obj = Instantiate(goFrame, goFrame.transform.parent);
+            }
+            TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
+            text.text = value;
+            text.fontSize = fontSize;
+            text.color = foreColor;
+
+            obj.color = backgroundColor;
+            RectTransform rtFrame = obj.GetComponent<RectTransform>();
+            rtFrame.anchoredPosition = xy;
+            rtFrame.rotation = Quaternion.Euler(0, 0, quaternion);
+            if (width == -1)
+            {
+                rtFrame.sizeDelta = new Vector2(text.preferredWidth + paiWidth / 5, text.preferredHeight);
+            }
+            else
+            {
+                rtFrame.sizeDelta = new Vector2(width, text.preferredHeight);
+            }
+            rtFrame.transform.SetSiblingIndex(0);
         }
 
         // 【描画】ボタン
