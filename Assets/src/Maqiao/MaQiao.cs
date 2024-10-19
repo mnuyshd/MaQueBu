@@ -1712,7 +1712,7 @@ namespace Maqiao
             ClearScreen();
             DrawJu();
             DrawJuOption();
-            DrawCanShanPaiShu(false);
+            DrawCanShanPaiShu();
             DrawSais(Chang.qin, Chang.sai1, Chang.sai2);
             DrawQiJia();
             DrawGongTuo();
@@ -1927,7 +1927,7 @@ namespace Maqiao
             }
             // 描画
             DrawShouPai(Chang.ziMoFan, QiaoShi.Yao.WU, -2, true, false);
-            DrawCanShanPaiShu(true);
+            DrawCanShanPaiShu();
             yield return new WaitForSeconds(waitTime);
             if (Chang.taJiaYao != QiaoShi.Yao.WU)
             {
@@ -2482,9 +2482,10 @@ namespace Maqiao
         /**
          * 【描画】残山牌数
          */
-        private void DrawCanShanPaiShu(bool isDrawShu)
+        private void DrawCanShanPaiShu()
         {
-            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, 0), 0, 30, new Color(0, 0.6f, 0), isDrawShu ? new Color(1f, 1f, 1f) : new Color(1f, 1f, 1f, 0), paiWidth * 0.9f);
+            float alfa = Pai.CanShanPaiShu() < 100 ? 1f : 0f;
+            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, 0), 0, 30, new Color(0, 0.6f, 0), new Color(1f, 1f, 1f, alfa), paiWidth * 0.9f);
         }
 
         // 【描画】自家腰
@@ -3265,7 +3266,7 @@ namespace Maqiao
             DrawGongTuo();
             DrawXuanShangPai();
             DrawDianBang();
-            DrawCanShanPaiShu(true);
+            DrawCanShanPaiShu();
             DrawSais(Chang.qin, Chang.sai1, Chang.sai2);
             DrawMingQian();
             DrawQiJia();
