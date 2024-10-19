@@ -3700,9 +3700,9 @@ namespace Maqiao
                     deDian = " " + deDian;
                 }
 
-                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 5), y), 0, 30, TextAlignmentOptions.Left);
-                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3, y), 0, 30, TextAlignmentOptions.Right);
-                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7, y), 0, 25, TextAlignmentOptions.Right);
+                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 4f), y), 0, 30, TextAlignmentOptions.Left);
+                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth, y), 0, 30, TextAlignmentOptions.Right);
+                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 3.5f, y), 0, 25, TextAlignmentOptions.Right);
                 y -= paiHeight * 2;
             }
         }
