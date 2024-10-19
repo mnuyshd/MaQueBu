@@ -747,44 +747,44 @@ namespace Maqiao
             goJiJuMingQian = Instantiate(goText, goDataContent.transform);
             DrawText(ref goJiJuMingQian, "", new Vector2(0, y), 0, 25);
 
-            float x = -(paiWidth * 3f);
+            float x = -(paiWidth * 2f);
             y -= paiHeight;
-            DrawData(ref goJiLuJiJiDian, "集計点", x, y);
+            DrawData(ref goJiLuJiJiDian, "集計点", y);
             y -= paiHeight;
-            DrawData(ref goJiLuBanZhuangShu, "半荘数", x, y);
+            DrawData(ref goJiLuBanZhuangShu, "半荘数", y);
             y -= paiHeight;
-            DrawData(ref goJiLuDuiJuShu, "対局数", x, y);
+            DrawData(ref goJiLuDuiJuShu, "対局数", y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei1Shuai, "１位", x, y);
+            DrawData(ref goJiLuShunWei1Shuai, "１位", y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei2Shuai, "２位", x, y);
+            DrawData(ref goJiLuShunWei2Shuai, "２位", y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei3Shuai, "３位", x, y);
+            DrawData(ref goJiLuShunWei3Shuai, "３位", y);
             y -= paiHeight;
-            DrawData(ref goJiLuShunWei4Shuai, "４位", x, y);
+            DrawData(ref goJiLuShunWei4Shuai, "４位", y);
             y -= paiHeight;
-            DrawData(ref goJiLuHeLeShuai, "和了率", x, y);
+            DrawData(ref goJiLuHeLeShuai, "和了率", y);
             y -= paiHeight;
-            DrawData(ref goJiLuFangChongShuai, "放銃率", x, y);
+            DrawData(ref goJiLuFangChongShuai, "放銃率", y);
             y -= paiHeight;
-            DrawData(ref goJiLuTingPaiShuai, "聴牌率", x, y);
+            DrawData(ref goJiLuTingPaiShuai, "聴牌率", y);
             y -= paiHeight;
-            DrawData(ref goJiLuPingJunHeLeDian, "平均和了点", x, y);
+            DrawData(ref goJiLuPingJunHeLeDian, "平均和了点", y);
             y -= paiHeight;
-            DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", x, y);
+            DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", y);
             y -= paiHeight;
             goYiShu = new TextMeshProUGUI[QiaoShi.YI_MING.Length];
             for (int i = 0; i < goYiShu.Length; i++)
             {
                 y -= paiHeight;
-                DrawData(ref goYiShu[i], QiaoShi.YI_MING[i], x, y);
+                DrawData(ref goYiShu[i], QiaoShi.YI_MING[i], y);
             }
             y -= paiHeight;
             goYiManShu = new TextMeshProUGUI[QiaoShi.YI_MAN_MING.Length];
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 y -= paiHeight;
-                DrawData(ref goYiManShu[i], QiaoShi.YI_MAN_MING[i], x, y);
+                DrawData(ref goYiManShu[i], QiaoShi.YI_MAN_MING[i], y);
             }
 
             RectTransform rtDataContent = goDataContent.GetComponent<RectTransform>();
@@ -796,16 +796,16 @@ namespace Maqiao
         }
 
         // 【描画】データ
-        private void DrawData(ref TextMeshProUGUI go, string ming, float x, float y)
+        private void DrawData(ref TextMeshProUGUI go, string ming, float y)
         {
             if (ming != "")
             {
                 TextMeshProUGUI goMing = Instantiate(goText, goDataContent.transform);
-                DrawText(ref goMing, ming, new Vector2(x, y), 0, 25, TextAlignmentOptions.Left);
+                DrawText(ref goMing, ming, new Vector2(-paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Left);
             }
 
             go = Instantiate(goText, goDataContent.transform);
-            DrawText(ref go, "", new Vector2(x + paiWidth * 6f, y), 0, 25);
+            DrawText(ref go, "", new Vector2(paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Right);
         }
 
         // 得点パネル 雀士名クリック
@@ -898,7 +898,7 @@ namespace Maqiao
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
 
             float y = paiHeight * 8.5f;
-            float x = -(paiWidth * 5f);
+            float x = -(paiWidth * 8.5f);
             TextMeshProUGUI title = Instantiate(goText, goGuiZeContent.transform);
             DrawText(ref title, "ルール", new Vector2(0, y), 0, 25);
             y -= paiHeight;
@@ -1893,8 +1893,8 @@ namespace Maqiao
                 int jia = (Chang.qin + i) % Chang.MIAN_ZI;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 Color background = shi.feng == 0x31 ? new Color(1f, 0.4f, 0.4f) : Color.black;
-                DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 1.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
-                DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x + paiWidth * 0.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
+                DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 1.3f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
+                DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x + paiWidth * 0.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
 
                 if (shi.liZhi)
                 {
@@ -3466,9 +3466,9 @@ namespace Maqiao
                         text += "　";
                     }
                     goYi[i] = Instantiate(goText, goText.transform.parent);
-                    DrawText(ref goYi[i], text, new Vector2(-paiWidth * 0.5f, y), 0, 25, TextAlignmentOptions.Left);
+                    DrawText(ref goYi[i], text, new Vector2(-paiWidth * 3.5f, y), 0, 25, TextAlignmentOptions.Left);
                     goFanShu[i] = Instantiate(goText, goText.transform.parent);
-                    DrawText(ref goFanShu[i], shi.fanShu[i].ToString(), new Vector2(paiWidth * 0.5f, y), 0, 25, TextAlignmentOptions.Right);
+                    DrawText(ref goFanShu[i], shi.fanShu[i].ToString(), new Vector2(paiWidth * 3.5f, y), 0, 25, TextAlignmentOptions.Right);
                 }
             }
         }
@@ -3495,8 +3495,8 @@ namespace Maqiao
                 // 受取
                 string shouQuGongTuo = (shi.shouQuGongTuo > 0 ? "+" : "") + (shi.shouQuGongTuo == 0 ? "" : shi.shouQuGongTuo.ToString());
                 string shouQu = (shi.shouQu - shi.shouQuGongTuo > 0 ? "+" : "") + (shi.shouQu - shi.shouQuGongTuo == 0 ? "" : (shi.shouQu - shi.shouQuGongTuo).ToString());
-                DrawText(ref goShouQuGongTuo[jia], shouQuGongTuo, Cal(0, -(paiHeight * 2.5f), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
-                DrawText(ref goShouQu[jia], shouQu, Cal(0, -(paiHeight * 3), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20);
+                DrawText(ref goShouQuGongTuo[jia], shouQuGongTuo, Cal(0, -(paiHeight * 2.5f), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20, TextAlignmentOptions.Right);
+                DrawText(ref goShouQu[jia], shouQu, Cal(0, -(paiHeight * 3), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20, TextAlignmentOptions.Right);
 
                 DrawText(ref goDianBang[jia], (shi.dianBang - shi.shouQu).ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 30);
                 if (Math.Abs(shi.shouQu) > max)
@@ -3701,9 +3701,9 @@ namespace Maqiao
                     deDian = " " + deDian;
                 }
 
-                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 4f), y), 0, 30, TextAlignmentOptions.Left);
-                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth, y), 0, 30, TextAlignmentOptions.Right);
-                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 3.5f, y), 0, 25, TextAlignmentOptions.Right);
+                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 7f), y), 0, 30, TextAlignmentOptions.Left);
+                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3f, y), 0, 30, TextAlignmentOptions.Right);
+                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7f, y), 0, 25, TextAlignmentOptions.Right);
                 y -= paiHeight * 2;
             }
         }
@@ -3725,6 +3725,7 @@ namespace Maqiao
             obj.rectTransform.rotation = Quaternion.Euler(0, 0, quaternion);
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.anchoredPosition = xy;
+            rt.sizeDelta = new Vector2(paiWidth, obj.preferredHeight);
             rt.transform.SetSiblingIndex(0);
         }
 
