@@ -652,7 +652,7 @@ namespace Maqiao
                 goScoreQiaoShi[i].onClick.AddListener(delegate {
                     OnClickScoreQiaoShi(kvp.Key);
                 });
-                DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y), paiWidth * 3f);
+                DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y));
 
                 if (i % 2 == 1)
                 {
@@ -1362,7 +1362,7 @@ namespace Maqiao
             {
                 x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
                 int pos = index;
-                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), paiWidth * 3f);
+                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y));
                 goQiaoShi[index].onClick.AddListener(delegate {
                     OnClickQiaoShi(kvp.Key, pos);
                 });
@@ -1454,7 +1454,7 @@ namespace Maqiao
             {
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
-                DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y), paiWidth * 3f);
+                DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y));
                 goQiaoShi[i].onClick.AddListener(delegate {
                     OnClickFollowQiaoShi(kvp.Key);
                 });
