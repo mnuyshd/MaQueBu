@@ -357,16 +357,12 @@ namespace Maqiao
 
             RectTransform rtButton = goButton.GetComponent<RectTransform>();
             TextMeshProUGUI buttonText = goButton.GetComponentInChildren<TextMeshProUGUI>();
-            Vector2 preferredSize = buttonText.GetPreferredValues(buttonText.rectTransform.rect.size.x, buttonText.rectTransform.rect.size.y);
-            RectTransform rtButtonText = buttonText.GetComponent<RectTransform>();
-            rtButtonText.sizeDelta = new Vector2(preferredSize.x, rtButtonText.sizeDelta.y);
-
             RectTransform rtFrame = goFrame.GetComponent<RectTransform>();
             rtFrame.localScale *= scale.x;
 
             // ボタンのスケールとサイズを設定
             rtButton.localScale *= scale.x;
-            rtButton.sizeDelta = new Vector2(preferredSize.x, rtButton.sizeDelta.y);
+            rtButton.sizeDelta = new Vector2(buttonText.rectTransform.rect.size.x, rtButton.sizeDelta.y);
             goDianBang100.GetComponent<RectTransform>().localScale *= scale.x;
             goDianBang1000.GetComponent<RectTransform>().localScale *= scale.x;
             goSpeech.GetComponent<RectTransform>().localScale *= scale.x;
@@ -2943,11 +2939,11 @@ namespace Maqiao
             }
             if (goLeft != null)
             {
-                DrawButton(ref goLeft, "◀︎", new Vector2(x, y));
+                DrawButton(ref goLeft, "◀", new Vector2(x, y));
             }
             if (goRight != null)
             {
-                DrawButton(ref goRight, "▶︎", new Vector2(x + paiWidth * 2.5f, y));
+                DrawButton(ref goRight, "▶", new Vector2(x + paiWidth * 2.5f, y));
             }
 
             x = paiWidth * 8f;
