@@ -205,8 +205,10 @@ namespace Maqiao
         private TextMeshProUGUI goJiLuTingPaiShuai;
         private TextMeshProUGUI goJiLuPingJunHeLeDian;
         private TextMeshProUGUI goJiLuPingJunFangChongDian;
-        private TextMeshProUGUI[] goYiManShu;
         private TextMeshProUGUI[] goYiShu;
+        private TextMeshProUGUI[] goYiMing;
+        private TextMeshProUGUI[] goYiManShu;
+        private TextMeshProUGUI[] goYiManMing;
 
         // 雀士名前
         private readonly Dictionary<string, bool> qiaoShiMingQian = new()
@@ -778,18 +780,24 @@ namespace Maqiao
             y -= paiHeight;
             DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", y);
             y -= paiHeight;
+            goYiMing = new TextMeshProUGUI[QiaoShi.YI_MING.Length];
             goYiShu = new TextMeshProUGUI[QiaoShi.YI_MING.Length];
             for (int i = 0; i < goYiShu.Length; i++)
             {
+                if (QiaoShi.YI_MING[i] == "ドラ")
+                {
+                    continue;
+                }
                 y -= paiHeight;
-                DrawData(ref goYiShu[i], QiaoShi.YI_MING[i], y);
+                DrawData(ref goYiMing[i], ref goYiShu[i], QiaoShi.YI_MING[i], y);
             }
             y -= paiHeight;
+            goYiManMing = new TextMeshProUGUI[QiaoShi.YI_MAN_MING.Length];
             goYiManShu = new TextMeshProUGUI[QiaoShi.YI_MAN_MING.Length];
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 y -= paiHeight;
-                DrawData(ref goYiManShu[i], QiaoShi.YI_MAN_MING[i], y);
+                DrawData(ref goYiManMing[i], ref goYiManShu[i], QiaoShi.YI_MAN_MING[i], y);
             }
 
             RectTransform rtDataContent = goDataContent.GetComponent<RectTransform>();
@@ -801,16 +809,21 @@ namespace Maqiao
         }
 
         // 【描画】データ
-        private void DrawData(ref TextMeshProUGUI go, string ming, float y)
+        private void DrawData(ref TextMeshProUGUI goShu, string ming, float y)
         {
-            if (ming != "")
+            TextMeshProUGUI text = Instantiate(goText, goDataContent.transform);
+            DrawData(ref text, ref goShu, ming, y);
+        }
+        private void DrawData(ref TextMeshProUGUI goMing, ref TextMeshProUGUI goShu, string ming, float y)
+        {
+            if (goMing == null)
             {
-                TextMeshProUGUI goMing = Instantiate(goText, goDataContent.transform);
-                DrawText(ref goMing, ming, new Vector2(-paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Left);
+                goMing = Instantiate(goText, goDataContent.transform);
             }
+            DrawText(ref goMing, ming, new Vector2(-paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Left);
 
-            go = Instantiate(goText, goDataContent.transform);
-            DrawText(ref go, "", new Vector2(paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Right);
+            goShu = Instantiate(goText, goDataContent.transform);
+            DrawText(ref goShu, "", new Vector2(paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Right);
         }
 
         // 得点パネル 雀士名クリック
@@ -826,38 +839,38 @@ namespace Maqiao
 
             goJiJuMingQian.text = mingQian;
             goJiLuJiJiDian.text = jiLu.jiJiDian + "点";
-            goJiLuJiJiDian.alignment = TextAlignmentOptions.Right;
             goJiLuBanZhuangShu.text = jiLu.banZhuangShu + "回";
-            goJiLuBanZhuangShu.alignment = TextAlignmentOptions.Right;
             goJiLuDuiJuShu.text = jiLu.duiJuShu + "回";
-            goJiLuDuiJuShu.alignment = TextAlignmentOptions.Right;
             goJiLuShunWei1Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei1 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei1Shuai.alignment = TextAlignmentOptions.Right;
             goJiLuShunWei2Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei2 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei2Shuai.alignment = TextAlignmentOptions.Right;
             goJiLuShunWei3Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei3 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei3Shuai.alignment = TextAlignmentOptions.Right;
             goJiLuShunWei4Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei4 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei4Shuai.alignment = TextAlignmentOptions.Right;
             goJiLuHeLeShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeShu / jiLu.duiJuShu * 100) + "％";
-            goJiLuHeLeShuai.alignment = TextAlignmentOptions.Right;
             goJiLuFangChongShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongShu / jiLu.duiJuShu * 100) + "％";
-            goJiLuFangChongShuai.alignment = TextAlignmentOptions.Right;
             goJiLuTingPaiShuai.text = jiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.tingPaiShu / jiLu.liuJuShu * 100) + "％";
-            goJiLuTingPaiShuai.alignment = TextAlignmentOptions.Right;
             goJiLuPingJunHeLeDian.text = jiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeDian / jiLu.heLeShu) + "点";
-            goJiLuPingJunHeLeDian.alignment = TextAlignmentOptions.Right;
             goJiLuPingJunFangChongDian.text = jiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongDian / jiLu.fangChongShu) + "点";
-            goJiLuPingJunFangChongDian.alignment = TextAlignmentOptions.Right;
             for (int i = 0; i < goYiShu.Length; i++)
             {
+                if (QiaoShi.YI_MING[i] == "ドラ")
+                {
+                    continue;
+                }
                 goYiShu[i].text = jiLu.yiShu[i] + "回";
-                goYiShu[i].alignment = TextAlignmentOptions.Right;
+                if (jiLu.yiShu[i] == 0)
+                {
+                    goYiMing[i].color = Color.gray;
+                    goYiShu[i].color = Color.gray;
+                }
             }
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 goYiManShu[i].text = jiLu.yiManShu[i] + "回";
-                goYiManShu[i].alignment = TextAlignmentOptions.Right;
+                if (jiLu.yiManShu[i] == 0)
+                {
+                    goYiManMing[i].color = Color.gray;
+                    goYiManShu[i].color = Color.gray;
+                }
             }
 
             goDataScrollView.SetActive(true);
