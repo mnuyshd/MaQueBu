@@ -1502,6 +1502,10 @@ namespace Maqiao
 
             ClearScreen();
 
+            if (qiaoShi[0] == null)
+            {
+                OnClickScreenFollowNone();
+            }
             int[] fengPai = new int[Pai.FENG_PAI.Length - (4 - Chang.MIAN_ZI)];
             for (int i = 0; i < Pai.FENG_PAI.Length - (4 - Chang.MIAN_ZI); i++)
             {
