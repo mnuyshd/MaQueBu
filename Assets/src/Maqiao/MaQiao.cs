@@ -836,8 +836,8 @@ namespace Maqiao
             goJiLuShunWei4Shuai.alignment = TextAlignmentOptions.Right;
             goJiLuHeLeShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeShu / jiLu.duiJuShu * 100) + "％";
             goJiLuHeLeShuai.alignment = TextAlignmentOptions.Right;
-            goJiLuDuiJuShu.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongShu / jiLu.duiJuShu * 100) + "％";
-            goJiLuDuiJuShu.alignment = TextAlignmentOptions.Right;
+            goJiLuFangChongShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongShu / jiLu.duiJuShu * 100) + "％";
+            goJiLuFangChongShuai.alignment = TextAlignmentOptions.Right;
             goJiLuTingPaiShuai.text = jiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.tingPaiShu / jiLu.liuJuShu * 100) + "％";
             goJiLuTingPaiShuai.alignment = TextAlignmentOptions.Right;
             goJiLuPingJunHeLeDian.text = jiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeDian / jiLu.heLeShu) + "点";
