@@ -101,6 +101,8 @@ namespace Maqiao
         private float paiHeight;
         // 画面向き
         private ScreenOrientation orientation;
+        // 雀士ボタン幅
+        private float quiaoShiButtonWidth;
 
         // イベント
         private static Event eventStatus;
@@ -215,6 +217,7 @@ namespace Maqiao
             { SomeyaMei.MING_QIAN, false },
             { KouzuNaruto.MING_QIAN, false },
             { KouzuTorako.MING_QIAN, false },
+            { YakudaJunji.MING_QIAN, false },
             { MenzenJunko.MING_QIAN, false },
         };
         // 雀士取得
@@ -227,6 +230,7 @@ namespace Maqiao
                 UchidaKou.MING_QIAN => new UchidaKou(),
                 KouzuNaruto.MING_QIAN => new KouzuNaruto(),
                 KouzuTorako.MING_QIAN => new KouzuTorako(),
+                YakudaJunji.MING_QIAN => new KouzuTorako(),
                 MenzenJunko.MING_QIAN => new MenzenJunko(),
                 _ => new QiaoJiXie(mingQian),
             };
@@ -350,6 +354,7 @@ namespace Maqiao
                 paiWidth = rtPai.rect.width * scale.x;
             }
             paiHeight = rtPai.rect.height * scale.y;
+            quiaoShiButtonWidth = paiWidth * 2.5f;
 
             TextMeshProUGUI text = goText.GetComponent<TextMeshProUGUI>();
             RectTransform rtText = text.GetComponent<RectTransform>();
@@ -652,7 +657,7 @@ namespace Maqiao
                 goScoreQiaoShi[i].onClick.AddListener(delegate {
                     OnClickScoreQiaoShi(kvp.Key);
                 });
-                DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y));
+                DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonWidth);
 
                 if (i % 2 == 1)
                 {
@@ -1362,7 +1367,7 @@ namespace Maqiao
             {
                 x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
                 int pos = index;
-                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y));
+                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonWidth);
                 goQiaoShi[index].onClick.AddListener(delegate {
                     OnClickQiaoShi(kvp.Key, pos);
                 });
@@ -1454,7 +1459,7 @@ namespace Maqiao
             {
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
-                DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y));
+                DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonWidth);
                 goQiaoShi[i].onClick.AddListener(delegate {
                     OnClickFollowQiaoShi(kvp.Key);
                 });
