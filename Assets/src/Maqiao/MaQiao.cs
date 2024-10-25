@@ -11,6 +11,7 @@ using TMPro;
 using Gongtong;
 using Sikao;
 using Sikao.Shi;
+using Unity.VisualScripting;
 
 namespace Maqiao
 {
@@ -169,6 +170,7 @@ namespace Maqiao
         private Button goRight;
         private Button goSelect;
         private Button goMingWu;
+        private Button goDianCha;
         private Button goLiZhiAuto;
         private Button goDaPaiFangFa;
         private Button goXuanShangYin;
@@ -1355,13 +1357,42 @@ namespace Maqiao
                 WriteSheDing();
             });
             float x = -paiWidth * 8f;
-            float y = -(paiWidth * 3f + paiHeight * 6.2f);
+            float y = -(paiHeight * 7.8f);
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = paiWidth * 13f;
-                y = -(paiWidth * 3f + paiHeight * 2.5f);
+                y = -(paiHeight * 4.3f);
             }
             DrawButton(ref goMingWu, sheDing.mingWu ? labelMingWu[0] : labelMingWu[1], new Vector2(x, y));
+
+            // 点差
+            if (goDianCha == null)
+            {
+                goDianCha = Instantiate(goButton, goButton.transform.parent);
+            }
+            y += (orientation == ScreenOrientation.Portrait ? -1 : 1) * paiHeight * 1.5f;
+            DrawButton(ref goDianCha, "点差", new Vector2(x, y));
+
+            EventTrigger trigger = goDianCha.AddComponent<EventTrigger>();
+            EventTrigger.Entry pointerDownEntry = new()
+            {
+                eventID = EventTriggerType.PointerDown
+            };
+            pointerDownEntry.callback.AddListener((data) =>
+            {
+                DrawDianBang(true);
+            });
+            trigger.triggers.Add(pointerDownEntry);
+
+            EventTrigger.Entry pointerUpEntry = new()
+            {
+                eventID = EventTriggerType.PointerUp
+            };
+            pointerUpEntry.callback.AddListener((data) =>
+            {
+                DrawDianBang();
+            });
+            trigger.triggers.Add(pointerUpEntry);
         }
 
         // 【描画】雀士選択
@@ -1908,6 +1939,25 @@ namespace Maqiao
         // 【描画】点数
         private void DrawDianBang()
         {
+            DrawDianBang(false);
+        }
+        private void DrawDianBang(bool isDianCha)
+        {
+            int dianPlayer = 0;
+            if (isDianCha)
+            {
+                for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                {
+                    int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                    QiaoShi shi = Chang.qiaoShi[jia];
+                    if (shi.player)
+                    {
+                        dianPlayer = shi.dianBang;
+                        break;
+                    }
+                }
+            }
+
             float x = 0f;
             float y = -(paiWidth * 2.5f);
             for (int i = 0; i < Chang.qiaoShi.Length; i++)
@@ -1915,8 +1965,18 @@ namespace Maqiao
                 int jia = (Chang.qin + i) % Chang.MIAN_ZI;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 Color background = shi.feng == 0x31 ? new Color(1f, 0.4f, 0.4f) : Color.black;
-                DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 1.3f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
-                DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x + paiWidth * 0.5f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
+                DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 2f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
+                if (isDianCha && !shi.player)
+                {
+                    int dianCha = dianPlayer - shi.dianBang;
+                    DrawText(ref goDianBang[i], dianCha.ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
+                    goDianBang[i].color = (dianCha >= 0 ? Color.blue : Color.red);
+                }
+                else
+                {
+                    DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
+                    goDianBang[i].color = Color.black;
+                }
 
                 if (shi.liZhi)
                 {
@@ -2954,7 +3014,7 @@ namespace Maqiao
         private void OrientationSelectDaPai()
         {
             float x = paiWidth * 2.5f;
-            float y = -(paiWidth * 3f + paiHeight * 6.2f);
+            float y = -(paiHeight * 7.8f);
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = -paiWidth * 14.5f;
@@ -3039,7 +3099,7 @@ namespace Maqiao
             }
 
             float x = -(paiWidth * 5.5f);
-            float y = -(paiWidth * 3f + paiHeight * 6.2f);
+            float y = -(paiHeight * 7.8f);
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = paiWidth * 11f;
@@ -3864,6 +3924,7 @@ namespace Maqiao
             ClearGameObject(ref goStart);
             ClearGameObject(ref goJu);
             ClearGameObject(ref goMingWu);
+            ClearGameObject(ref goDianCha);
             ClearGameObject(ref goQiJia);
             ClearGameObject(ref goBenChang);
             ClearGameObject(ref goBenChangText);
