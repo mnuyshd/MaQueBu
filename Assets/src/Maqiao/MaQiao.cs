@@ -124,6 +124,7 @@ namespace Maqiao
         private bool isZhuangZhongLeCoroutine;
 
         private bool isBackDuiJuZhongLe;
+        private bool isDianCha;
 
         // Game Object
         private Button goScreen;
@@ -1380,7 +1381,8 @@ namespace Maqiao
             };
             pointerDownEntry.callback.AddListener((data) =>
             {
-                DrawDianBang(true);
+                isDianCha = true;
+                DrawDianBang();
             });
             trigger.triggers.Add(pointerDownEntry);
 
@@ -1390,6 +1392,7 @@ namespace Maqiao
             };
             pointerUpEntry.callback.AddListener((data) =>
             {
+                isDianCha = false;
                 DrawDianBang();
             });
             trigger.triggers.Add(pointerUpEntry);
@@ -1938,10 +1941,6 @@ namespace Maqiao
 
         // 【描画】点数
         private void DrawDianBang()
-        {
-            DrawDianBang(false);
-        }
-        private void DrawDianBang(bool isDianCha)
         {
             int dianPlayer = 0;
             if (isDianCha)
