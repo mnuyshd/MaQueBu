@@ -1005,7 +1005,10 @@ namespace Maqiao
                         DrawJuOption();
                         DrawGongTuo();
                         DrawXuanShangPai();
-                        DrawDaiPai(Chang.ziMoFan, -1);
+                        for (int i = 0; i < Chang.MIAN_ZI; i++)
+                        {
+                            DrawDaiPai(i, -2);
+                        }
                         OrientationSelectDaPai();
                         break;
                     // 対局終了
@@ -3106,8 +3109,11 @@ namespace Maqiao
 
             if (sheDing.daiPaiBiaoShi)
             {
-                shi.DaiPaiJiSuan(xuanZe);
-                shi.GongKaiPaiShuJiSuan();
+                if (xuanZe != -2)
+                {
+                    shi.DaiPaiJiSuan(xuanZe);
+                    shi.GongKaiPaiShuJiSuan();
+                }
                 for (int i = 0; i < shi.daiPaiShu; i++)
                 {
                     int p = shi.daiPai[i] & QiaoShi.QIAO_PAI;
@@ -3134,7 +3140,10 @@ namespace Maqiao
                 }
                 if (shi.daiPaiShu == 0)
                 {
-                    shi.XiangTingShuJiSuan(xuanZe);
+                    if (xuanZe != -2)
+                    {
+                        shi.XiangTingShuJiSuan(xuanZe);
+                    }
                     if (shi.xiangTingShu > 0)
                     {
                         DrawText(ref shi.goXiangTingShu, shi.xiangTingShu.ToString() + "シャンテン", Cal(x, y, shi.playOrder), 0, 18);

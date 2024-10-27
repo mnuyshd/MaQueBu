@@ -597,6 +597,9 @@ namespace Sikao
             Init(liZhiHouPai, 0xff);
             liZhiHouPaiWei = 0;
             liZhiWei = -1;
+            Init(daiPai, 0xff);
+            daiPaiShu = 0;
+            xiangTingShu = 0;
 
             liZhi = false;
             wLiZhi = false;
