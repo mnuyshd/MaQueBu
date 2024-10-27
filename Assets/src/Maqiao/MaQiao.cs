@@ -1769,7 +1769,6 @@ namespace Maqiao
             DrawJu();
             DrawJuOption();
             DrawCanShanPaiShu();
-            DrawSais(Chang.qin, Chang.sai1, Chang.sai2);
             DrawQiJia();
             DrawGongTuo();
             DrawXuanShangPai();
@@ -3348,7 +3347,6 @@ namespace Maqiao
             DrawXuanShangPai();
             DrawDianBang();
             DrawCanShanPaiShu();
-            DrawSais(Chang.qin, Chang.sai1, Chang.sai2);
             DrawMingQian();
             DrawQiJia();
             for (int i = 0; i < Chang.MIAN_ZI; i++)

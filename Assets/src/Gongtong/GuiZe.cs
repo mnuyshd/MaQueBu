@@ -12,7 +12,7 @@ namespace Gongtong
         // 箱(ドボン)
         internal static bool xiang = true;
         // 赤牌数
-        internal static int[] chiPaiShu = new int[] { 1, 2, 1 };
+        internal static int[] chiPaiShu = new int[] { 1, 1, 1 };
         // W栄和(falseの場合、頭ハネ)
         internal static bool wRongHe = true;
         // 借金立直
