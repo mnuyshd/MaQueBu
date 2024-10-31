@@ -994,16 +994,14 @@ namespace Maqiao
                     case Event.QIAO_SHI_XUAN_ZE:
                     // フォロー雀士選択
                     case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                        DrawJu();
+                        DrawTitle();
                         break;
 
                     // 配牌
                     case Event.PEI_PAI:
                     // 対局
                     case Event.DUI_JU:
-                        DrawJu();
                         DrawJuOption();
-                        DrawGongTuo();
                         DrawXuanShangPai();
                         for (int i = 0; i < Chang.MIAN_ZI; i++)
                         {
@@ -1015,16 +1013,8 @@ namespace Maqiao
                     case Event.DUI_JU_ZHONG_LE:
                     // 役表示
                     case Event.YI_BIAO_SHI:
-                        DrawJu();
-                        DrawGongTuo();
                         DrawXuanShangPai();
                         OrientationSelectDaPai();
-                        break;
-
-                    // 点表示
-                    case Event.DIAN_BIAO_SHI:
-                        DrawJu();
-                        DrawGongTuo();
                         break;
                 }
             }
@@ -1260,7 +1250,7 @@ namespace Maqiao
 
             // 描画
             ClearScreen();
-            DrawJu();
+            DrawTitle();
             DrawQiaoShiXuanZe();
 
             yield return Pause(ForwardMode.FAST_FORWARD);
@@ -1301,7 +1291,7 @@ namespace Maqiao
 
             // 描画
             ClearScreen();
-            DrawJu();
+            DrawTitle();
             DrawFollowQiaoShiXuanZe();
 
             keyPress = false;
@@ -1317,8 +1307,8 @@ namespace Maqiao
             isFollowQiaoShiXuanZeCoroutine = false;
         }
 
-        // 【描画】局
-        private void DrawJu()
+        // 【描画】タイトル
+        private void DrawTitle()
         {
             float x = 0;
             float y = paiHeight * 5.5f;
@@ -1332,17 +1322,35 @@ namespace Maqiao
                     value = "フォロー";
                     break;
                 default:
-                    value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
-                    x = -(paiWidth * 4.5f);
-                    y = paiHeight * 8.2f;
-                    if (orientation != ScreenOrientation.Portrait)
-                    {
-                        x = -(paiWidth * 13f);
-                        y = paiHeight * 4f;
-                    }
+                    value = "";
                     break;
             }
             DrawText(ref goJu, value, new Vector2(x, y), 0, 30);
+        }
+
+        // 【描画】局
+        private void DrawJu()
+        {
+            float x = 0;
+            float y = paiHeight * 5.5f;
+            string value;
+            switch (eventStatus)
+            {
+                case Event.QIAO_SHI_XUAN_ZE:
+                    value = "相手選択";
+                    DrawText(ref goJu, value, new Vector2(x, y), 0, 30);
+                    break;
+                case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
+                    value = "フォロー";
+                    DrawText(ref goJu, value, new Vector2(x, y), 0, 30);
+                    break;
+                default:
+                    value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
+                    x = 0;
+                    y = paiHeight * 0.9f;
+                    DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
+                    break;
+            }
         }
 
         // 【描画】対局中オプション
@@ -1777,7 +1785,6 @@ namespace Maqiao
             DrawXuanShangPai();
             DrawMingQian();
             DrawDianBang();
-            DrawGongTuo();
 
             // 配牌
             for (int i = 0; i < 3; i++)
@@ -1859,33 +1866,30 @@ namespace Maqiao
         // 【描画】供託
         private void DrawGongTuo()
         {
-            float x = -(paiWidth * 1.2f);
-            float y = paiWidth * 2.5f + paiHeight * 6.8f;
-            if (orientation != ScreenOrientation.Portrait)
-            {
-                x = -(paiWidth * 13.8f);
-                y = paiWidth * 4.5f;
-            }
+            float x = -paiWidth * 0.3f;
+            float y = paiHeight * 0.4f;
             if (goBenChang != null)
             {
                 ClearGameObject(ref goBenChang);
             }
             goBenChang = Instantiate(goDianBang100, goDianBang100.transform.parent);
             RectTransform rt100 = goBenChang.GetComponent<RectTransform>();
+            rt100.sizeDelta = new Vector2(rt100.sizeDelta.x * 0.5f, rt100.sizeDelta.y);
             rt100.anchoredPosition = new Vector2(x, y);
-            string valueBenChang = "x " + Chang.benChang.ToString();
-            DrawText(ref goBenChangText, valueBenChang, new Vector2(x + paiWidth * 2.4f, y), 0, 20);
+            string valueBenChang = "x" + Chang.benChang.ToString();
+            DrawText(ref goBenChangText, valueBenChang, new Vector2(x + paiWidth * 1.1f, y + paiHeight * 0.05f), 0, 14);
 
-            y -= paiWidth;
+            y -= paiHeight * 0.4f;
             if (goGongTou != null)
             {
                 ClearGameObject(ref goGongTou);
             }
             goGongTou = Instantiate(goDianBang1000, goDianBang1000.transform.parent);
             RectTransform rt1000 = goGongTou.GetComponent<RectTransform>();
+            rt1000.sizeDelta = new Vector2(rt1000.sizeDelta.x * 0.5f, rt1000.sizeDelta.y);
             rt1000.anchoredPosition = new Vector2(x, y);
-            string valueGongTou = "x " + (Chang.gongTuo / 1000).ToString();
-            DrawText(ref goGongTouText, valueGongTou, new Vector2(x + paiWidth * 2.4f, y), 0, 20);
+            string valueGongTou = "x" + (Chang.gongTuo / 1000).ToString();
+            DrawText(ref goGongTouText, valueGongTou, new Vector2(x + paiWidth * 1.1f, y + paiHeight * 0.05f), 0, 14);
         }
 
         // 【描画】懸賞牌
@@ -1894,12 +1898,12 @@ namespace Maqiao
             ClearGameObject(ref Pai.goXuanShangPai);
             ClearGameObject(ref Pai.goLiXuanShangPai);
 
-            float X = paiWidth * 2.7f;
-            float Y = paiWidth * 2.5f + paiHeight * 6.5f;
+            float X = -(paiWidth * 2f);
+            float Y = paiHeight * 8f;
             if (orientation != ScreenOrientation.Portrait)
             {
                 X = -(paiWidth * 15f);
-                Y = paiWidth * 1.7f;
+                Y = paiHeight * 2f;
             }
             float x = X;
             float y = Y;
@@ -1987,7 +1991,7 @@ namespace Maqiao
                         goLizhiBang[jia].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.playOrder));
                     }
                     RectTransform rt = goLizhiBang[jia].GetComponent<RectTransform>();
-                    rt.anchoredPosition = Cal(x, y + paiHeight / 2, shi.playOrder);
+                    rt.anchoredPosition = Cal(x, y + paiHeight * 0.4f, shi.playOrder);
                 }
             }
         }
@@ -2568,7 +2572,7 @@ namespace Maqiao
         private void DrawCanShanPaiShu()
         {
             float alfa = Pai.CanShanPaiShu() < 100 ? 1f : 0f;
-            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, 0), 0, 30, new Color(0, 0.6f, 0), new Color(1f, 1f, 1f, alfa), paiWidth * 0.9f);
+            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, -paiHeight * 0.6f), 0, 20, new Color(0, 0.6f, 0), new Color(1f, 1f, 1f, alfa), paiWidth * 0.7f);
         }
 
         // 【描画】自家腰
@@ -3390,8 +3394,6 @@ namespace Maqiao
                     // 描画
                     ClearScreen();
                     DrawBackDuiJuZhongLe();
-                    DrawJu();
-                    DrawGongTuo();
                     DrawYi(Chang.rongHeFan[i]);
 
                     yield return Pause(ForwardMode.FAST_FORWARD);
@@ -3402,8 +3404,6 @@ namespace Maqiao
                 // 描画
                 ClearScreen();
                 DrawBackDuiJuZhongLe();
-                DrawJu();
-                DrawGongTuo();
                 DrawYi(Chang.heleFan);
 
                 yield return Pause(ForwardMode.FAST_FORWARD);
