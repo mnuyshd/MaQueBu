@@ -1368,12 +1368,12 @@ namespace Maqiao
                 goMingWu.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
                 WriteSheDing();
             });
-            float x = -paiWidth * 8f;
-            float y = -(paiHeight * 7.8f);
+            float x = paiWidth * 8f;
+            float y = -(paiHeight * 9.3f);
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = paiWidth * 13f;
-                y = -(paiHeight * 4.3f);
+                y = -(paiHeight * 3f);
             }
             DrawButton(ref goMingWu, sheDing.mingWu ? labelMingWu[0] : labelMingWu[1], new Vector2(x, y));
 
@@ -1382,7 +1382,15 @@ namespace Maqiao
             {
                 goDianCha = Instantiate(goButton, goButton.transform.parent);
             }
-            y += (orientation == ScreenOrientation.Portrait ? -1 : 1) * paiHeight * 1.5f;
+
+            if (orientation == ScreenOrientation.Portrait)
+            {
+                x -= paiWidth * 3.5f;
+            }
+            else
+            {
+                y -= paiHeight * 1.5f;
+            }
             DrawButton(ref goDianCha, "点差", new Vector2(x, y));
 
             EventTrigger trigger = goDianCha.AddComponent<EventTrigger>();
@@ -3018,8 +3026,8 @@ namespace Maqiao
 
         private void OrientationSelectDaPai()
         {
-            float x = paiWidth * 2.5f;
-            float y = -(paiHeight * 7.8f);
+            float x = -(paiWidth * 8.5f);
+            float y = -(paiHeight * 9.3f);
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = -paiWidth * 14.5f;
@@ -3034,7 +3042,7 @@ namespace Maqiao
                 DrawButton(ref goRight, "▶", new Vector2(x + paiWidth * 2.5f, y));
             }
 
-            x = paiWidth * 8f;
+            x = -(paiWidth * 3f);
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = -paiWidth * 13.2f;
@@ -3103,7 +3111,7 @@ namespace Maqiao
                 return;
             }
 
-            float x = -(paiWidth * 5.5f);
+            float x = -(paiWidth * 8.5f);
             float y = -(paiHeight * 7.8f);
             if (orientation != ScreenOrientation.Portrait)
             {
@@ -3137,7 +3145,7 @@ namespace Maqiao
             if (sheDing.xiangTingShuBiaoShi)
             {
                 // 向聴数計算
-                x = -(paiWidth * 4f);
+                x = -(paiWidth * 7f);
                 if (orientation != ScreenOrientation.Portrait)
                 {
                     x = paiWidth * 13f;
