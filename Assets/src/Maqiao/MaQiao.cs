@@ -1316,41 +1316,25 @@ namespace Maqiao
             switch (eventStatus)
             {
                 case Event.QIAO_SHI_XUAN_ZE:
-                    value = "相手選択";
+                    value = "相手雀士を選択";
                     break;
                 case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                    value = "フォロー";
+                    value = "フォロー雀士を選択";
                     break;
                 default:
                     value = "";
                     break;
             }
-            DrawText(ref goJu, value, new Vector2(x, y), 0, 30);
+            DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
         }
 
         // 【描画】局
         private void DrawJu()
         {
             float x = 0;
-            float y = paiHeight * 5.5f;
-            string value;
-            switch (eventStatus)
-            {
-                case Event.QIAO_SHI_XUAN_ZE:
-                    value = "相手選択";
-                    DrawText(ref goJu, value, new Vector2(x, y), 0, 30);
-                    break;
-                case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                    value = "フォロー";
-                    DrawText(ref goJu, value, new Vector2(x, y), 0, 30);
-                    break;
-                default:
-                    value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
-                    x = 0;
-                    y = paiHeight * 0.9f;
-                    DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
-                    break;
-            }
+            float y = paiHeight * 0.9f;
+            string value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
+            DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
         }
 
         // 【描画】対局中オプション
