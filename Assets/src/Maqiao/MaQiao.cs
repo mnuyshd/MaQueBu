@@ -3645,8 +3645,33 @@ namespace Maqiao
                 Chang.LunZhuang();
             }
 
+            bool isQinTop = false;
+            if (Chang.changFeng == 0x32 && Chang.ju == Chang.MIAN_ZI)
+            {
+                QiaoShi qinShi = Chang.qiaoShi[Chang.qin];
+                if (qinShi.ziJiaYao == QiaoShi.Yao.ZI_MO || qinShi.taJiaYao == QiaoShi.Yao.RONG_HE)
+                {
+                    // 親の和了
+                    int maxDian = 0;
+                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    {
+                        int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                        QiaoShi shi = Chang.qiaoShi[jia];
+                        if (maxDian < shi.dianBang)
+                        {
+                            maxDian = shi.dianBang;
+                        }
+                    }
+                    if (maxDian == qinShi.dianBang)
+                    {
+                        // 親の和了辞め
+                        isQinTop = true;
+                    }
+                }
+            }
+
             // 点表示
-            if (Chang.changFeng > 0x32 || (GuiZe.xiang && Chang.XiangPanDing(Chang.qiaoShi)))
+            if (Chang.changFeng > 0x32 || (GuiZe.xiang && Chang.XiangPanDing(Chang.qiaoShi)) || isQinTop)
             {
                 eventStatus = Event.ZHUANG_ZHONG_LE;
             }
