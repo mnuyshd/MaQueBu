@@ -344,22 +344,7 @@ namespace Maqiao
             }
 
             // scale設定
-            float w = (Screen.safeArea.height < Screen.safeArea.width) ? Screen.safeArea.height : Screen.safeArea.width;
-            RectTransform rtPai = goPai.GetComponent<RectTransform>();
-            w = w / 20f / rtPai.rect.width;
-            scale = new(w, w, w);
-            goPai.transform.localScale = scale;
-            paiWidth = rtPai.rect.width * scale.x;
-            if (paiWidth * 5f > Math.Abs(Screen.safeArea.width - Screen.safeArea.height) / 2)
-            {
-                w = paiWidth * 16f;
-                w = w / 20f / rtPai.rect.width;
-                scale = new(w, w, w);
-                goPai.transform.localScale = scale;
-                paiWidth = rtPai.rect.width * scale.x;
-            }
-            paiHeight = rtPai.rect.height * scale.y;
-            quiaoShiButtonWidth = paiWidth * 2.5f;
+            SetScale();
 
             TextMeshProUGUI text = goText.GetComponent<TextMeshProUGUI>();
             RectTransform rtText = text.GetComponent<RectTransform>();
@@ -395,6 +380,27 @@ namespace Maqiao
             DrawDataScrollView();
             // ルール画面
             DrawGuiZeScrollView();
+        }
+
+        // scale設定
+        private void SetScale()
+        {
+            float w = (Screen.safeArea.height < Screen.safeArea.width) ? Screen.safeArea.height : Screen.safeArea.width;
+            RectTransform rtPai = goPai.GetComponent<RectTransform>();
+            w = w / 20f / rtPai.rect.width;
+            scale = new(w, w, w);
+            goPai.transform.localScale = scale;
+            paiWidth = rtPai.rect.width * scale.x;
+            if (paiWidth * 5f > Math.Abs(Screen.safeArea.width - Screen.safeArea.height) / 2)
+            {
+                w = paiWidth * 16f;
+                w = w / 20f / rtPai.rect.width;
+                scale = new(w, w, w);
+                goPai.transform.localScale = scale;
+                paiWidth = rtPai.rect.width * scale.x;
+            }
+            paiHeight = rtPai.rect.height * scale.y;
+            quiaoShiButtonWidth = paiWidth * 2.5f;
         }
 
         // 【描画】設定画面
@@ -981,7 +987,8 @@ namespace Maqiao
                 {
                     orientation = ScreenOrientation.Portrait;
                 }
-
+                // scale設定
+                SetScale();
                 switch (eventStatus)
                 {
                     // 雀士選択
@@ -995,11 +1002,20 @@ namespace Maqiao
                     case Event.PEI_PAI:
                     // 対局
                     case Event.DUI_JU:
+                        ClearScreen();
+                        DrawJu();
                         DrawJuOption();
+                        DrawCanShanPaiShu();
+                        DrawQiJia();
+                        DrawGongTuo();
                         DrawXuanShangPai();
+                        DrawMingQian();
+                        DrawDianBang();
                         for (int i = 0; i < Chang.MIAN_ZI; i++)
                         {
+                            DrawShouPai(i, QiaoShi.Yao.WU, 0);
                             DrawDaiPai(i, -2);
+                            DrawShePai(i);
                         }
                         OrientationSelectDaPai();
                         break;
@@ -1670,6 +1686,7 @@ namespace Maqiao
             switch (eventStatus)
             {
                 case Event.PEI_PAI:
+                case Event.DUI_JU:
                 case Event.DUI_JU_ZHONG_LE:
                     x = -paiWidth * 5f;
                     y = -(paiWidth * 3f + paiHeight * 3f);
