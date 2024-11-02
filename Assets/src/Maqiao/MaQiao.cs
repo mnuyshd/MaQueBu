@@ -860,20 +860,14 @@ namespace Maqiao
                     continue;
                 }
                 goYiShu[i].text = jiLu.yiShu[i] + "回";
-                if (jiLu.yiShu[i] == 0)
-                {
-                    goYiMing[i].color = Color.gray;
-                    goYiShu[i].color = Color.gray;
-                }
+                goYiMing[i].color = jiLu.yiShu[i] == 0 ? Color.gray : Color.black;
+                goYiShu[i].color = jiLu.yiShu[i] == 0 ? Color.gray : Color.black;
             }
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 goYiManShu[i].text = jiLu.yiManShu[i] + "回";
-                if (jiLu.yiManShu[i] == 0)
-                {
-                    goYiManMing[i].color = Color.gray;
-                    goYiManShu[i].color = Color.gray;
-                }
+                goYiManMing[i].color = jiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
+                goYiManShu[i].color = jiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
             }
 
             goDataScrollView.SetActive(true);
