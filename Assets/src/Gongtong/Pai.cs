@@ -342,6 +342,10 @@ namespace Gongtong
         // 残山牌数
         internal static int CanShanPaiShu()
         {
+            if (shanPai == null)
+            {
+                return 0;
+            }
             int shu = 0;
             for (int i = shanPaiWei; i < shanPai.Length; i++)
             {

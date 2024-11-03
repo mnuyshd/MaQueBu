@@ -62,6 +62,7 @@ namespace Maqiao
         private const float WAIT_TIME = 0.3f;
         // プレイヤー牌倍率
         private const float PLAYER_PAI_SCALE = 1.4f;
+        private const float PLAYER_PAI_SCALE_LANDSCAPE = 1.2f;
         // プレイヤー名
         private const string PLAYER_NAME = "プレイヤー";
         // 設定ファイル名
@@ -979,7 +980,7 @@ namespace Maqiao
 
         void Update()
         {
-            if (orientation != Screen.orientation)
+            if (orientation != Screen.orientation && !(orientation == ScreenOrientation.Portrait && Screen.orientation == ScreenOrientation.PortraitUpsideDown))
             {
                 // 画面回転
                 orientation = Screen.orientation;
@@ -1000,9 +1001,9 @@ namespace Maqiao
 
                     // 配牌
                     case Event.PEI_PAI:
+                        break;
                     // 対局
                     case Event.DUI_JU:
-                        ClearScreen();
                         DrawJu();
                         DrawJuOption();
                         DrawCanShanPaiShu();
@@ -1013,7 +1014,39 @@ namespace Maqiao
                         DrawDianBang();
                         for (int i = 0; i < Chang.MIAN_ZI; i++)
                         {
-                            DrawShouPai(i, QiaoShi.Yao.WU, 0);
+                            QiaoShi shi = Chang.qiaoShi[i];
+                            bool isTaJiaYao = false;
+                            if (goYao[0] != null)
+                            {
+                                DrawZiJiaYao(shi, 0, shi.shouPaiWei - 1, true, false);
+                                if (goYao[0] == null)
+                                {
+                                    DrawTaJiaYao(i, shi, 0, shi.follow);
+                                    if (goYao[0] != null)
+                                    {
+                                        isTaJiaYao = true;
+                                    }
+                                }
+                            }
+
+                            if (isTaJiaYao)
+                            {
+                                DrawShouPai(i, QiaoShi.Yao.WU, -2);
+                            }
+                            else if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
+                            {
+                                int x = shi.follow ? shi.ziJiaXuanZe : shi.shouPaiWei - 1;
+                                DrawSelectDaPai(i, shi, x);
+                                DrawDaiPai(i, x);
+                            }
+                            else if (shi.ziJiaYao == QiaoShi.Yao.JIU_ZHONG_JIU_PAI || shi.ziJiaYao == QiaoShi.Yao.ZI_MO || shi.ziJiaYao == QiaoShi.Yao.LI_ZHI || shi.ziJiaYao == QiaoShi.Yao.AN_GANG || shi.ziJiaYao == QiaoShi.Yao.JIA_GANG)
+                            {
+                                DrawShouPai(i, QiaoShi.Yao.WU, -1, true, false);
+                            }
+                            else
+                            {
+                                DrawShouPai(i, QiaoShi.Yao.WU, -1, true, shi.follow);
+                            }
                             DrawDaiPai(i, -2);
                             DrawShePai(i);
                         }
@@ -1367,7 +1400,7 @@ namespace Maqiao
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = paiWidth * 13f;
-                y = -(paiHeight * 3f);
+                y = -(paiHeight * 0.5f);
             }
             DrawButton(ref goMingWu, sheDing.mingWu ? labelMingWu[0] : labelMingWu[1], new Vector2(x, y));
 
@@ -1735,8 +1768,8 @@ namespace Maqiao
                     y = -(paiWidth * 2.5f + paiHeight * 2f);
                     break;
                 default:
-                    x = paiWidth * 7.4f;
-                    y = -(paiWidth * 2.5f + paiHeight * 3.5f);
+                    x = paiWidth * 7.2f;
+                    y = -(paiHeight * 4.9f);
                     break;
             }
             for (int i = 0; i < Chang.qiaoShi.Length; i++)
@@ -1746,6 +1779,15 @@ namespace Maqiao
                 {
                     ClearGameObject(ref goQiJia);
                     QiaoShi shi = Chang.qiaoShi[jia];
+                    if (shi.player && orientation != ScreenOrientation.Portrait)
+                    {
+                        x -= paiWidth * 1.2f;
+                        y += paiHeight * 0.6f;
+                    }
+                    if (shi.playOrder == 3 && orientation != ScreenOrientation.Portrait)
+                    {
+                        x -= paiHeight * 0.6f;
+                    }
                     goQiJia = Instantiate(goQiJias[Chang.changFeng - 0x31].GetComponent<Image>(), goQiJias[Chang.changFeng - 0x31].GetComponent<Image>().transform.parent);
                     goQiJia.transform.Rotate(0, 0, 90 * GetDrawOrder(shi.playOrder));
                     RectTransform rt = goQiJia.GetComponent<RectTransform>();
@@ -2026,6 +2068,8 @@ namespace Maqiao
             ClearGameObject(ref goSheng);
 
             // 思考自家判定
+            ziJiaShi.taJiaYao = QiaoShi.Yao.WU;
+            ziJiaShi.taJiaXuanZe = 0;
             ziJiaShi.SiKaoZiJiaPanDing();
             DrawDaiPai(Chang.ziMoFan, -1);
             // 思考自家
@@ -2239,6 +2283,8 @@ namespace Maqiao
                 int jia = i % Chang.MIAN_ZI;
                 QiaoShi taJiaShi = Chang.qiaoShi[jia];
                 // 思考他家判定
+                taJiaShi.ziJiaYao = QiaoShi.Yao.WU;
+                taJiaShi.ziJiaXuanZe = 0;
                 taJiaShi.SiKaoTaJiaPanDing(i - Chang.ziMoFan);
                 // 思考他家
                 if (taJiaShi.player)
@@ -2581,11 +2627,20 @@ namespace Maqiao
         // 【描画】自家腰
         private void DrawZiJiaYao(QiaoShi shi, int mingWei, int shouPaiWei, bool isFollow, bool isPass)
         {
+            if (!shi.player)
+            {
+                return;
+            }
+
             ClearGameObject(ref goYao);
 
             float width = paiWidth * 3.5f;
-            float y = -(paiWidth * 3 + paiHeight * 2.5f);
             float x = -(paiWidth * 7.5f);
+            float y = -(paiHeight * 4.5f);
+            if (orientation != ScreenOrientation.Portrait)
+            {
+                y += paiHeight * 0.5f;
+            }
 
             int index = 0;
             if (shi.heLe && shi.taJiaYao == QiaoShi.Yao.WU)
@@ -2704,11 +2759,19 @@ namespace Maqiao
         // 【描画】他家腰
         private void DrawTaJiaYao(int jia, QiaoShi shi, int mingWei, bool isFollow)
         {
+            if (!shi.player)
+            {
+                return;
+            }
             ClearGameObject(ref goYao);
 
             float width = paiWidth * 4;
-            float y = -(paiWidth * 3 + paiHeight * 2.5f);
             float x = -(paiWidth * 7.5f);
+            float y = -(paiHeight * 4.5f);
+            if (orientation != ScreenOrientation.Portrait)
+            {
+                y += paiHeight * 0.5f;
+            }
 
             int index = 0;
             if (shi.heLe)
@@ -2734,7 +2797,10 @@ namespace Maqiao
                 DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), QiaoShi.Yao.DA_MING_GANG, mingWei);
                 index++;
             }
-            DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(paiWidth * 7.5f, y), QiaoShi.Yao.WU, mingWei);
+            if (index > 0)
+            {
+                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(paiWidth * 7.5f, y), QiaoShi.Yao.WU, mingWei);
+            }
         }
 
         // 【描画】他家腰
@@ -2794,6 +2860,10 @@ namespace Maqiao
             if (shi.player)
             {
                 pw *= PLAYER_PAI_SCALE;
+                if (orientation != ScreenOrientation.Portrait)
+                {
+                    pw *= PLAYER_PAI_SCALE_LANDSCAPE;
+                }
             }
 
             float x = -(pw * 6.6f);
@@ -2802,6 +2872,10 @@ namespace Maqiao
             {
                 y = -(pw * 3f + ph * 3.2f);
                 ph *= PLAYER_PAI_SCALE;
+                if (orientation != ScreenOrientation.Portrait)
+                {
+                    ph *= PLAYER_PAI_SCALE_LANDSCAPE;
+                }
             }
 
             // 手牌
@@ -2822,6 +2896,10 @@ namespace Maqiao
                 if (shi.player)
                 {
                     shi.goShouPai[i].transform.localScale *= PLAYER_PAI_SCALE;
+                    if (orientation != ScreenOrientation.Portrait)
+                    {
+                        shi.goShouPai[i].transform.localScale *= PLAYER_PAI_SCALE_LANDSCAPE;
+                    }
 
                     int wei = i;
                     if (yao == QiaoShi.Yao.LI_ZHI)
@@ -2905,7 +2983,12 @@ namespace Maqiao
                     }
                     else
                     {
-                        DrawPai(ref shi.goShouPai[i], p, Cal(x, yy, shi.playOrder), 90 * GetDrawOrder(shi.playOrder));
+                        float yyy = yy;
+                        if (orientation != ScreenOrientation.Portrait && shi.player)
+                        {
+                            yyy += ph * 0.45f;
+                        }
+                        DrawPai(ref shi.goShouPai[i], p, Cal(x, yyy, shi.playOrder), 90 * GetDrawOrder(shi.playOrder));
                     }
                 }
                 x += pw;
@@ -2927,7 +3010,8 @@ namespace Maqiao
                 y -= paiHeight;
                 if (orientation != ScreenOrientation.Portrait)
                 {
-                    y = -Screen.height / 2 + ph / 2;
+                    x += paiWidth * 2f;
+                    y = -Screen.safeArea.height / 2 + ph / 2;
                 }
             }
             for (int i = 0; i < shi.fuLuPaiWei; i++)
@@ -3025,8 +3109,8 @@ namespace Maqiao
             float y = -(paiHeight * 9.3f);
             if (orientation != ScreenOrientation.Portrait)
             {
-                x = -paiWidth * 14.5f;
-                y = -(paiWidth * 3f + paiHeight * 4f);
+                x = -(paiWidth * 14.5f);
+                y = -(paiHeight * 4f);
             }
             if (goLeft != null)
             {
@@ -3111,7 +3195,7 @@ namespace Maqiao
             if (orientation != ScreenOrientation.Portrait)
             {
                 x = paiWidth * 11f;
-                y = -(paiWidth * 3f + paiHeight * 4f);
+                y = -(paiHeight * 4f);
             }
 
             if (sheDing.daiPaiBiaoShi)
