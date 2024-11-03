@@ -1004,56 +1004,10 @@ namespace Maqiao
                         break;
                     // 対局
                     case Event.DUI_JU:
-                        DrawJu();
-                        DrawJuOption();
-                        DrawCanShanPaiShu();
-                        DrawQiJia();
-                        DrawGongTuo();
-                        DrawXuanShangPai();
-                        DrawMingQian();
-                        DrawDianBang();
-                        for (int i = 0; i < Chang.MIAN_ZI; i++)
-                        {
-                            QiaoShi shi = Chang.qiaoShi[i];
-                            bool isTaJiaYao = false;
-                            if (goYao[0] != null)
-                            {
-                                DrawZiJiaYao(shi, 0, shi.shouPaiWei - 1, true, false);
-                                if (goYao[0] == null)
-                                {
-                                    DrawTaJiaYao(i, shi, 0, shi.follow);
-                                    if (goYao[0] != null)
-                                    {
-                                        isTaJiaYao = true;
-                                    }
-                                }
-                            }
-
-                            if (isTaJiaYao)
-                            {
-                                DrawShouPai(i, QiaoShi.Yao.WU, -2);
-                            }
-                            else if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
-                            {
-                                int x = shi.follow ? shi.ziJiaXuanZe : shi.shouPaiWei - 1;
-                                DrawSelectDaPai(i, shi, x);
-                                DrawDaiPai(i, x);
-                            }
-                            else if (shi.ziJiaYao == QiaoShi.Yao.JIU_ZHONG_JIU_PAI || shi.ziJiaYao == QiaoShi.Yao.ZI_MO || shi.ziJiaYao == QiaoShi.Yao.LI_ZHI || shi.ziJiaYao == QiaoShi.Yao.AN_GANG || shi.ziJiaYao == QiaoShi.Yao.JIA_GANG)
-                            {
-                                DrawShouPai(i, QiaoShi.Yao.WU, -1, true, false);
-                            }
-                            else
-                            {
-                                DrawShouPai(i, QiaoShi.Yao.WU, -1, true, shi.follow);
-                            }
-                            DrawDaiPai(i, -2);
-                            DrawShePai(i);
-                        }
-                        OrientationSelectDaPai();
-                        break;
                     // 対局終了
                     case Event.DUI_JU_ZHONG_LE:
+                        DrawDuiJu();
+                        break;
                     // 役表示
                     case Event.YI_BIAO_SHI:
                         DrawXuanShangPai();
@@ -1157,6 +1111,96 @@ namespace Maqiao
                     }
                     break;
             }
+        }
+
+        // 【描画】対局
+        private void DrawDuiJu()
+        {
+            DrawJu();
+            DrawJuOption();
+            DrawCanShanPaiShu();
+            DrawQiJia();
+            DrawGongTuo();
+            DrawXuanShangPai();
+            DrawMingQian();
+            DrawDianBang();
+
+            bool isHeLe = false;
+            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            {
+                QiaoShi shi = Chang.qiaoShi[i];
+                if (shi.player)
+                {
+                    continue;
+                }
+                QiaoShi.Yao yao = shi.ziJiaYao;
+                int xuanZe = shi.ziJiaXuanZe;
+                if (shi.taJiaYao != QiaoShi.Yao.WU)
+                {
+                    yao = shi.taJiaYao;
+                    xuanZe = shi.taJiaXuanZe;
+                }
+                if (yao == QiaoShi.Yao.ZI_MO || yao == QiaoShi.Yao.RONG_HE)
+                {
+                    yao = QiaoShi.Yao.HE_LE;
+                    isHeLe = true;
+                }
+                DrawShouPai(i, yao, xuanZe, shi.player, shi.follow);
+            }
+            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            {
+                QiaoShi shi = Chang.qiaoShi[i];
+                if (!shi.player)
+                {
+                    continue;
+                }
+                if (isHeLe)
+                {
+                    DrawShouPai(i, QiaoShi.Yao.WU, -2);
+                    break;
+                }
+                if (goYao[0] != null)
+                {
+                    DrawZiJiaYao(shi, 0, shi.shouPaiWei - 1, true, false);
+                    if (goYao[0] == null)
+                    {
+                        DrawTaJiaYao(i, shi, 0, shi.follow);
+                        if (goYao[0] != null)
+                        {
+                            DrawShouPai(i, QiaoShi.Yao.WU, -2);
+                            break;
+                        }
+                    }
+                }
+                if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
+                {
+                    int x = shi.follow ? shi.ziJiaXuanZe : shi.shouPaiWei - 1;
+                    DrawSelectDaPai(i, shi, x);
+                    DrawDaiPai(i, x);
+                }
+                else
+                {
+                    QiaoShi.Yao yao = shi.ziJiaYao;
+                    int xuanZe = shi.ziJiaXuanZe;
+                    if (shi.taJiaYao != QiaoShi.Yao.WU)
+                    {
+                        yao = shi.taJiaYao;
+                        xuanZe = shi.taJiaXuanZe;
+                    }
+                    if (yao == QiaoShi.Yao.ZI_MO || yao == QiaoShi.Yao.RONG_HE)
+                    {
+                        yao = QiaoShi.Yao.HE_LE;
+                    }
+                    DrawShouPai(i, yao, xuanZe, shi.player, shi.follow);
+                }
+            }
+
+            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            {
+                DrawDaiPai(i, -2);
+                DrawShePai(i);
+            }
+            OrientationSelectDaPai();
         }
 
         // スクリーンクリック
@@ -1354,7 +1398,7 @@ namespace Maqiao
         private void DrawTitle()
         {
             float x = 0;
-            float y = paiHeight * 5.5f;
+            float y = paiHeight * 3.5f;
             string value;
             switch (eventStatus)
             {
@@ -1454,7 +1498,7 @@ namespace Maqiao
             }
 
             float x = 0;
-            float y = paiHeight * 4;
+            float y = paiHeight * 2f;
             int index = 0;
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
@@ -1546,7 +1590,7 @@ namespace Maqiao
         private void DrawFollowQiaoShiXuanZe()
         {
             float x = 0;
-            float y = paiHeight * 4;
+            float y = paiHeight * 2f;
             int i = 0;
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
@@ -3442,26 +3486,7 @@ namespace Maqiao
             isDuiJuZhongLeCoroutine = true;
 
             ClearScreen();
-            DrawJu();
-            DrawGongTuo();
-            DrawXuanShangPai();
-            DrawDianBang();
-            DrawCanShanPaiShu();
-            DrawMingQian();
-            DrawQiJia();
-            for (int i = 0; i < Chang.MIAN_ZI; i++)
-            {
-                QiaoShi shi = Chang.qiaoShi[i];
-                if (shi.ziJiaYao == QiaoShi.Yao.ZI_MO || shi.taJiaYao == QiaoShi.Yao.RONG_HE)
-                {
-                    DrawShouPai(i, QiaoShi.Yao.HE_LE, 0);
-                }
-                else
-                {
-                    DrawShouPai(i, QiaoShi.Yao.WU, 0);
-                }
-                DrawShePai(i);
-            }
+            DrawDuiJu();
             yield return Pause(ForwardMode.FAST_FORWARD);
 
             eventStatus = Event.YI_BIAO_SHI;
