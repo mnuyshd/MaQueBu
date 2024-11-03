@@ -532,6 +532,7 @@ namespace Maqiao
             float offset = paiHeight * 2;
             // 1タップ打牌
             string[] labelDaPaiFangFa = new string[] { "選択をして打牌", "１タップで打牌", "２タップで打牌" };
+            ClearGameObject(ref goDaPaiFangFa);
             goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
             goDaPaiFangFa.onClick.AddListener(delegate {
                 sheDing.daPaiFangFa = (SheDing.DaPaiFangFa)((int)(sheDing.daPaiFangFa + 1) % Enum.GetValues(typeof(SheDing.DaPaiFangFa)).Length);
@@ -541,6 +542,7 @@ namespace Maqiao
             DrawButton(ref goDaPaiFangFa, labelDaPaiFangFa[(int)sheDing.daPaiFangFa], new Vector2(-x, y));
             // 立直後 自動・手動
             string[] labelLiZhiAuto = new string[] { "立直後自動打牌", "立直後手動打牌" };
+            ClearGameObject(ref goLiZhiAuto);
             goLiZhiAuto = Instantiate(goButton, goSettingPanel.transform);
             goLiZhiAuto.onClick.AddListener(delegate {
                 sheDing.liZhiAuto = !sheDing.liZhiAuto;
@@ -551,6 +553,7 @@ namespace Maqiao
             y -= offset;
             // ドラマーク
             string[] labelXuanShangYin = new string[] { "ドラマーク有り", "ドラマーク無し" };
+            ClearGameObject(ref goXuanShangYin);
             goXuanShangYin = Instantiate(goButton, goSettingPanel.transform);
             goXuanShangYin.onClick.AddListener(delegate {
                 sheDing.xuanShangYin = !sheDing.xuanShangYin;
@@ -560,6 +563,7 @@ namespace Maqiao
             DrawButton(ref goXuanShangYin, sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1], new Vector2(-x, y));
             // ツモ切表示有り・無し
             string[] labelZiMoQieBiaoShi = new string[] { "ツモ切表示有り", "ツモ切表示無し" };
+            ClearGameObject(ref goZiMoQieBiaoShi);
             goZiMoQieBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goZiMoQieBiaoShi.onClick.AddListener(delegate {
                 sheDing.ziMoQieBiaoShi = !sheDing.ziMoQieBiaoShi;
@@ -570,6 +574,7 @@ namespace Maqiao
             y -= offset;
             // 待牌表示有り・無し
             string[] labelDaiPaiBiaoShi = new string[] { "待ち牌表示有り", "待ち牌表示無し" };
+            ClearGameObject(ref goDaiPaiBiaoShi);
             goDaiPaiBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goDaiPaiBiaoShi.onClick.AddListener(delegate {
                 sheDing.daiPaiBiaoShi = !sheDing.daiPaiBiaoShi;
@@ -579,6 +584,7 @@ namespace Maqiao
             DrawButton(ref goDaiPaiBiaoShi, sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1], new Vector2(-x, y));
             // 向聴数表示有り・無し
             string[] labelXiangTingShuBiaoShi = new string[] { "向聴数表示有り", "向聴数表示無し" };
+            ClearGameObject(ref goXiangTingShuBiaoShi);
             goXiangTingShuBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goXiangTingShuBiaoShi.onClick.AddListener(delegate {
                 sheDing.xiangTingShuBiaoShi = !sheDing.xiangTingShuBiaoShi;
@@ -612,7 +618,10 @@ namespace Maqiao
             }
             sheDing = new SheDing();
             DrawOption();
-            DrawJuOption();
+            if (eventStatus == Event.DUI_JU)
+            {
+                DrawJuOption();
+            }
         }
 
         // 設定の書込
@@ -683,7 +692,7 @@ namespace Maqiao
             goScoreReset.onClick.AddListener(delegate {
                 goScoreDialogPanel.SetActive(true);
             });
-            DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight * 2f));
+            DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight));
 
             EventTrigger etResetPanel = goScoreDialogPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eResetPanel = new();
@@ -1429,10 +1438,8 @@ namespace Maqiao
         {
             // 鳴 有り・無し
             string[] labelMingWu = new string[] { "鳴無", "鳴有" };
-            if (goMingWu == null)
-            {
-                goMingWu = Instantiate(goButton, goButton.transform.parent);
-            }
+            ClearGameObject(ref goMingWu);
+            goMingWu = Instantiate(goButton, goButton.transform.parent);
             goMingWu.onClick.AddListener(delegate
             {
                 sheDing.mingWu = !sheDing.mingWu;
@@ -1449,10 +1456,8 @@ namespace Maqiao
             DrawButton(ref goMingWu, sheDing.mingWu ? labelMingWu[0] : labelMingWu[1], new Vector2(x, y));
 
             // 点差
-            if (goDianCha == null)
-            {
-                goDianCha = Instantiate(goButton, goButton.transform.parent);
-            }
+            ClearGameObject(ref goDianCha);
+            goDianCha = Instantiate(goButton, goButton.transform.parent);
 
             if (orientation == ScreenOrientation.Portrait)
             {
