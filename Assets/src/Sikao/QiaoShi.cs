@@ -2131,7 +2131,7 @@ namespace Sikao
             }
 
             int beiKou = 0;
-            for (int i = 0; i < duiZiShu - 3; i++)
+            for (int i = 0; i < duiZiShu - 2; i++)
             {
                 int p1 = duiZi[i][0];
                 if (ZiPaiPanDing(p1))
