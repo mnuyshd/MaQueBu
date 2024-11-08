@@ -795,15 +795,6 @@ namespace Sikao
         {
             // 和了判定
             HeLePanDing();
-            // 符計算
-            if (!yiMan && fanShuJi < 5)
-            {
-                FuJiSuan();
-            }
-            else
-            {
-                fu = 0;
-            }
             // 点計算
             DianJiSuan();
 
@@ -1343,6 +1334,14 @@ namespace Sikao
                             maxFanShuJi = fanShuJi;
                             Copy(yi, maxYi);
                             Copy(fanShu, maxFanShu);
+                            if (yiMan || fanShuJi >= 5)
+                            {
+                                fu = 0;
+                            }
+                            else
+                            {
+                                fu = FuJiSuan();
+                            }
                         }
                         // 形聴
                         ret = XING_TING;
@@ -1491,30 +1490,26 @@ namespace Sikao
         }
 
         // 符計算
-        private void FuJiSuan()
+        private int FuJiSuan()
         {
-            fu = 0;
             for (int i = 0; i < yiShu; i++)
             {
                 if (yi[i] == (int)Yi.QI_DUI_ZI)
                 {
-                    fu = 25;
-                    return;
+                    return 25;
                 }
                 if (yi[i] == (int)Yi.PING_HE)
                 {
                     if (GuiZe.ziMoPingHe && jiJia)
                     {
-                        fu = 20;
-                        return;
+                        return 20;
                     }
-                    fu = 30;
-                    return;
+                    return 30;
                 }
             }
 
             // 副底
-            fu = 20;
+            int fu = 20;
             if (!jiJia && taJiaFuLuShu == 0)
             {
                 // 門前栄和加符
@@ -1594,7 +1589,7 @@ namespace Sikao
                 }
             }
             // 切上
-            fu = Chang.Ceil(fu, 10);
+            return Chang.Ceil(fu, 10);
         }
 
         // 点計算
