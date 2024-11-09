@@ -146,6 +146,7 @@ namespace Maqiao
         private TextMeshProUGUI goTitle;
         private TextMeshProUGUI goStart;
         private TextMeshProUGUI goJu;
+        private Image goJuFrame;
         private TextMeshProUGUI goBenChangText;
         private TextMeshProUGUI goGongTouText;
         private Image goCanShanPaiShu;
@@ -394,6 +395,7 @@ namespace Maqiao
             paiWidth = rtPai.rect.width * scale.x;
             if (paiWidth * 5f > Math.Abs(Screen.safeArea.width - Screen.safeArea.height) / 2)
             {
+                // 縦横の長さの差が牌5枚以内の場合、牌16枚分の大きさに縮小する
                 w = paiWidth * 16f;
                 w = w / 20f / rtPai.rect.width;
                 scale = new(w, w, w);
@@ -1125,6 +1127,7 @@ namespace Maqiao
         // 【描画】対局
         private void DrawDuiJu()
         {
+            DrawJuFrame();
             DrawJu();
             DrawJuOption();
             DrawCanShanPaiShu();
@@ -1424,9 +1427,29 @@ namespace Maqiao
             DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
         }
 
+        // 【描画】局枠線
+        private void DrawJuFrame()
+        {
+            ClearGameObject(ref goJuFrame);
+            goJuFrame = Instantiate(goFrame, goFrame.transform.parent);
+            RectTransform rt = goJuFrame.rectTransform;
+            rt.anchoredPosition = new Vector2(0, 0);
+            rt.localScale = scale;
+            rt.localScale *= 5.9f;
+            goJuFrame.color = new Color(0f, 0.8f, 0f, 0.2f);
+            Outline outline = goJuFrame.GetComponent<Outline>();
+            outline.effectDistance = new Vector2(0.2f, 0.2f);
+            outline.effectColor = new Color(1, 1, 1, 0.5f);
+
+            TextMeshProUGUI text = goJuFrame.GetComponentInChildren<TextMeshProUGUI>();
+            Destroy(text);
+        }
+
         // 【描画】局
         private void DrawJu()
         {
+            ClearGameObject(ref goJu);
+            goJu = Instantiate(goText, goJuFrame.transform.parent);
             float x = 0;
             float y = paiHeight * 0.9f;
             string value = Pai.FENG_PAI_MING[Chang.changFeng - 0x31] + (Chang.ju + 1) + "局";
@@ -1871,6 +1894,7 @@ namespace Maqiao
 
             // 描画
             ClearScreen();
+            DrawJuFrame();
             DrawJu();
             DrawJuOption();
             DrawCanShanPaiShu();
@@ -1962,26 +1986,24 @@ namespace Maqiao
         {
             float x = -paiWidth * 0.3f;
             float y = paiHeight * 0.4f;
-            if (goBenChang != null)
-            {
-                ClearGameObject(ref goBenChang);
-            }
+            ClearGameObject(ref goBenChang);
             goBenChang = Instantiate(goDianBang100, goDianBang100.transform.parent);
             RectTransform rt100 = goBenChang.GetComponent<RectTransform>();
             rt100.sizeDelta = new Vector2(rt100.sizeDelta.x * 0.5f, rt100.sizeDelta.y);
             rt100.anchoredPosition = new Vector2(x, y);
+            ClearGameObject(ref goBenChangText);
+            goBenChangText = Instantiate(goText, goJuFrame.transform.parent);
             string valueBenChang = "x" + Chang.benChang.ToString();
             DrawText(ref goBenChangText, valueBenChang, new Vector2(x + paiWidth * 1.1f, y + paiHeight * 0.05f), 0, 14);
 
             y -= paiHeight * 0.4f;
-            if (goGongTou != null)
-            {
-                ClearGameObject(ref goGongTou);
-            }
+            ClearGameObject(ref goGongTou);
             goGongTou = Instantiate(goDianBang1000, goDianBang1000.transform.parent);
             RectTransform rt1000 = goGongTou.GetComponent<RectTransform>();
             rt1000.sizeDelta = new Vector2(rt1000.sizeDelta.x * 0.5f, rt1000.sizeDelta.y);
             rt1000.anchoredPosition = new Vector2(x, y);
+            ClearGameObject(ref goGongTouText);
+            goGongTouText = Instantiate(goText, goJuFrame.transform.parent);
             string valueGongTou = "x" + (Chang.gongTuo / 1000).ToString();
             DrawText(ref goGongTouText, valueGongTou, new Vector2(x + paiWidth * 1.1f, y + paiHeight * 0.05f), 0, 14);
         }
@@ -2064,7 +2086,15 @@ namespace Maqiao
                 int jia = (Chang.qin + i) % Chang.MIAN_ZI;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 Color background = shi.feng == 0x31 ? new Color(1f, 0.4f, 0.4f) : Color.black;
+                ClearGameObject(ref goFeng[i]);
+                goFeng[i] = Instantiate(goFrame, goJuFrame.transform.parent);
                 DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 2f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
+                if (eventStatus == Event.DIAN_BIAO_SHI)
+                {
+                    continue;
+                }
+                ClearGameObject(ref goDianBang[i]);
+                goDianBang[i] = Instantiate(goText, goJuFrame.transform.parent);
                 if (isDianCha && !shi.player)
                 {
                     int dianCha = dianPlayer - shi.dianBang;
@@ -2079,11 +2109,9 @@ namespace Maqiao
 
                 if (shi.liZhi)
                 {
-                    if (goLizhiBang[jia] == null)
-                    {
-                        goLizhiBang[jia] = Instantiate(goDianBang1000, goDianBang1000.transform.parent);
-                        goLizhiBang[jia].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.playOrder));
-                    }
+                    ClearGameObject(ref goLizhiBang[jia]);
+                    goLizhiBang[jia] = Instantiate(goDianBang1000, goJuFrame.transform.parent);
+                    goLizhiBang[jia].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.playOrder));
                     RectTransform rt = goLizhiBang[jia].GetComponent<RectTransform>();
                     rt.anchoredPosition = Cal(x, y + paiHeight * 0.4f, shi.playOrder);
                 }
@@ -2669,6 +2697,7 @@ namespace Maqiao
          */
         private void DrawCanShanPaiShu()
         {
+            ClearGameObject(ref goCanShanPaiShu);
             float alfa = Pai.CanShanPaiShu() < 100 ? 1f : 0f;
             DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, -paiHeight * 0.6f), 0, 20, new Color(0, 0.6f, 0), new Color(1f, 1f, 1f, alfa), paiWidth * 0.7f);
         }
@@ -3685,9 +3714,11 @@ namespace Maqiao
 
             // 描画
             ClearScreen();
+            DrawJuFrame();
             DrawJu();
             DrawGongTuo();
             DrawMingQian();
+            DrawDianBang();
             Chang.DianJiSuan(Chang.qiaoShi);
 
             float x = 0;
@@ -3956,7 +3987,6 @@ namespace Maqiao
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.anchoredPosition = xy;
             rt.sizeDelta = new Vector2(paiWidth, obj.preferredHeight);
-            rt.transform.SetSiblingIndex(0);
         }
 
         // 【描画】フレームテキスト
@@ -3987,7 +4017,6 @@ namespace Maqiao
             {
                 rtFrame.sizeDelta = new Vector2(width, text.preferredHeight);
             }
-            rtFrame.transform.SetSiblingIndex(0);
         }
 
         // 【描画】ボタン
@@ -4070,6 +4099,7 @@ namespace Maqiao
             ClearGameObject(ref goBackDuiJuZhongLe);
             ClearGameObject(ref goTitle);
             ClearGameObject(ref goStart);
+            ClearGameObject(ref goJuFrame);
             ClearGameObject(ref goJu);
             ClearGameObject(ref goMingWu);
             ClearGameObject(ref goDianCha);
