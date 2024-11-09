@@ -1873,7 +1873,7 @@ namespace Maqiao
                     goQiJia = Instantiate(goQiJias[Chang.changFeng - 0x31].GetComponent<Image>(), goQiJias[Chang.changFeng - 0x31].GetComponent<Image>().transform.parent);
                     goQiJia.transform.Rotate(0, 0, 90 * GetDrawOrder(shi.playOrder));
                     RectTransform rt = goQiJia.GetComponent<RectTransform>();
-                    rt.anchoredPosition = Cal(x, y, shi.playOrder);
+                    rt.anchoredPosition = Cal(eventStatus == Event.QIN_JUE ? 0 : x, y, shi.playOrder);
                 }
             }
         }
