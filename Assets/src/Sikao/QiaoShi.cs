@@ -797,6 +797,10 @@ namespace Sikao
             HeLePanDing();
             // 点計算
             DianJiSuan();
+            if (yiMan || fanShuJi >= 5)
+            {
+                fu = 0;
+            }
 
             if (Chang.ziJiaYao == Yao.ZI_MO)
             {
@@ -1233,6 +1237,7 @@ namespace Sikao
         // 和了判定
         protected int HeLePanDing()
         {
+            fu = 0;
             // 国士無双判定
             if (GuoShiWuShuangPanDing())
             {
@@ -1257,6 +1262,7 @@ namespace Sikao
                 YiPanDing();
                 if (yiShu > 0)
                 {
+                    fu = 25;
                     // 聴牌
                     return TING_PAI;
                 }
@@ -1266,6 +1272,7 @@ namespace Sikao
             int[] maxFanShu = new int[fanShu.Length];
             int maxYiShu = 0;
             int maxFanShuJi = 0;
+            int maxFu = 0;
             // 不聴
             int ret = BU_TING;
             for (int i = 0; i < shouPaiWei; i++)
@@ -1328,20 +1335,14 @@ namespace Sikao
                         }
                         // 役判定
                         YiPanDing();
+                        FuJiSuan();
                         if (fanShuJi > maxFanShuJi)
                         {
                             maxYiShu = yiShu;
                             maxFanShuJi = fanShuJi;
+                            maxFu = fu;
                             Copy(yi, maxYi);
                             Copy(fanShu, maxFanShu);
-                            if (yiMan || fanShuJi >= 5)
-                            {
-                                fu = 0;
-                            }
-                            else
-                            {
-                                fu = FuJiSuan();
-                            }
                         }
                         // 形聴
                         ret = XING_TING;
@@ -1354,6 +1355,7 @@ namespace Sikao
                 ret = TING_PAI;
                 yiShu = maxYiShu;
                 fanShuJi = maxFanShuJi;
+                fu = maxFu;
                 Copy(maxYi, yi);
                 Copy(maxFanShu, fanShu);
             }
@@ -1490,26 +1492,29 @@ namespace Sikao
         }
 
         // 符計算
-        private int FuJiSuan()
+        private void FuJiSuan()
         {
             for (int i = 0; i < yiShu; i++)
             {
                 if (yi[i] == (int)Yi.QI_DUI_ZI)
                 {
-                    return 25;
+                    fu = 25;
+                    return;
                 }
                 if (yi[i] == (int)Yi.PING_HE)
                 {
                     if (GuiZe.ziMoPingHe && jiJia)
                     {
-                        return 20;
+                        fu = 20;
+                        return;
                     }
-                    return 30;
+                    fu = 30;
+                    return;
                 }
             }
 
             // 副底
-            int fu = 20;
+            fu = 20;
             if (!jiJia && taJiaFuLuShu == 0)
             {
                 // 門前栄和加符
@@ -1589,7 +1594,7 @@ namespace Sikao
                 }
             }
             // 切上
-            return Chang.Ceil(fu, 10);
+            fu = Chang.Ceil(fu, 10);
         }
 
         // 点計算
