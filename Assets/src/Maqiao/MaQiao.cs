@@ -104,7 +104,7 @@ namespace Maqiao
         // 画面向き
         private ScreenOrientation orientation;
         // 雀士ボタン幅
-        private float quiaoShiButtonWidth;
+        private int quiaoShiButtonMaxLen;
 
         // イベント
         private static Event eventStatus;
@@ -403,7 +403,16 @@ namespace Maqiao
                 paiWidth = rtPai.rect.width * scale.x;
             }
             paiHeight = rtPai.rect.height * scale.y;
-            quiaoShiButtonWidth = paiWidth * 2.5f;
+
+            quiaoShiButtonMaxLen = 0;
+            foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
+            {
+                int len = kvp.Key.Length;
+                if (len > quiaoShiButtonMaxLen)
+                {
+                    quiaoShiButtonMaxLen = len;
+                }
+            }
         }
 
         // 【描画】設定画面
@@ -532,8 +541,9 @@ namespace Maqiao
             float x = paiWidth * 4.5f;
             float y = paiHeight * 2.5f;
             float offset = paiHeight * 2;
+            int len = 7;
             // 1タップ打牌
-            string[] labelDaPaiFangFa = new string[] { "選択をして打牌", "１タップで打牌", "２タップで打牌" };
+            string[] labelDaPaiFangFa = new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" };
             ClearGameObject(ref goDaPaiFangFa);
             goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
             goDaPaiFangFa.onClick.AddListener(delegate {
@@ -541,7 +551,7 @@ namespace Maqiao
                 goDaPaiFangFa.GetComponentInChildren<TextMeshProUGUI>().text = labelDaPaiFangFa[(int)sheDing.daPaiFangFa];
                 WriteSheDing();
             });
-            DrawButton(ref goDaPaiFangFa, labelDaPaiFangFa[(int)sheDing.daPaiFangFa], new Vector2(-x, y));
+            DrawButton(ref goDaPaiFangFa, labelDaPaiFangFa[(int)sheDing.daPaiFangFa], new Vector2(-x, y), len);
             // 立直後 自動・手動
             string[] labelLiZhiAuto = new string[] { "立直後自動打牌", "立直後手動打牌" };
             ClearGameObject(ref goLiZhiAuto);
@@ -551,10 +561,10 @@ namespace Maqiao
                 goLiZhiAuto.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1];
                 WriteSheDing();
             });
-            DrawButton(ref goLiZhiAuto, sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1], new Vector2(x, y));
+            DrawButton(ref goLiZhiAuto, sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1], new Vector2(x, y), len);
             y -= offset;
             // ドラマーク
-            string[] labelXuanShangYin = new string[] { "ドラマーク有り", "ドラマーク無し" };
+            string[] labelXuanShangYin = new string[] { "ドラマーク有", "ドラマーク無" };
             ClearGameObject(ref goXuanShangYin);
             goXuanShangYin = Instantiate(goButton, goSettingPanel.transform);
             goXuanShangYin.onClick.AddListener(delegate {
@@ -562,9 +572,9 @@ namespace Maqiao
                 goXuanShangYin.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1];
                 WriteSheDing();
             });
-            DrawButton(ref goXuanShangYin, sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1], new Vector2(-x, y));
+            DrawButton(ref goXuanShangYin, sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1], new Vector2(-x, y), len);
             // ツモ切表示有り・無し
-            string[] labelZiMoQieBiaoShi = new string[] { "ツモ切表示有り", "ツモ切表示無し" };
+            string[] labelZiMoQieBiaoShi = new string[] { "ツモ切表示有", "ツモ切表示無" };
             ClearGameObject(ref goZiMoQieBiaoShi);
             goZiMoQieBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goZiMoQieBiaoShi.onClick.AddListener(delegate {
@@ -572,10 +582,10 @@ namespace Maqiao
                 goZiMoQieBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1];
                 WriteSheDing();
             });
-            DrawButton(ref goZiMoQieBiaoShi, sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1], new Vector2(x, y));
+            DrawButton(ref goZiMoQieBiaoShi, sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1], new Vector2(x, y), len);
             y -= offset;
             // 待牌表示有り・無し
-            string[] labelDaiPaiBiaoShi = new string[] { "待ち牌表示有り", "待ち牌表示無し" };
+            string[] labelDaiPaiBiaoShi = new string[] { "待牌表示有", "待牌表示無" };
             ClearGameObject(ref goDaiPaiBiaoShi);
             goDaiPaiBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goDaiPaiBiaoShi.onClick.AddListener(delegate {
@@ -583,9 +593,9 @@ namespace Maqiao
                 goDaiPaiBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1];
                 WriteSheDing();
             });
-            DrawButton(ref goDaiPaiBiaoShi, sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1], new Vector2(-x, y));
+            DrawButton(ref goDaiPaiBiaoShi, sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1], new Vector2(-x, y), len);
             // 向聴数表示有り・無し
-            string[] labelXiangTingShuBiaoShi = new string[] { "向聴数表示有り", "向聴数表示無し" };
+            string[] labelXiangTingShuBiaoShi = new string[] { "向聴数表示有", "向聴数表示無" };
             ClearGameObject(ref goXiangTingShuBiaoShi);
             goXiangTingShuBiaoShi = Instantiate(goButton, goSettingPanel.transform);
             goXiangTingShuBiaoShi.onClick.AddListener(delegate {
@@ -593,7 +603,7 @@ namespace Maqiao
                 goXiangTingShuBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1];
                 WriteSheDing();
             });
-            DrawButton(ref goXiangTingShuBiaoShi, sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1], new Vector2(x, y));
+            DrawButton(ref goXiangTingShuBiaoShi, sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1], new Vector2(x, y), len);
             y -= offset;
             // リセット
             goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
@@ -680,7 +690,7 @@ namespace Maqiao
                 goScoreQiaoShi[i].onClick.AddListener(delegate {
                     OnClickScoreQiaoShi(kvp.Key);
                 });
-                DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonWidth);
+                DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
 
                 if (i % 2 == 1)
                 {
@@ -1532,7 +1542,7 @@ namespace Maqiao
             {
                 x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
                 int pos = index;
-                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonWidth);
+                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
                 goQiaoShi[index].onClick.AddListener(delegate {
                     OnClickQiaoShi(kvp.Key, pos);
                 });
@@ -1624,7 +1634,7 @@ namespace Maqiao
             {
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
-                DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonWidth);
+                DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
                 goQiaoShi[i].onClick.AddListener(delegate {
                     OnClickFollowQiaoShi(kvp.Key);
                 });
@@ -2784,7 +2794,7 @@ namespace Maqiao
                 TextMeshProUGUI text = go.GetComponentInChildren<TextMeshProUGUI>();
                 text.color = Color.gray;
             }
-            DrawButton(ref go, value, xy, paiWidth);
+            DrawButton(ref go, value, xy, value.Length);
         }
 
         // 自家腰クリック
@@ -4024,7 +4034,7 @@ namespace Maqiao
         {
             DrawButton(ref obj, value, xy, -1);
         }
-        private void DrawButton(ref Button obj, string value, Vector2 xy, float width)
+        private void DrawButton(ref Button obj, string value, Vector2 xy, int len)
         {
             if (obj == null)
             {
@@ -4035,14 +4045,12 @@ namespace Maqiao
 
             RectTransform rt = obj.GetComponent<RectTransform>();
             TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
-            if (width == -1)
+            if (len == -1)
             {
-                rt.sizeDelta = new Vector2(text.preferredWidth + paiWidth / 2, rt.sizeDelta.y);
+                len = value.Length;
             }
-            else
-            {
-                rt.sizeDelta = new Vector2(width, rt.sizeDelta.y);
-            }
+            float width = text.preferredWidth / value.Length * (len + 1);
+            rt.sizeDelta = new Vector2(width, rt.sizeDelta.y);
         }
 
         // 【描画】牌
