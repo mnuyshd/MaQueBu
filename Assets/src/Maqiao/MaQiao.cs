@@ -490,9 +490,13 @@ namespace Maqiao
             goShouPaiOpen.onClick.AddListener(delegate {
                 shouPaiOpen = !shouPaiOpen;
                 SwitchShouPaiOpenImage();
-                for (int i = 0; i < Chang.MIAN_ZI; i++)
+                for (int i = 0; i < Chang.mianZi; i++)
                 {
                     QiaoShi shi = Chang.qiaoShi[i];
+                    if (shi == null)
+                    {
+                        break;
+                    }
                     if (!shi.player)
                     {
                         DrawShouPai(i, QiaoShi.Yao.WU, 0);
@@ -747,7 +751,7 @@ namespace Maqiao
                 }
             }
 
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 if (shi != null)
@@ -1144,7 +1148,7 @@ namespace Maqiao
             DrawMingQian();
 
             bool isHeLe = false;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 if (shi.player)
@@ -1165,7 +1169,7 @@ namespace Maqiao
                 }
                 DrawShouPai(i, yao, xuanZe, shi.player, shi.follow);
             }
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 if (!shi.player)
@@ -1213,7 +1217,7 @@ namespace Maqiao
                 }
             }
 
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 DrawDaiPai(i, -2);
                 DrawShePai(i);
@@ -1276,8 +1280,8 @@ namespace Maqiao
             }
             if (selectedCount == 3 || selectedCount == 2 || selectedCount == 1)
             {
-                Chang.MIAN_ZI = selectedCount + 1;
-                Chang.qiaoShi = new QiaoShi[Chang.MIAN_ZI];
+                Chang.mianZi = selectedCount + 1;
+                Chang.qiaoShi = new QiaoShi[Chang.mianZi];
                 keyPress = true;
             }
         }
@@ -1517,9 +1521,9 @@ namespace Maqiao
             int dianPlayer = 0;
             if (isDianCha)
             {
-                for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                for (int i = 0; i < Chang.mianZi; i++)
                 {
-                    int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                    int jia = (Chang.qin + i) % Chang.mianZi;
                     QiaoShi shi = Chang.qiaoShi[jia];
                     if (shi.player)
                     {
@@ -1531,9 +1535,9 @@ namespace Maqiao
 
             float x = 0f;
             float y = -(paiWidth * 2.5f);
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                int jia = (Chang.qin + i) % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 Color background = shi.feng == 0x31 ? new Color(1f, 0.4f, 0.4f) : Color.black;
                 ClearGameObject(ref goFeng[i]);
@@ -1667,7 +1671,7 @@ namespace Maqiao
                 qiaoShiMingQian[key] = false;
             }
             int cnt = 0;
-            while (cnt < Chang.MIAN_ZI - 1)
+            while (cnt < Chang.mianZi - 1)
             {
                 System.Random r = new();
                 int n = r.Next(0, qiaoShiMingQian.Count);
@@ -1770,17 +1774,17 @@ namespace Maqiao
             {
                 OnClickScreenFollowNone();
             }
-            int[] fengPai = new int[Pai.FENG_PAI.Length - (4 - Chang.MIAN_ZI)];
-            for (int i = 0; i < Pai.FENG_PAI.Length - (4 - Chang.MIAN_ZI); i++)
+            int[] fengPai = new int[Pai.FENG_PAI.Length - (4 - Chang.mianZi)];
+            for (int i = 0; i < Pai.FENG_PAI.Length - (4 - Chang.mianZi); i++)
             {
                 fengPai[i] = Pai.FENG_PAI[i];
             }
             Chang.Shuffle(fengPai, 20);
 
-            Button[] goButton = new Button[Chang.MIAN_ZI];
+            Button[] goButton = new Button[Chang.mianZi];
 
             int jia = 0;
-            for (int i = 0x31; i <= 0x34 - (4 - Chang.MIAN_ZI); i++)
+            for (int i = 0x31; i <= 0x34 - (4 - Chang.mianZi); i++)
             {
                 for (int j = 0; j < fengPai.Length; j++)
                 {
@@ -1795,7 +1799,7 @@ namespace Maqiao
             }
 
             int order = 0;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 shi.playOrder = i;
@@ -1804,20 +1808,20 @@ namespace Maqiao
                     order = i;
                 }
             }
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 shi.playOrder -= order;
                 if (shi.playOrder < 0)
                 {
-                    shi.playOrder += Chang.qiaoShi.Length;
+                    shi.playOrder += Chang.mianZi;
                 }
             }
 
             DrawMingQian();
 
             // 記録の読込
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 string filePath = Application.persistentDataPath + "/" + shi.mingQian + ".json";
@@ -1872,7 +1876,7 @@ namespace Maqiao
             yield return Pause(ForwardMode.NORMAL);
 
             // 親
-            Chang.qin = (sai1 + sai2 - 1) % Chang.MIAN_ZI;
+            Chang.qin = (sai1 + sai2 - 1) % Chang.mianZi;
             // 起家
             Chang.qiaJia = Chang.qin;
             Chang.changFeng = 0x31;
@@ -1887,9 +1891,9 @@ namespace Maqiao
         // 【描画】名前(4人分)
         private void DrawMingQian()
         {
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                int jia = (Chang.qin + i) % Chang.mianZi;
                 DrawMingQian(jia);
             }
         }
@@ -1956,9 +1960,9 @@ namespace Maqiao
                     y = -(paiHeight * 4.9f);
                     break;
             }
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                int jia = (Chang.qin + i) % Chang.mianZi;
                 if (Chang.qiaJia == jia)
                 {
                     ClearGameObject(ref goQiJia);
@@ -1984,7 +1988,7 @@ namespace Maqiao
         private void ZhuangChuQiHua()
         {
             Chang.ZhuangChuQiHua();
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 Chang.qiaoShi[i].ZhuangChuQiHua();
             }
@@ -2015,33 +2019,33 @@ namespace Maqiao
             // 配牌
             for (int i = 0; i < 3; i++)
             {
-                for (int j = 0; j < Chang.qiaoShi.Length; j++)
+                for (int j = 0; j < Chang.mianZi; j++)
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        Chang.qiaoShi[(Chang.qin + j) % Chang.MIAN_ZI].ZiMo(Pai.ShanPaiZiMo());
+                        Chang.qiaoShi[(Chang.qin + j) % Chang.mianZi].ZiMo(Pai.ShanPaiZiMo());
                     }
-                    DrawShouPai((Chang.qin + j) % Chang.MIAN_ZI, QiaoShi.Yao.WU, -1);
+                    DrawShouPai((Chang.qin + j) % Chang.mianZi, QiaoShi.Yao.WU, -1);
                     yield return new WaitForSeconds(waitTime / 3);
                 }
             }
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 // 理牌
-                Chang.qiaoShi[(Chang.qin + i) % Chang.MIAN_ZI].LiPai();
-                DrawShouPai((Chang.qin + i) % Chang.MIAN_ZI, QiaoShi.Yao.WU, -1);
+                Chang.qiaoShi[(Chang.qin + i) % Chang.mianZi].LiPai();
+                DrawShouPai((Chang.qin + i) % Chang.mianZi, QiaoShi.Yao.WU, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                Chang.qiaoShi[(Chang.qin + i) % Chang.MIAN_ZI].ZiMo(Pai.ShanPaiZiMo());
-                DrawShouPai((Chang.qin + i) % Chang.MIAN_ZI, QiaoShi.Yao.WU, -1);
+                Chang.qiaoShi[(Chang.qin + i) % Chang.mianZi].ZiMo(Pai.ShanPaiZiMo());
+                DrawShouPai((Chang.qin + i) % Chang.mianZi, QiaoShi.Yao.WU, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                Chang.qiaoShi[(Chang.qin + i) % Chang.MIAN_ZI].LiPai();
-                DrawShouPai((Chang.qin + i) % Chang.MIAN_ZI, QiaoShi.Yao.WU, -1);
+                Chang.qiaoShi[(Chang.qin + i) % Chang.mianZi].LiPai();
+                DrawShouPai((Chang.qin + i) % Chang.mianZi, QiaoShi.Yao.WU, -1);
             }
 
             eventStatus = Event.DUI_JU;
@@ -2055,9 +2059,9 @@ namespace Maqiao
             Chang.JuChuQiHua();
             // 雀士初期化
             int w = 0;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                int jia = (Chang.qin + i) % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 shi.JuChuQiHua(Pai.FENG_PAI[i]);
 
@@ -2269,7 +2273,7 @@ namespace Maqiao
                     ziJiaShi.AnGang(Chang.ziJiaXuanZe);
                     // 描画
                     // 消
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
                         Chang.qiaoShi[i].Xiao();
                     }
@@ -2379,9 +2383,9 @@ namespace Maqiao
             // 副露判定初期化
             Chang.taJiaYao = QiaoShi.Yao.WU;
             Chang.mingFan = Chang.ziMoFan;
-            for (int i = Chang.ziMoFan + 1; i < Chang.ziMoFan + Chang.qiaoShi.Length; i++)
+            for (int i = Chang.ziMoFan + 1; i < Chang.ziMoFan + Chang.mianZi; i++)
             {
-                int jia = i % Chang.MIAN_ZI;
+                int jia = i % Chang.mianZi;
                 QiaoShi taJiaShi = Chang.qiaoShi[jia];
                 // 思考他家判定
                 taJiaShi.ziJiaYao = QiaoShi.Yao.WU;
@@ -2421,9 +2425,9 @@ namespace Maqiao
                 }
             }
             // 思考他家プレイヤー分
-            for (int i = Chang.ziMoFan + 1; i < Chang.ziMoFan + Chang.qiaoShi.Length; i++)
+            for (int i = Chang.ziMoFan + 1; i < Chang.ziMoFan + Chang.mianZi; i++)
             {
-                int jia = i % Chang.MIAN_ZI;
+                int jia = i % Chang.mianZi;
                 QiaoShi taJiaShi = Chang.qiaoShi[jia];
                 if (!taJiaShi.player)
                 {
@@ -2494,10 +2498,10 @@ namespace Maqiao
                 yield break;
             }
 
-            for (int i = Chang.ziMoFan + 1; i < Chang.ziMoFan + Chang.qiaoShi.Length; i++)
+            for (int i = Chang.ziMoFan + 1; i < Chang.ziMoFan + Chang.mianZi; i++)
             {
                 // 振聴牌処理
-                Chang.qiaoShi[i % Chang.MIAN_ZI].ZhenTingPaiChuLi();
+                Chang.qiaoShi[i % Chang.mianZi].ZhenTingPaiChuLi();
             }
 
             switch (Chang.ziJiaYao)
@@ -2526,7 +2530,7 @@ namespace Maqiao
                 case QiaoShi.Yao.JIA_GANG:
                     // 加槓成立
                     // 消
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
                         Chang.qiaoShi[i].Xiao();
                     }
@@ -2566,7 +2570,7 @@ namespace Maqiao
                     // 捨牌処理
                     Chang.qiaoShi[Chang.ziMoFan].ShePaiChuLi(QiaoShi.Yao.DA_MING_GANG);
                     // 消
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
                         Chang.qiaoShi[i].Xiao();
                     }
@@ -2590,7 +2594,7 @@ namespace Maqiao
                     // 捨牌処理
                     Chang.qiaoShi[Chang.ziMoFan].ShePaiChuLi(QiaoShi.Yao.BING);
                     // 消
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
                         Chang.qiaoShi[i].Xiao();
                     }
@@ -2613,7 +2617,7 @@ namespace Maqiao
                     // 捨牌処理
                     Chang.qiaoShi[Chang.ziMoFan].ShePaiChuLi(QiaoShi.Yao.CHI);
                     // 消
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
                         Chang.qiaoShi[i].Xiao();
                     }
@@ -2639,9 +2643,9 @@ namespace Maqiao
                 int liuManGuan = -1;
                 if (GuiZe.liuManGuan)
                 {
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
-                        int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                        int jia = (Chang.qin + i) % Chang.mianZi;
                         if (Chang.qiaoShi[jia].LiuJu())
                         {
                             Chang.ziJiaYao = QiaoShi.Yao.ZI_MO;
@@ -2657,9 +2661,9 @@ namespace Maqiao
                 {
                     tingPaiLianZhuang = Zhuang.LIAN_ZHUANG;
                 }
-                for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                for (int i = 0; i < Chang.mianZi; i++)
                 {
-                    int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                    int jia = (Chang.qin + i) % Chang.mianZi;
                     QiaoShi shi = Chang.qiaoShi[jia];
                     // 形聴判定
                     shi.XingTingPanDing();
@@ -2710,7 +2714,7 @@ namespace Maqiao
                 yield break;
             }
 
-            Chang.ziMoFan = (Chang.ziMoFan + 1) % Chang.MIAN_ZI;
+            Chang.ziMoFan = (Chang.ziMoFan + 1) % Chang.mianZi;
             eventStatus = Event.DUI_JU;
             isDuiJuCoroutine = false;
         }
@@ -3346,7 +3350,7 @@ namespace Maqiao
             ClearGameObject(ref shi.goShePai);
             int shePaiEnter = 6;
             float shePaiLeft = 2.5f;
-            if (Chang.MIAN_ZI == 2)
+            if (Chang.mianZi == 2)
             {
                 shePaiLeft = 8.5f;
                 shePaiEnter = 18;
@@ -3358,7 +3362,7 @@ namespace Maqiao
             bool isDrawLizhi = !shi.liZhi;
             float dark = 0.8f;
             int playOrder = shi.playOrder;
-            if (Chang.MIAN_ZI == 2 && playOrder == 1)
+            if (Chang.mianZi == 2 && playOrder == 1)
             {
                 playOrder = 2;
             }
@@ -3734,9 +3738,9 @@ namespace Maqiao
             float x = 0;
             float y = -(paiHeight * 4);
             int max = 0;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                int jia = (Chang.qin + i) % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 // 受取
                 string shouQuGongTuo = (shi.shouQuGongTuo > 0 ? "+" : "") + (shi.shouQuGongTuo == 0 ? "" : shi.shouQuGongTuo.ToString());
@@ -3756,9 +3760,9 @@ namespace Maqiao
             }
             for (int shu = 0; shu <= max; shu += 100)
             {
-                for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                for (int i = 0; i < Chang.mianZi; i++)
                 {
-                    int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                    int jia = (Chang.qin + i) % Chang.mianZi;
                     QiaoShi shi = Chang.qiaoShi[jia];
                     if (shi.shouQu > 0)
                     {
@@ -3784,15 +3788,15 @@ namespace Maqiao
                     yield return new WaitForSeconds(0);
                 }
             }
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
-                int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                int jia = (Chang.qin + i) % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 DrawText(ref goDianBang[jia], (shi.dianBang).ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 30);
             }
 
             // 記録の書込
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 // 記録 対局数
@@ -3812,16 +3816,16 @@ namespace Maqiao
             }
 
             bool isQinTop = false;
-            if (Chang.changFeng == 0x32 && Chang.ju == Chang.MIAN_ZI)
+            if (Chang.changFeng == 0x32 && Chang.ju == Chang.mianZi)
             {
                 QiaoShi qinShi = Chang.qiaoShi[Chang.qin];
                 if (qinShi.ziJiaYao == QiaoShi.Yao.ZI_MO || qinShi.taJiaYao == QiaoShi.Yao.RONG_HE)
                 {
                     // 親の和了
                     int maxDian = 0;
-                    for (int i = 0; i < Chang.qiaoShi.Length; i++)
+                    for (int i = 0; i < Chang.mianZi; i++)
                     {
-                        int jia = (Chang.qin + i) % Chang.MIAN_ZI;
+                        int jia = (Chang.qin + i) % Chang.mianZi;
                         QiaoShi shi = Chang.qiaoShi[jia];
                         if (maxDian < shi.dianBang)
                         {
@@ -3865,9 +3869,9 @@ namespace Maqiao
 
             // 記録の書込
             List<(int dian, QiaoShi shi)> shunWei = new();
-            for (int i = Chang.qiaJia; i < Chang.qiaJia + Chang.qiaoShi.Length; i++)
+            for (int i = Chang.qiaJia; i < Chang.qiaJia + Chang.mianZi; i++)
             {
-                int jia = i % Chang.MIAN_ZI;
+                int jia = i % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
                 shunWei.Add((shi.dianBang, shi));
             }
@@ -3911,9 +3915,9 @@ namespace Maqiao
             int geHe = 0;
             int maxDian = 0;
             int top = 0;
-            for (int i = Chang.qiaJia; i < Chang.qiaJia + Chang.qiaoShi.Length; i++)
+            for (int i = Chang.qiaJia; i < Chang.qiaJia + Chang.mianZi; i++)
             {
-                int jia = i % Chang.MIAN_ZI;
+                int jia = i % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
 
                 if (maxDian < shi.dianBang)
@@ -3936,7 +3940,7 @@ namespace Maqiao
             int maxMingQian = 0;
             int maxDianBang = 0;
             int maxDeDian = 0;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 if (maxMingQian < shi.mingQian.Length)
@@ -3958,7 +3962,7 @@ namespace Maqiao
                 }
             }
 
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 string dianBang = shi.dianBang.ToString();
@@ -4089,11 +4093,11 @@ namespace Maqiao
 
         private int GetDrawOrder(int order)
         {
-            if (Chang.MIAN_ZI == 3 && order == 2)
+            if (Chang.mianZi == 3 && order == 2)
             {
                 return 3;
             }
-            if (Chang.MIAN_ZI == 2 && order == 1)
+            if (Chang.mianZi == 2 && order == 1)
             {
                 return 2;
             }
@@ -4127,7 +4131,7 @@ namespace Maqiao
             ClearGameObject(ref Pai.goXuanShangPai);
             ClearGameObject(ref Pai.goLiXuanShangPai);
 
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi qs = Chang.qiaoShi[i];
                 if (qs == null)

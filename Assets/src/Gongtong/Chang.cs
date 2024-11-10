@@ -7,10 +7,10 @@ namespace Gongtong
     internal class Chang
     {
         // 面子
-        internal static int MIAN_ZI = 4;
+        internal static int mianZi = 4;
 
         // 雀士
-        internal static QiaoShi[] qiaoShi = new QiaoShi[MIAN_ZI];
+        internal static QiaoShi[] qiaoShi = new QiaoShi[mianZi];
         // 場風
         internal static int changFeng;
         // 局
@@ -88,8 +88,8 @@ namespace Gongtong
         // 荘初期化
         internal static void ZhuangChuQiHua()
         {
-            rongHeFan = new int[MIAN_ZI];
-            siFengZiLianDaPai = new int[MIAN_ZI];
+            rongHeFan = new int[mianZi];
+            siFengZiLianDaPai = new int[mianZi];
             benChang = 0;
             ju = 0;
             feng = 0;
@@ -127,11 +127,11 @@ namespace Gongtong
         // 四家立直判定
         internal static bool SiJiaLiZhiPanDing()
         {
-            if (MIAN_ZI != 4)
+            if (mianZi != 4)
             {
                 return false;
             }
-            if (liZhiShu >= MIAN_ZI)
+            if (liZhiShu >= mianZi)
             {
                 return true;
             }
@@ -141,7 +141,7 @@ namespace Gongtong
         // 四風子連打牌処理
         internal static void SiFengZiLianDaChuLi(int shePai)
         {
-            if (MIAN_ZI != 4)
+            if (mianZi != 4)
             {
                 return;
             }
@@ -190,7 +190,7 @@ namespace Gongtong
         internal static void LunZhuang()
         {
             ju++;
-            if (ju >= (4 - (4 - MIAN_ZI)))
+            if (ju >= (4 - (4 - mianZi)))
             {
                 // 場変更
                 ChangBianGeng();
@@ -205,7 +205,7 @@ namespace Gongtong
                 benChang = 0;
             }
             qin++;
-            qin %= MIAN_ZI;
+            qin %= mianZi;
         }
 
         // 点計算
@@ -218,9 +218,9 @@ namespace Gongtong
             // 受取
             int shouQu = 0;
             int cuHe = 1;
-            for (int i = ziMoFan + 1; i < ziMoFan + MIAN_ZI; i++)
+            for (int i = ziMoFan + 1; i < ziMoFan + mianZi; i++)
             {
-                QiaoShi shi = qiaoShi[i % MIAN_ZI];
+                QiaoShi shi = qiaoShi[i % mianZi];
                 if (shi.cuHeSheng != "")
                 {
                     cuHe = -1;
@@ -236,7 +236,7 @@ namespace Gongtong
                 if (qiaoShi[ziMoFan].baoZeFan >= 0)
                 {
                     // 包則
-                    int baoZeFan = (ziMoFan + MIAN_ZI - qiaoShi[ziMoFan].baoZeFan) % MIAN_ZI;
+                    int baoZeFan = (ziMoFan + mianZi - qiaoShi[ziMoFan].baoZeFan) % mianZi;
                     shouQu = dian + benChang * 100 * cuHe;
                     qiaoShi[ziMoFan].DianBangJiSuan(shouQu);
                     qiaoShi[baoZeFan].DianBangJiSuan(-shouQu);
@@ -246,12 +246,12 @@ namespace Gongtong
                 else if (ziMoFan == qin)
                 {
                     // 親
-                    zhiFu = Ceil(dian / (MIAN_ZI - 1), 100);
+                    zhiFu = Ceil(dian / (mianZi - 1), 100);
                     // 本場
                     zhiFu += benChang * 100 * cuHe;
-                    for (int i = ziMoFan + 1; i < ziMoFan + MIAN_ZI; i++)
+                    for (int i = ziMoFan + 1; i < ziMoFan + mianZi; i++)
                     {
-                        qiaoShi[i % MIAN_ZI].DianBangJiSuan(-zhiFu);
+                        qiaoShi[i % mianZi].DianBangJiSuan(-zhiFu);
                         shouQu += zhiFu;
                     }
                     qiaoShi[ziMoFan].DianBangJiSuan(shouQu);
@@ -261,9 +261,9 @@ namespace Gongtong
                 else
                 {
                     // 子
-                    for (int i = ziMoFan + 1; i < ziMoFan + MIAN_ZI; i++)
+                    for (int i = ziMoFan + 1; i < ziMoFan + mianZi; i++)
                     {
-                        if ((i % MIAN_ZI) == qin)
+                        if ((i % mianZi) == qin)
                         {
                             zhiFu = Ceil(dian / 2, 100);
                         }
@@ -273,19 +273,19 @@ namespace Gongtong
                         }
                         // 本場
                         zhiFu += benChang * 100 * cuHe;
-                        if (MIAN_ZI == 3)
+                        if (mianZi == 3)
                         {
                             // 3打ちの場合、北家分を折半
                             zhiFu += Ceil(Ceil(dian / 4, 100) / 2, 100);
                             zhiFu += benChang * 100 / 2 * cuHe;
                         }
-                        else if (MIAN_ZI == 2)
+                        else if (mianZi == 2)
                         {
                             // 2打ちの場合、全て支払
                             zhiFu = dian;
                             zhiFu += benChang * 300 * cuHe;
                         }
-                        qiaoShi[i % MIAN_ZI].DianBangJiSuan(-zhiFu);
+                        qiaoShi[i % mianZi].DianBangJiSuan(-zhiFu);
                         shouQu += zhiFu;
                     }
                     qiaoShi[ziMoFan].DianBangJiSuan(shouQu);
@@ -310,7 +310,7 @@ namespace Gongtong
                     if (qiaoShi[rongHeFan[i]].baoZeFan >= 0)
                     {
                         // 包則
-                        int baoZeFan = (rongHeFan[i] + MIAN_ZI - qiaoShi[rongHeFan[i]].baoZeFan) % MIAN_ZI;
+                        int baoZeFan = (rongHeFan[i] + mianZi - qiaoShi[rongHeFan[i]].baoZeFan) % mianZi;
                         shouQu = Ceil(dian / 2, 100);
                         qiaoShi[ziMoFan].DianBangJiSuan(-(dian - shouQu));
                         qiaoShi[baoZeFan].DianBangJiSuan(-shouQu);
@@ -349,15 +349,15 @@ namespace Gongtong
                 return;
             }
             // 記録 流局数(四家立直や四開槓で流局の場合はカウントしない)
-            for (int i = ziMoFan + 1; i < ziMoFan + MIAN_ZI; i++)
+            for (int i = ziMoFan + 1; i < ziMoFan + mianZi; i++)
             {
-                QiaoShi shi = qiaoShi[i % MIAN_ZI];
+                QiaoShi shi = qiaoShi[i % mianZi];
                 shi.jiLu.liuJuShu++;
             }
 
             // 形式聴牌計算
             int xingTingShu = 0;
-            for (int i = 0; i < qiaoShi.Length; i++)
+            for (int i = 0; i < mianZi; i++)
             {
                 if (qiaoShi[i].xingTing)
                 {
@@ -371,11 +371,11 @@ namespace Gongtong
                     qiaoShi[i].jiLu.buTingShu++;
                 }
             }
-            if (xingTingShu == MIAN_ZI || xingTingShu == 0)
+            if (xingTingShu == mianZi || xingTingShu == 0)
             {
                 return;
             }
-            for (int i = 0; i < qiaoShi.Length; i++)
+            for (int i = 0; i < mianZi; i++)
             {
                 if (qiaoShi[i].xingTing)
                 {
@@ -383,7 +383,7 @@ namespace Gongtong
                 }
                 else
                 {
-                    qiaoShi[i].DianBangJiSuan(-3000 / (MIAN_ZI - xingTingShu));
+                    qiaoShi[i].DianBangJiSuan(-3000 / (mianZi - xingTingShu));
                 }
             }
         }
@@ -395,19 +395,19 @@ namespace Gongtong
             {
                 // 親
                 qiaoShi[jia].DianBangJiSuan(-12000);
-                for (int i = jia + 1; i < jia + MIAN_ZI; i++)
+                for (int i = jia + 1; i < jia + mianZi; i++)
                 {
-                    int taJia = i % MIAN_ZI;
-                    qiaoShi[taJia].DianBangJiSuan(12000 / MIAN_ZI);
+                    int taJia = i % mianZi;
+                    qiaoShi[taJia].DianBangJiSuan(12000 / mianZi);
                 }
             }
             else
             {
                 // 子
                 qiaoShi[jia].DianBangJiSuan(-8000);
-                for (int i = jia + 1; i < jia + MIAN_ZI; i++)
+                for (int i = jia + 1; i < jia + mianZi; i++)
                 {
-                    int taJia = i % MIAN_ZI;
+                    int taJia = i % mianZi;
                     int dian;
                     if (taJia == qin)
                     {
@@ -417,7 +417,7 @@ namespace Gongtong
                     {
                         dian = 2000;
                     }
-                    if (MIAN_ZI == 3)
+                    if (mianZi == 3)
                     {
                         dian += 1000;
                     }
@@ -430,7 +430,7 @@ namespace Gongtong
         // 箱判定
         internal static bool XiangPanDing(QiaoShi[] qiaoShi)
         {
-            for (int i = 0; i < qiaoShi.Length; i++)
+            for (int i = 0; i < mianZi; i++)
             {
                 if (qiaoShi[i].dianBang <= 0)
                 {

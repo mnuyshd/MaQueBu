@@ -533,10 +533,7 @@ namespace Sikao
         {
             for (int i = 0; i < list.Length; i++)
             {
-                for (int j = 0; j < list[i].Length; j++)
-                {
-                    list[i][j] = value;
-                }
+                Init(list[i], value);
             }
         }
 
@@ -563,10 +560,7 @@ namespace Sikao
         {
             for (int i = 0; i < from.Length; i++)
             {
-                for (int j = 0; j < from[i].Length; j++)
-                {
-                    to[i][j] = from[i][j];
-                }
+                Copy(from[i], to[i]);
             }
         }
 
@@ -653,7 +647,7 @@ namespace Sikao
                 return;
             }
 
-            if (Pai.XuanShangPaiShu() <= 4 && Pai.CanShanPaiShu() >= 4)
+            if (Pai.XuanShangPaiShu() <= 4 && Pai.CanShanPaiShu() >= Chang.mianZi)
             {
                 // 暗槓判定
                 AnGangPanDing();
@@ -879,7 +873,7 @@ namespace Sikao
             int ziMoFan = Chang.ziMoFan;
             if (mingFan < ziMoFan)
             {
-                mingFan += Chang.MIAN_ZI;
+                mingFan += Chang.mianZi;
             }
             return mingFan - ziMoFan;
         }
@@ -1220,7 +1214,7 @@ namespace Sikao
         protected int HePaiPanDing(int pai)
         {
             int hePai = 0;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 for (int j = 0; j < shi.shePaiWei; j++)
@@ -1944,7 +1938,7 @@ namespace Sikao
         // 吃判定
         private void ChiPanDing()
         {
-            if (Chang.MIAN_ZI <= 2)
+            if (Chang.mianZi <= 2)
             {
                 return;
             }
@@ -3576,7 +3570,7 @@ namespace Sikao
         {
             Init(gongKaiPaiShu, 0);
             Init(liZhiJiaShePaiShu, 0);
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 // 捨牌

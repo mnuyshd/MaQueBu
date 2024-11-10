@@ -60,7 +60,7 @@ namespace Sikao
         {
             // 最高得点
             int zuiGaoDingBang = 0;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 if (shi.dianBang > zuiGaoDingBang)

@@ -80,7 +80,7 @@ namespace Gongtong
 
         // 洗牌
         internal static void XiPai() {
-            if (Chang.MIAN_ZI == 3)
+            if (Chang.mianZi == 3)
             {
                 // 3人打ちの場合、萬子を抜く
                 PAI = PAI3;
@@ -170,11 +170,11 @@ namespace Gongtong
                             int wei;
                             if (j < 12)
                             {
-                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % Chang.MIAN_ZI * 4);
+                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % Chang.mianZi * 4);
                             }
                             else
                             {
-                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % Chang.MIAN_ZI);
+                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % Chang.mianZi);
                             }
                             int p = shanPai[wei];
                             shanPai[wei] = shanPai[k];
@@ -273,7 +273,7 @@ namespace Gongtong
         {
             gangJia[xuanShangPaiWei - 1] = jia;
             xuanShangPaiWei++;
-            for (int i = 0; i < Chang.qiaoShi.Length; i++)
+            for (int i = 0; i < Chang.mianZi; i++)
             {
                 QiaoShi shi = Chang.qiaoShi[i];
                 if (shi.player)
