@@ -124,8 +124,9 @@ namespace Maqiao
         private bool isDianBiaoShiCoroutine;
         private bool isZhuangZhongLeCoroutine;
 
-        private bool isBackDuiJuZhongLe;
-        private bool isDianCha;
+        private bool isBackDuiJuZhongLe = false;
+        private bool isDianCha = false;
+        private bool isQuXiao = false;
 
         // Game Object
         private Button goScreen;
@@ -180,6 +181,7 @@ namespace Maqiao
         private Button goZiMoQieBiaoShi;
         private Button goDaiPaiBiaoShi;
         private Button goXiangTingShuBiaoShi;
+        private Button goMingquXiao;
         private Button goSetting;
         private Button goScore;
         private Button goGuiZe;
@@ -544,7 +546,7 @@ namespace Maqiao
             // オプション
             float x = paiWidth * 4.5f;
             float y = paiHeight * 2.5f;
-            float offset = paiHeight * 2;
+            float offset = paiHeight * 1.8f;
             int len = 7;
             // 1タップ打牌
             string[] labelDaPaiFangFa = new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" };
@@ -608,6 +610,17 @@ namespace Maqiao
                 WriteSheDing();
             });
             DrawButton(ref goXiangTingShuBiaoShi, sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1], new Vector2(x, y), len);
+            y -= offset;
+            // 鳴きの取消
+            string[] labelMingQuXiao = new string[] { "鳴パスはボタン", "鳴パスはタップ" };
+            ClearGameObject(ref goMingquXiao);
+            goMingquXiao = Instantiate(goButton, goSettingPanel.transform);
+            goMingquXiao.onClick.AddListener(delegate {
+                sheDing.mingQuXiao = !sheDing.mingQuXiao;
+                goMingquXiao.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1];
+                WriteSheDing();
+            });
+            DrawButton(ref goMingquXiao, sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1], new Vector2(-x, y), len);
             y -= offset;
             // リセット
             goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
@@ -1263,6 +1276,10 @@ namespace Maqiao
                     {
                         keyPress = true;
                     }
+                    if (isQuXiao && !sheDing.mingQuXiao)
+                    {
+                        keyPress = true;
+                    }
                     break;
             }
         }
@@ -1425,16 +1442,16 @@ namespace Maqiao
             switch (eventStatus)
             {
                 case Event.QIAO_SHI_XUAN_ZE:
-                    value = "相手雀士を選択";
+                    value = "相手雀士";
                     break;
                 case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                    value = "フォロー雀士を選択";
+                    value = "フォロー雀士";
                     break;
                 default:
                     value = "";
                     break;
             }
-            DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
+            DrawText(ref goJu, value, new Vector2(x, y), 0, 20);
         }
 
         // 【描画】局、残牌、供託、点
@@ -2894,7 +2911,11 @@ namespace Maqiao
             }
             if (index > 0)
             {
-                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(paiWidth * 7.5f, y), QiaoShi.Yao.WU, mingWei);
+                isQuXiao = true;
+                if (sheDing.mingQuXiao)
+                {
+                    DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(paiWidth * 7.5f, y), QiaoShi.Yao.WU, mingWei);
+                }
             }
         }
 
@@ -2931,6 +2952,7 @@ namespace Maqiao
             {
                 shi.taJiaYao = yao;
                 shi.taJiaXuanZe = 0;
+                isQuXiao = false;
                 keyPress = true;
             }
         }

@@ -28,5 +28,7 @@ namespace Maqiao
         public bool daiPaiBiaoShi = true;
         // 向聴数表示有り
         public bool xiangTingShuBiaoShi = true;
+        // 鳴パスはボタン
+        public bool mingQuXiao = true;
     }
 }
