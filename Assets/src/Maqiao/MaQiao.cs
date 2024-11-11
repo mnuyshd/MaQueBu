@@ -157,6 +157,7 @@ namespace Maqiao
         private TextMeshProUGUI[] goYi;
         private TextMeshProUGUI[] goFanShu;
         private TextMeshProUGUI[] goDianBang;
+        private GameObject goDianBangLine;
         private Image[] goFeng;
         private TextMeshProUGUI[] goShouQu;
         private TextMeshProUGUI[] goShouQuGongTuo;
@@ -1556,9 +1557,15 @@ namespace Maqiao
             {
                 int jia = (Chang.qin + i) % Chang.mianZi;
                 QiaoShi shi = Chang.qiaoShi[jia];
-                Color background = shi.feng == 0x31 ? new Color(1f, 0.4f, 0.4f) : Color.black;
+                Color background = shi.feng == 0x31 ? new Color(1f, 0.5f, 0.5f) : Color.black;
                 ClearGameObject(ref goFeng[i]);
                 goFeng[i] = Instantiate(goFrame, goJuFrame.transform.parent);
+                Outline line = goFeng[i].GetComponentInChildren<Outline>();
+                if (eventStatus == Event.DUI_JU && jia == Chang.ziMoFan)
+                {
+                    line.effectColor = new Color(1f, 0f, 0f, 1f);
+                    line.effectDistance = new Vector2(1.5f, 1.5f);
+                }
                 DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 2f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
                 if (eventStatus == Event.DIAN_BIAO_SHI)
                 {
@@ -1566,17 +1573,19 @@ namespace Maqiao
                 }
                 ClearGameObject(ref goDianBang[i]);
                 goDianBang[i] = Instantiate(goText, goJuFrame.transform.parent);
+                string value;
                 if (isDianCha && !shi.player)
                 {
                     int dianCha = dianPlayer - shi.dianBang;
-                    DrawText(ref goDianBang[i], dianCha.ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
+                    value = dianCha.ToString();
                     goDianBang[i].color = (dianCha >= 0 ? Color.blue : Color.red);
                 }
                 else
                 {
-                    DrawText(ref goDianBang[i], shi.dianBang.ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
+                    value = shi.dianBang.ToString();
                     goDianBang[i].color = Color.black;
                 }
+                DrawText(ref goDianBang[i], value, Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16);
 
                 if (shi.liZhi)
                 {
@@ -2193,6 +2202,7 @@ namespace Maqiao
             ziJiaShi.taJiaYao = QiaoShi.Yao.WU;
             ziJiaShi.taJiaXuanZe = 0;
             ziJiaShi.SiKaoZiJiaPanDing();
+            DrawDianBang();
             DrawDaiPai(Chang.ziMoFan, -1);
             // 思考自家
             if (ziJiaShi.player)
