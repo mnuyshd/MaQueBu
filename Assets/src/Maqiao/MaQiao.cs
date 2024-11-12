@@ -1280,6 +1280,7 @@ namespace Maqiao
                     if (isQuXiao && !sheDing.mingQuXiao)
                     {
                         keyPress = true;
+                        isQuXiao = false;
                     }
                     break;
             }
