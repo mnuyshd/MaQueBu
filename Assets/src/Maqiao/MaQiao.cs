@@ -1279,8 +1279,15 @@ namespace Maqiao
                     }
                     if (isQuXiao && !sheDing.mingQuXiao)
                     {
-                        keyPress = true;
-                        isQuXiao = false;
+                        for (int i = 0; i < Chang.mianZi; i++)
+                        {
+                            QiaoShi shi = Chang.qiaoShi[i];
+                            if (shi.player)
+                            {
+                                OnClickTaJiaYao(i, shi, QiaoShi.Yao.WU, 0);
+                                break;
+                            }
+                        }
                     }
                     break;
             }
