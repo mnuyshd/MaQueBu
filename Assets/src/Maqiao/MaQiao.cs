@@ -132,6 +132,7 @@ namespace Maqiao
         private Button goScreen;
         private TextMeshProUGUI goText;
         private Image goFrame;
+        private Image goLine;
         private Button goButton;
         private Button goFast;
         private Button goReproduction;
@@ -148,6 +149,7 @@ namespace Maqiao
         private TextMeshProUGUI goStart;
         private TextMeshProUGUI goJu;
         private Image goJuFrame;
+        private Image goZiMoShiLine;
         private TextMeshProUGUI goBenChangText;
         private TextMeshProUGUI goGongTouText;
         private Image goCanShanPaiShu;
@@ -157,7 +159,6 @@ namespace Maqiao
         private TextMeshProUGUI[] goYi;
         private TextMeshProUGUI[] goFanShu;
         private TextMeshProUGUI[] goDianBang;
-        private GameObject goDianBangLine;
         private Image[] goFeng;
         private TextMeshProUGUI[] goShouQu;
         private TextMeshProUGUI[] goShouQuGongTuo;
@@ -291,6 +292,7 @@ namespace Maqiao
             goMingQian = new TextMeshProUGUI[4];
             // イメージ
             goFrame = GameObject.Find("Frame").GetComponent<Image>();
+            goLine = GameObject.Find("Line").GetComponent<Image>();
             // スクリーン
             goScreen = GameObject.Find("Screen").GetComponent<Button>();
             goScreen.onClick.AddListener(delegate {
@@ -359,6 +361,9 @@ namespace Maqiao
             TextMeshProUGUI buttonText = goButton.GetComponentInChildren<TextMeshProUGUI>();
             RectTransform rtFrame = goFrame.rectTransform;
             rtFrame.localScale *= scale.x;
+
+            RectTransform rtLine = goLine.GetComponent<RectTransform>();
+            rtLine.localScale *= scale.x;
 
             // ボタンのスケールとサイズを設定
             rtButton.localScale *= scale.x;
@@ -1568,11 +1573,13 @@ namespace Maqiao
                 Color background = shi.feng == 0x31 ? new Color(1f, 0.5f, 0.5f) : Color.black;
                 ClearGameObject(ref goFeng[i]);
                 goFeng[i] = Instantiate(goFrame, goJuFrame.transform.parent);
-                Outline line = goFeng[i].GetComponentInChildren<Outline>();
-                if (eventStatus == Event.DUI_JU && jia == Chang.ziMoFan)
+                if ((eventStatus == Event.DUI_JU || eventStatus == Event.DUI_JU_ZHONG_LE) && jia == Chang.ziMoFan)
                 {
-                    line.effectColor = new Color(1f, 0f, 0f, 1f);
-                    line.effectDistance = new Vector2(1.5f, 1.5f);
+                    ClearGameObject(ref goZiMoShiLine);
+                    goZiMoShiLine = Instantiate(goLine, goJuFrame.transform.parent);
+                    RectTransform rt = goZiMoShiLine.rectTransform;
+                    rt.anchoredPosition = Cal(0, -(paiHeight * 2f), shi.playOrder);
+                    rt.rotation = Quaternion.Euler(0, 0, 90 * GetDrawOrder(shi.playOrder));
                 }
                 DrawFrame(ref goFeng[i], Pai.FENG_PAI_MING[shi.feng - 0x31], Cal(x - paiWidth * 2f, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 16, background, Color.white);
                 if (eventStatus == Event.DIAN_BIAO_SHI)
@@ -4188,6 +4195,7 @@ namespace Maqiao
                 ClearGameObject(ref qs.goCanPaiShu);
                 ClearGameObject(ref qs.goXiangTingShu);
             }
+            ClearGameObject(ref goZiMoShiLine);
 
             ClearGameObject(ref goMingQian);
             ClearGameObject(ref goFu);
