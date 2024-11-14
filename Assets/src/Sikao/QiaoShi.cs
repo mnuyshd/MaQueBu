@@ -740,8 +740,6 @@ namespace Sikao
         internal void ZiMo(int p)
         {
             shouPai[shouPaiWei++] = p;
-            Init(tongShunPai, 0xff);
-            tongShunPaiWei = 0;
 
             ziMoPai[ziMoPaiWei++] = p;
         }
@@ -758,6 +756,8 @@ namespace Sikao
             }
             shouPaiWei--;
             shePaiWei++;
+            Init(tongShunPai, 0xff);
+            tongShunPaiWei = 0;
 
             fuLuShun = false;
         }
