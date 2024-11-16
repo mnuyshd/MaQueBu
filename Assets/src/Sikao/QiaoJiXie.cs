@@ -333,7 +333,7 @@ namespace Sikao
             }
             if (wei >= 0)
             {
-                if (fuLuPaiWei == 0)
+                if (taJiaFuLuShu == 0)
                 {
                     gaoDian += 100 - nao[XingGe.MING];
                 }
@@ -377,7 +377,7 @@ namespace Sikao
                 }
                 else
                 {
-                    if (fuLuPaiWei == 0)
+                    if (taJiaFuLuShu == 0)
                     {
                         gaoDian += 100 - nao[XingGe.MING];
                     }
@@ -429,7 +429,7 @@ namespace Sikao
             }
             if (wei >= 0)
             {
-                if (fuLuPaiWei == 0)
+                if (taJiaFuLuShu == 0)
                 {
                     diDian += 100 - nao[XingGe.MING];
                 }
