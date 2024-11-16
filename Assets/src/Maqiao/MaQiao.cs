@@ -874,10 +874,10 @@ namespace Maqiao
             {
                 goMing = Instantiate(goText, goDataContent.transform);
             }
-            DrawText(ref goMing, ming, new Vector2(-paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Left);
+            DrawText(ref goMing, ming, new Vector2(-paiWidth * 2f, y), 0, 25, TextAlignmentOptions.Left, 7);
 
             goShu = Instantiate(goText, goDataContent.transform);
-            DrawText(ref goShu, "", new Vector2(paiWidth * 5f, y), 0, 25, TextAlignmentOptions.Right);
+            DrawText(ref goShu, "", new Vector2(paiWidth * 5.5f, y), 0, 25, TextAlignmentOptions.Right, 0);
         }
 
         // 得点パネル 雀士名クリック
@@ -964,7 +964,7 @@ namespace Maqiao
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
 
             float y = paiHeight * 8.5f;
-            float x = -(paiWidth * 8.5f);
+            float x = 0;
             TextMeshProUGUI title = Instantiate(goText, goGuiZeContent.transform);
             DrawText(ref title, "ルール", new Vector2(0, y), 0, 25);
             y -= paiHeight;
@@ -988,7 +988,7 @@ namespace Maqiao
             foreach (string g in guiZe)
             {
                 TextMeshProUGUI t = Instantiate(goText, goGuiZeContent.transform);
-                DrawText(ref t, g, new Vector2(x, y), 0, 20, TextAlignmentOptions.Left);
+                DrawText(ref t, g, new Vector2(x, y), 0, 20, TextAlignmentOptions.Left, 21);
                 y -= paiHeight;
             }
 
@@ -3758,15 +3758,10 @@ namespace Maqiao
                 for (int i = 0; i < shi.yiShu; i++)
                 {
                     y -= paiHeight;
-                    string text = yi[i];
-                    for (int j = text.Length; j < 6; j++)
-                    {
-                        text += "　";
-                    }
                     goYi[i] = Instantiate(goText, goText.transform.parent);
-                    DrawText(ref goYi[i], text, new Vector2(-paiWidth * 3.5f, y), 0, 25, TextAlignmentOptions.Left);
+                    DrawText(ref goYi[i], yi[i], new Vector2(0, y), 0, 25, TextAlignmentOptions.Left, 7);
                     goFanShu[i] = Instantiate(goText, goText.transform.parent);
-                    DrawText(ref goFanShu[i], shi.fanShu[i].ToString(), new Vector2(paiWidth * 3.5f, y), 0, 25, TextAlignmentOptions.Right);
+                    DrawText(ref goFanShu[i], shi.fanShu[i].ToString(), new Vector2(paiWidth * 3.3f, y), 0, 25, TextAlignmentOptions.Right, 2);
                 }
             }
         }
@@ -3792,8 +3787,13 @@ namespace Maqiao
                 // 受取
                 string shouQuGongTuo = (shi.shouQuGongTuo > 0 ? "+" : "") + (shi.shouQuGongTuo == 0 ? "" : shi.shouQuGongTuo.ToString());
                 string shouQu = (shi.shouQu - shi.shouQuGongTuo > 0 ? "+" : "") + (shi.shouQu - shi.shouQuGongTuo == 0 ? "" : (shi.shouQu - shi.shouQuGongTuo).ToString());
-                DrawText(ref goShouQuGongTuo[jia], shouQuGongTuo, Cal(0, -(paiHeight * 2.5f), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20, TextAlignmentOptions.Right);
-                DrawText(ref goShouQu[jia], shouQu, Cal(0, -(paiHeight * 3), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20, TextAlignmentOptions.Right);
+                int len = shouQuGongTuo.Length;
+                if (len < shouQu.Length)
+                {
+                    len = shouQu.Length;
+                }
+                DrawText(ref goShouQuGongTuo[jia], shouQuGongTuo, Cal(0, -(paiHeight * 2.5f), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20, TextAlignmentOptions.Right, len - 1);
+                DrawText(ref goShouQu[jia], shouQu, Cal(0, -(paiHeight * 3f), shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 20, TextAlignmentOptions.Right, len - 1);
 
                 DrawText(ref goDianBang[jia], (shi.dianBang - shi.shouQu).ToString(), Cal(x, y, shi.playOrder), 90 * GetDrawOrder(shi.playOrder), 30);
                 if (Math.Abs(shi.shouQu) > max)
@@ -4023,9 +4023,9 @@ namespace Maqiao
                     deDian = " " + deDian;
                 }
 
-                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 7f), y), 0, 30, TextAlignmentOptions.Left);
-                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3f, y), 0, 30, TextAlignmentOptions.Right);
-                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7f, y), 0, 25, TextAlignmentOptions.Right);
+                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 7f), y), 0, 30, TextAlignmentOptions.Left, quiaoShiButtonMaxLen);
+                DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3f, y), 0, 30, TextAlignmentOptions.Right, 6);
+                DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7f, y), 0, 25, TextAlignmentOptions.Right, 4);
                 y -= paiHeight * 2;
             }
         }
@@ -4033,9 +4033,9 @@ namespace Maqiao
         // 【描画】テキスト
         private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize)
         {
-            DrawText(ref obj, value, xy, quaternion, fontSize, TextAlignmentOptions.Center);
+            DrawText(ref obj, value, xy, quaternion, fontSize, TextAlignmentOptions.Center, -1);
         }
-        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize, TextAlignmentOptions align)
+        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize, TextAlignmentOptions align, int len)
         {
             if (obj == null)
             {
@@ -4047,7 +4047,18 @@ namespace Maqiao
             RectTransform rt = obj.rectTransform;
             rt.rotation = Quaternion.Euler(0, 0, quaternion);
             rt.anchoredPosition = xy;
-            rt.sizeDelta = new Vector2(paiWidth, obj.preferredHeight);
+            if (len == -1)
+            {
+                len = value.Length;
+            }
+            if (len == 0)
+            {
+                rt.sizeDelta = new Vector2(paiWidth, obj.preferredHeight);
+            }
+            else
+            {
+                rt.sizeDelta = new Vector2(obj.preferredWidth / value.Length * (len + 1), obj.preferredHeight);
+            }
             rt.SetSiblingIndex(1);
         }
 
