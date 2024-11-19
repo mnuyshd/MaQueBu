@@ -498,17 +498,13 @@ namespace Maqiao
             goShouPaiOpen.onClick.AddListener(delegate {
                 shouPaiOpen = !shouPaiOpen;
                 SwitchShouPaiOpenImage();
-                for (int i = 0; i < Chang.mianZi; i++)
+                switch (eventStatus)
                 {
-                    QiaoShi shi = Chang.qiaoShi[i];
-                    if (shi == null)
-                    {
+                    case Event.PEI_PAI:
+                    case Event.DUI_JU:
+                    case Event.DUI_JU_ZHONG_LE:
+                        DrawDuiJu();
                         break;
-                    }
-                    if (!shi.player)
-                    {
-                        DrawShouPai(i, QiaoShi.Yao.WU, 0);
-                    }
                 }
             });
             RectTransform rtShouPaiOpen = goShouPaiOpen.GetComponent<RectTransform>();
