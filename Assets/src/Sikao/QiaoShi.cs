@@ -64,6 +64,8 @@ namespace Sikao
         internal static readonly int SE_PAI = 0x30;
         // 字牌
         internal static readonly int ZI_PAI = 0x30;
+        // 赤牌
+        internal static readonly int CHI_PAI = 0x40;
 
         // 腰名
         private static readonly string[] YAO_MING = new string[] {
@@ -1181,7 +1183,7 @@ namespace Sikao
                 {
                     xuan++;
                 }
-                if (pai >= 0x40)
+                if (pai >= CHI_PAI)
                 {
                     xuan++;
                 }
@@ -1664,7 +1666,7 @@ namespace Sikao
                 for (int j = 0; j < shouPaiWei; j++)
                 {
                     int p = shouPai[j] & QIAO_PAI;
-                    if (p == Pai.XUAN_SHANG_PAI[xp] || shouPai[j] > 0x40)
+                    if (p == Pai.XUAN_SHANG_PAI[xp] || shouPai[j] > CHI_PAI)
                     {
                         shouPaiXuanShang[j] = true;
                     }
@@ -3320,7 +3322,7 @@ namespace Sikao
             }
             for (int i = 0; i < shouPaiWei; i++)
             {
-                if ((shouPai[i] & 0x40) == 0x40)
+                if ((shouPai[i] & CHI_PAI) == CHI_PAI)
                 {
                     xuan += 1;
                 }
@@ -3329,20 +3331,12 @@ namespace Sikao
             {
                 for (int j = 0; j < fuLuPai[i].Length; j++)
                 {
-                    int pai = fuLuPai[i][j];
-                    if (pai == 0xff)
+                    int p = fuLuPai[i][j];
+                    if (p == 0xff)
                     {
                         break;
                     }
-                    for (int k = 0; k < xuanShangPaiQuDe.Length; k++)
-                    {
-                        int xuanShangPai = Pai.XUAN_SHANG_PAI[xuanShangPaiQuDe[k] & QIAO_PAI];
-                        if ((pai & QIAO_PAI) == xuanShangPai)
-                        {
-                            xuan += 1;
-                        }
-                    }
-                    if ((pai & 0x40) == 0x40)
+                    if ((p & CHI_PAI) == CHI_PAI)
                     {
                         xuan += 1;
                     }
@@ -3542,7 +3536,7 @@ namespace Sikao
         {
             ShouPaiShuJiSuan(false);
         }
-        protected void ShouPaiShuJiSuan(bool anGang)
+        protected void ShouPaiShuJiSuan(bool fuLu)
         {
             Init(shouPaiShu, 0);
             for (int i = 0; i < shouPaiWei; i++)
@@ -3551,15 +3545,19 @@ namespace Sikao
                 shouPaiShu[p]++;
             }
 
-            if (anGang)
+            if (fuLu)
             {
-                // 暗槓牌加算
+                // 副露牌加算
                 for (int i = 0; i < fuLuPaiWei; i++)
                 {
-                    if (fuLuZhong[i] == Yao.AN_GANG)
+                    for (int j = 0; j < fuLuPai[i].Length; j++)
                     {
-                        int p = fuLuPai[i][0] & QIAO_PAI;
-                        shouPaiShu[p] += 4;
+                        int p = fuLuPai[i][j] & QIAO_PAI;
+                        if (p == 0xff)
+                        {
+                            break;
+                        }
+                        shouPaiShu[p]++;
                     }
                 }
             }
