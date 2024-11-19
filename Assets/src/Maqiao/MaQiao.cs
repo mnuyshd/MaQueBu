@@ -4023,7 +4023,7 @@ namespace Maqiao
                     deDian = " " + deDian;
                 }
 
-                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 7f), y), 0, 30, TextAlignmentOptions.Left, quiaoShiButtonMaxLen);
+                DrawText(ref goMingQian[i], shi.mingQian, new Vector2(-(paiWidth * 5f), y), 0, 30, TextAlignmentOptions.Left, quiaoShiButtonMaxLen);
                 DrawText(ref goDianBang[i], dianBang, new Vector2(paiWidth * 3f, y), 0, 30, TextAlignmentOptions.Right, 6);
                 DrawText(ref goShouQu[i], deDian, new Vector2(paiWidth * 7f, y), 0, 25, TextAlignmentOptions.Right, 4);
                 y -= paiHeight * 2;
