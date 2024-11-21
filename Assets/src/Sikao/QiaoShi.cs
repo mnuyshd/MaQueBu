@@ -754,7 +754,11 @@ namespace Sikao
             shePai[shePaiWei] = Chang.shePai;
             if (ziJiaXuanZe == shouPaiWei - 1)
             {
-                shePaiZiMoQie[shePaiWei] = true;
+                Yao y = yao[ziMoPaiWei - 1];
+                if (y == Yao.WU || y == Yao.LI_ZHI)
+                {
+                    shePaiZiMoQie[shePaiWei] = true;
+                }
             }
             shouPaiWei--;
             shePaiWei++;
