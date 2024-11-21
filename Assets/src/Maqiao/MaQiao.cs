@@ -4224,7 +4224,8 @@ namespace Maqiao
             {
                 return;
             }
-            go.text = "";
+            Destroy(go.gameObject);
+            go = null;
         }
 
         // ボタンクリア
