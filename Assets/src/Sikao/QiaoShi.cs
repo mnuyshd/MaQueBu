@@ -212,11 +212,11 @@ namespace Sikao
         }
 
         // 不聴
-        protected const int BU_TING = 0;
+        protected static readonly int BU_TING = 0;
         // 形聴
-        protected const int XING_TING = 1;
+        protected static readonly int XING_TING = 1;
         // 聴牌
-        protected const int TING_PAI = 2;
+        protected static readonly int TING_PAI = 2;
 
         // 名前
         internal string mingQian = "";

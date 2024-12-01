@@ -2,7 +2,7 @@ namespace Sikao.Shi
 {
     internal class MenzenJunko : QiaoJiXie
     {
-        internal const string MING_QIAN = "面前順子";
+        internal static readonly string MING_QIAN = "面前順子";
         internal MenzenJunko() : base(MING_QIAN)
         {
             liPai = false;

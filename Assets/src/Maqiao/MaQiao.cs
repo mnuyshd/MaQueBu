@@ -59,14 +59,14 @@ namespace Maqiao
         }
 
         // 待ち時間(デフォルト)
-        private const float WAIT_TIME = 0.3f;
+        private static readonly float WAIT_TIME = 0.3f;
         // プレイヤー牌倍率
-        private const float PLAYER_PAI_SCALE = 1.4f;
-        private const float PLAYER_PAI_SCALE_LANDSCAPE = 1.2f;
+        private static readonly float PLAYER_PAI_SCALE = 1.4f;
+        private static readonly float PLAYER_PAI_SCALE_LANDSCAPE = 1.2f;
         // プレイヤー名
-        private const string PLAYER_NAME = "プレイヤー";
+        private static readonly string PLAYER_NAME = "プレイヤー";
         // 設定ファイル名
-        private const string SHE_DING_FILE_NAME = "SheDing";
+        private static readonly string SHE_DING_FILE_NAME = "SheDing";
 
         // 送りモード
         private enum ForwardMode

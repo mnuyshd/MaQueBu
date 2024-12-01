@@ -2,7 +2,7 @@ namespace Sikao.Shi
 {
     internal class UchidaKou : QiaoJiXie
     {
-        internal const string MING_QIAN = "打田攻";
+        internal static readonly string MING_QIAN = "打田攻";
         internal UchidaKou() : base(MING_QIAN)
         {
             nao = new()

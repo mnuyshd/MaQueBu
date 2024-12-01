@@ -2,7 +2,7 @@ namespace Sikao.Shi
 {
     internal class KouzuTorako : QiaoJiXie
     {
-        internal const string MING_QIAN = "河津虎子";
+        internal static readonly string MING_QIAN = "河津虎子";
         internal KouzuTorako() : base(MING_QIAN)
         {
             nao = new()
