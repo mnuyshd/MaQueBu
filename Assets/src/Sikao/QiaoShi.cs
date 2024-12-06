@@ -9,399 +9,713 @@ namespace Sikao
     // 雀士
     internal abstract class QiaoShi
     {
-        // 【腰】
-        internal enum Yao
-        {
-            // 無
-            WU = 0,
-            // 吃
-            CHI = 1,
-            // 石並
-            BING = 2,
-            // 大明槓
-            DA_MING_GANG = 3,
-            // 加槓
-            JIA_GANG = 4,
-            // 暗槓
-            AN_GANG = 5,
-            // 立直
-            LI_ZHI = 6,
-            // 自摸
-            ZI_MO = 7,
-            // 栄和
-            RONG_HE = 8,
-            // 九種九牌
-            JIU_ZHONG_JIU_PAI = 9,
-            // 聴牌
-            TING_PAI = 10,
-            // 不聴
-            BU_TING = 11,
-            // 和了
-            HE_LE = 12,
-            // 四開槓
-            SI_KAI_GANG = 13,
-            // 四家立直
-            SI_JIA_LI_ZHI = 14,
-            // 流し満貫
-            LIU_MAN_GUAN = 15,
-            // 四風子連打
-            SI_FENG_ZI_LIAN_DA = 16,
-            // 錯和
-            CU_HE = 17,
-            // 選択
-            SELECT = 18,
-            // 打牌
-            DA_PAI = 19,
-            // 取消
-            CLEAR = 20
-        }
-
         // 牌
-        internal static readonly int QIAO_PAI = 0x3f;
+        internal const int QIAO_PAI = 0x3f;
         // 数牌
-        internal static readonly int SHU_PAI = 0x0f;
+        internal const int SHU_PAI = 0x0f;
         // 牌色
-        internal static readonly int SE_PAI = 0x30;
+        internal const int SE_PAI = 0x30;
         // 字牌
-        internal static readonly int ZI_PAI = 0x30;
+        internal const int ZI_PAI = 0x30;
         // 赤牌
-        internal static readonly int CHI_PAI = 0x40;
+        internal const int CHI_PAI = 0x40;
 
         // 腰名
-        private static readonly string[] YAO_MING = new string[] {
+        private static readonly string[] YaoMingDingYi = new string[] {
             "", "チー", "ポン", "カン", "カン", "カン", "リーチ", "ツモ", "ロン", "九種九牌",
             "テンパイ", "ノーテン", "和了", "四開槓", "四家立直", "流し満貫", "四風子連打", "チョンボ", "", "", ""
         };
-        internal static string YaoMing(Yao yao)
+        internal static string YaoMing(Chang.YaoDingYi yao)
         {
-            return YAO_MING[(int)yao];
+            return YaoMingDingYi[(int)yao];
         }
         // ボタン腰名
-        private static readonly string[] YAO_MING_BUTTON = new string[] {
+        private static readonly string[] YaoMingButtonDingYi = new string[] {
             "パス", "チー", "ポン", "カン", "加槓", "暗槓", "立直", "ツモ", "ロン", "九種",
             "", "", "", "", "", "", "", "", "", "", "取消"
         };
-        internal string YaoMingButton(Yao yao)
+        internal string YaoMingButton(Chang.YaoDingYi yao)
         {
-            if ((yao == Yao.JIA_GANG || yao == Yao.AN_GANG) && (anGangKeNengShu == 0 || jiaGangKeNengShu == 0))
+            if ((yao == Chang.YaoDingYi.JiaGang || yao == Chang.YaoDingYi.AnGang) && (anGangKeNengShu == 0 || jiaGangKeNengShu == 0))
             {
                 // 加槓、暗槓で片方のみ可能な場合、ボタン名は「カン」
-                yao = Yao.DA_MING_GANG;
+                yao = Chang.YaoDingYi.DaMingGang;
             }
-            return YAO_MING_BUTTON[(int)yao];
+            return YaoMingButtonDingYi[(int)yao];
         }
 
         // 役満名
-        internal static readonly string[] YI_MAN_MING = new string[] {
+        internal static readonly string[] YiManMing = new string[] {
             "天和", "人和", "地和", "国士無双", "国士無双十三面", "四暗刻", "四暗刻単騎", "四槓子", "四連刻", "大三元",
             "小四喜", "大四喜", "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "大車輪", "十三不塔"
         };
         // 役名
-        internal static readonly string[] YI_MING = new string[] {
+        internal static readonly string[] YiMing = new string[] {
             "立直", "Ｗ立直", "一発", "海底撈月", "河底撈魚", "嶺上開花", "槍槓", "面前清自摸和", "平和", "断幺九",
             "一盃口", "二盃口", "一気通貫", "三色同順", "全帯幺", "純全帯", "混老頭", "三暗刻", "三槓子", "三連刻",
             "小三元", "混一色", "清一色", "対々和", "役牌", "七対子", "ドラ", "流し満貫"
         };
         // 得点役
-        internal static readonly string[] DE_DIAN_YI = new string[] {
+        internal static readonly string[] DeDianYi = new string[] {
             "", "", "", "", "", "満貫", "跳満", "跳満", "倍満", "倍満", "倍満", "三倍満", "三倍満", "役満"
         };
 
         // 役満
-        private enum YiMan
+        private enum YiManDingYi
         {
             // 天和
-            TIAN_HE = 0,
+            TianHe = 0,
             // 人和
-            REN_HE = 1,
+            RenHe = 1,
             // 地和
-            DE_HE = 2,
+            DeHe = 2,
             // 国士無双
-            GUO_SHI_WU_SHUANG = 3,
+            GuoShiWuShuang = 3,
             // 国士無双十三面
-            GUO_SHI_SHI_SAN_MIAN = 4,
+            GuoShiShiSanMian = 4,
             // 四暗刻
-            SI_AN_KE = 5,
+            SiAnKe = 5,
             // 四暗刻単騎
-            SI_AN_KE_DAN_QI = 6,
+            SiAnKeDanQi = 6,
             // 四槓子
-            SI_GANG_ZI = 7,
+            SiGangZi = 7,
             // 四連刻
-            SI_LIAN_KE = 8,
+            SiLianKe = 8,
             // 大三元
-            DA_SAN_YUAN = 9,
+            DaSanYuan = 9,
             // 小四喜
-            XIAO_SI_XI = 10,
+            XiaoSiXi = 10,
             // 大四喜
-            DA_SI_XI = 11,
+            DaSiXi = 11,
             // 字一色
-            ZI_YI_SE = 12,
+            ZiYiSe = 12,
             // 清老頭
-            QING_LAO_TOU = 13,
+            QingLaoTou = 13,
             // 九連宝燈
-            JIU_LIAN_BAO_DENG = 14,
+            JiuLianBaoDegn = 14,
             // 純正九連宝燈
-            CHUN_ZHENG_JIU_LIAN = 15,
+            ChunZhengJiuLian = 15,
             // 緑一色
-            LU_YI_SE = 16,
+            LuYiSe = 16,
             // 大車輪
-            DA_CHE_LUN = 17,
+            DaCheLun = 17,
             // 十三不塔
-            SHI_SAN_BU_TA = 18,
+            ShiSanBuTa = 18,
         }
 
         // 役
-        private enum Yi
+        private enum YiDingYi
         {
             // 立直
-            LI_ZI = 0,
+            LiZi = 0,
             // Ｗ立直
-            W_LI_ZI = 1,
+            WLiZi = 1,
             // 一発
-            YI_FA = 2,
+            YiFa = 2,
             // 海底撈月
-            HAI_DI_LAO_YUE = 3,
+            HaiDiLaoYue = 3,
             // 河底撈魚
-            HE_DI_LAO_YU = 4,
+            HeDiLaoYu = 4,
             // 嶺上開花
-            LING_SHANG_KAI_HUA = 5,
+            LingShangKaiHua = 5,
             // 槍槓
-            QIANG_GANG = 6,
+            QiangGang = 6,
             // 面前清自摸和
-            MIAN_QIAN_QING_ZI_MO_HE = 7,
+            MianQianQingZiMoHe = 7,
             // 平和
-            PING_HE = 8,
+            PingHe = 8,
             // 断幺九
-            DUAN_YAO_JIU = 9,
+            DuanYaoJiu = 9,
             // 一盃口
-            YI_BEI_KOU = 10,
+            YiBeiKou = 10,
             // 二盃口
-            ER_BEI_KOU = 11,
+            ErBeiKou = 11,
             // 一気通貫
-            YI_QI_TONG_GUAN = 12,
+            YiQiTongGuan = 12,
             // 三色同順
-            SAN_SE_TONG_SHUN = 13,
+            SanSeTongShun = 13,
             // 全帯幺
-            QUAN_DAI_YAO = 14,
+            QuanDaiYao = 14,
             // 純全帯
-            CHUN_QUAN_DAI = 15,
+            ChunQuanDai = 15,
             // 混老頭
-            HUN_LAO_TOU = 16,
+            HunLaoTou = 16,
             // 三暗刻
-            SAN_AN_KE = 17,
+            SanAnKe = 17,
             // 三槓子
-            SAN_GANG_ZI = 18,
+            SanGangZi = 18,
             // 三連刻
-            SAN_LIAN_KE = 19,
+            SanLianKe = 19,
             // 小三元
-            XIAO_SAN_YUAN = 20,
+            XiaoSanYuan = 20,
             // 混一色
-            HUN_YI_SE = 21,
+            HunYiSe = 21,
             // 清一色
-            QING_YI_SE = 22,
+            QingYiSe = 22,
             // 対々和
-            DUI_DUI_HE = 23,
+            DuiDuiHe = 23,
             // 役牌
-            YI_PAI = 24,
+            YiPai = 24,
             // 七対子
-            QI_DUI_ZI = 25,
+            QiDuiZi = 25,
             // 懸賞
-            XUAN_SHANG = 26,
+            XuanShang = 26,
             // 流し満貫
-            LIU_MAN_GUAN = 27,
+            LiuManGuan = 27,
         }
 
-        // 不聴
-        protected static readonly int BU_TING = 0;
-        // 形聴
-        protected static readonly int XING_TING = 1;
-        // 聴牌
-        protected static readonly int TING_PAI = 2;
+        protected enum Ting
+        {
+            // 不聴
+            BuTing = 0,
+            // 形聴
+            XingTing = 1,
+            // 聴牌
+            TingPai = 2,
+        }
 
         // 名前
-        internal string mingQian = "";
+        private string mingQian = "";
+        internal string MingQian
+        {
+            get { return mingQian; }
+            set { mingQian = value; }
+        }
         // 自家思考結果
-        internal Yao ziJiaYao;
+        private Chang.YaoDingYi ziJiaYao;
+        internal Chang.YaoDingYi ZiJiaYao
+        {
+            get { return ziJiaYao; }
+            set { ziJiaYao = value; }
+        }
         // 自家選択
-        internal int ziJiaXuanZe;
+        private int ziJiaXuanZe;
+        internal int ZiJiaXuanZe
+        {
+            get { return ziJiaXuanZe; }
+            set { ziJiaXuanZe = value; }
+        }
         // 他家思考結果
-        internal Yao taJiaYao;
+        private Chang.YaoDingYi taJiaYao;
+        internal Chang.YaoDingYi TaJiaYao
+        {
+            get { return taJiaYao; }
+            set { taJiaYao = value; }
+        }
         // 他家選択
-        internal int taJiaXuanZe;
+        private int taJiaXuanZe;
+        internal int TaJiaXuanZe
+        {
+            get { return taJiaXuanZe; }
+            set { taJiaXuanZe= value; }
+        }
 
         // プレイヤー
-        internal bool player = false;
+        private bool player = false;
+        internal bool Player
+        {
+            get { return player; }
+            set { player = value; }
+        }
         // プレイヤー順(プレイヤーが必ず0となり、そこから順番にふられる)
-        internal int playOrder = -1;
+        private int playOrder = -1;
+        internal int PlayOrder
+        {
+            get { return playOrder; }
+            set { playOrder = value; }
+        }
         // 理牌
-        protected bool liPai = true;
+        private bool liPaiDongZuo = true;
+        internal bool LiPaiDongZuo
+        {
+            get { return liPaiDongZuo; }
+            set { liPaiDongZuo = value; }
+        }
         // フォロー
-        internal bool follow = false;
+        private bool follow = false;
+        internal bool Follow
+        {
+            get { return follow; }
+            set { follow = value; }
+        }
+        // 記録
+        private Maqiao.JiLu jiLu;
+        internal Maqiao.JiLu JiLu
+        {
+            get { return jiLu; }
+            set { jiLu = value; }
+        }
 
         // 役満
-        internal bool yiMan;
+        private bool yiMan;
+        internal bool YiMan
+        {
+            get { return yiMan; }
+        }
         // 役
-        internal int[] yi;
+        private readonly int[] yi;
+        internal int[] Yi
+        {
+            get { return yi; }
+        }
         // 役数
-        internal int yiShu;
+        private int yiShu;
+        internal int YiShu
+        {
+            get { return yiShu; }
+        }
         // 飜数
-        internal int[] fanShu;
+        private readonly int[] fanShu;
+        internal int[] FanShu
+        {
+            get { return fanShu; }
+        }
         // 飜数計
-        internal int fanShuJi;
+        private int fanShuJi;
+        internal int FanShuJi
+        {
+            get { return fanShuJi; }
+        }
         // 符
-        internal int fu;
+        private int fu;
+        internal int Fu
+        {
+            get { return fu; }
+        }
         // 和了点
-        internal int heLeDian;
+        private int heLeDian;
+        internal int HeLeDian
+        {
+            get { return heLeDian; }
+        }
         // 点棒
-        internal int dianBang;
+        private int dianBang;
+        internal int DianBang
+        {
+            get { return dianBang; }
+        }
         // 集計点
-        internal int jiJiDian;
+        private int jiJiDian;
+        internal int JiJiDian
+        {
+            get { return jiJiDian; }
+            set { jiJiDian = value; }
+        }
         // 風
-        internal int feng;
+        private int feng;
+        internal int Feng
+        {
+            get { return feng; }
+        }
         // 手牌
-        internal int[] shouPai;
+        private readonly int[] shouPai;
+        internal int[] ShouPai
+        {
+            get { return shouPai; }
+        }
         internal Button[] goShouPai;
         // 手牌懸賞
-        internal bool[] shouPaiXuanShang;
+        private readonly bool[] shouPaiXuanShang;
+        internal bool[] ShouPaiXuanShang
+        {
+            get { return shouPaiXuanShang; }
+        }
         // 手牌位
-        internal int shouPaiWei;
+        private int shouPaiWei;
+        internal int ShouPaiWei
+        {
+            get { return shouPaiWei; }
+        }
         // 副露牌
-        internal int[][] fuLuPai;
+        private readonly int[][] fuLuPai;
+        internal int[][] FuLuPai
+        {
+            get { return fuLuPai; }
+        }
         internal Button[][] goFuLuPai;
         // 副露家
-        internal int[] fuLuJia;
+        private readonly int[] fuLuJia;
+        internal int[] FuLuJia
+        {
+            get { return fuLuJia; }
+        }
         // 副露種
-        internal Yao[] fuLuZhong;
+        private readonly Chang.YaoDingYi[] fuLuZhong;
+        internal Chang.YaoDingYi[] FuLuZhong
+        {
+            get { return fuLuZhong; }
+        }
         // 副露牌位
-        internal int fuLuPaiWei;
+        private int fuLuPaiWei;
+        internal int FuLuPaiWei
+        {
+            get { return fuLuPaiWei; }
+        }
         // 包則番
-        internal int baoZeFan;
+        private int baoZeFan;
+        internal int BaoZeFan
+        {
+            get { return baoZeFan; }
+        }
         // 他家副露数
-        internal int taJiaFuLuShu;
+        private int taJiaFuLuShu;
+        internal int TaJiaFuLuShu
+        {
+            get { return taJiaFuLuShu; }
+        }
         // 捨牌
-        internal int[] shePai;
+        private readonly int[] shePai;
+        internal int[] ShePai
+        {
+            get { return shePai; }
+        }
         internal Button[] goShePai;
         // 捨牌位
-        internal int shePaiWei;
+        private int shePaiWei;
+        internal int ShePaiWei
+        {
+            get { return shePaiWei; }
+        }
         // 捨牌腰
-        internal Yao[] shePaiYao;
+        private readonly Chang.YaoDingYi[] shePaiYao;
+        internal Chang.YaoDingYi[] ShePaiYao
+        {
+            get { return shePaiYao; }
+        }
         // 捨牌自摸切
-        internal bool[] shePaiZiMoQie;
+        private readonly bool[] shePaiZiMoQie;
+        internal bool[] ShePaiZiMoQie
+        {
+            get { return shePaiZiMoQie; }
+        }
         // 立直位
-        internal int liZhiWei;
+        private int liZhiWei;
+        internal int LiZhiWei
+        {
+            get { return liZhiWei; }
+        }
         // 同順牌
-        internal int[] tongShunPai;
+        private readonly int[] tongShunPai;
+        internal int[] TongShunPai
+        {
+            get { return tongShunPai; }
+        }
         // 同順牌位
-        internal int tongShunPaiWei;
+        private int tongShunPaiWei;
+        internal int TongShunPaiWei
+        {
+            get { return tongShunPaiWei; }
+        }
         // 立直後牌
-        internal int[] liZhiHouPai;
+        private readonly int[] liZhiHouPai;
+        internal int[] LiZhiHouPai
+        {
+            get { return liZhiHouPai; }
+        }
         // 立直後牌位
-        internal int liZhiHouPaiWei;
+        private int liZhiHouPaiWei;
+        internal int LiZhiHouPaiWei
+        {
+            get { return liZhiHouPaiWei; }
+        }
         // 待牌
-        internal int[] daiPai;
+        private readonly int[] daiPai;
+        internal int[] DaiPai
+        {
+            get { return daiPai; }
+        }
         internal Button[] goDaiPai;
         // 残牌数
         internal TextMeshProUGUI[] goCanPaiShu;
         // 待牌数
-        internal int daiPaiShu;
+        private int daiPaiShu;
+        internal int DaiPaiShu
+        {
+            get { return daiPaiShu; }
+        }
         // 向聴数
-        internal int xiangTingShu;
+        private int xiangTingShu;
+        internal int XiangTingShu
+        {
+            get { return xiangTingShu; }
+        }
         internal TextMeshProUGUI goXiangTingShu;
         // 対子
-        internal int[][] duiZi;
+        private readonly int[][] duiZi;
+        internal int[][] DuiZi
+        {
+            get { return duiZi; }
+        }
         // 対子数
-        internal int duiZiShu;
+        private int duiZiShu;
+        internal int DuiZiShu
+        {
+            get { return duiZiShu; }
+        }
         // 刻子
-        internal int[][] keZi;
+        private readonly int[][] keZi;
+        internal int[][] KeZi
+        {
+            get { return keZi; }
+        }
         // 刻子数
-        internal int keZiShu;
+        private int keZiShu;
+        internal int KeZiShu
+        {
+            get { return keZiShu; }
+        }
         // 刻子種
-        internal Yao[] keZiZhong;
+        internal readonly Chang.YaoDingYi[] keZiZhong;
+        internal Chang.YaoDingYi[] KeZiZhong
+        {
+            get { return keZiZhong; }
+        }
         // 順子
-        internal int[][] shunZi;
+        private readonly int[][] shunZi;
+        internal int[][] ShunZi
+        {
+            get { return shunZi; }
+        }
         // 順子数
-        internal int shunZiShu;
+        private int shunZiShu;
+        internal int ShunZiShu
+        {
+            get { return shunZiShu; }
+        }
         // 塔子
-        internal int[][] taZi;
+        private readonly int[][] taZi;
+        internal int[][] TaZi
+        {
+            get { return taZi; }
+        }
         // 塔子数
-        internal int taZiShu;
+        private int taZiShu;
+        internal int TaZiShu
+        {
+            get { return taZiShu; }
+        }
         // 手牌数
-        internal int[] shouPaiShu;
+        private int[] shouPaiShu;
+        internal int[] ShouPaiShu
+        {
+            get { return shouPaiShu; }
+        }
         // 副露牌数
-        internal int[] fuLuPaiShu;
+        private readonly int[] fuLuPaiShu;
+        internal int[] FuLuPaiShu
+        {
+            get { return fuLuPaiShu; }
+        }
         // 公開牌数
-        internal int[] gongKaiPaiShu;
+        private int[] gongKaiPaiShu;
+        internal int[] GongKaiPaiShu
+        {
+            get { return gongKaiPaiShu; }
+        }
         // 立直家捨牌数
-        internal int[] liZhiJiaShePaiShu;
+        private readonly int[] liZhiJiaShePaiShu;
+        internal int[] LiZhiJiaShePaiShu
+        {
+            get { return liZhiJiaShePaiShu; }
+        }
         // 和了
-        internal bool heLe;
+        private bool heLe;
+        internal bool HeLe
+        {
+            get { return heLe; }
+        }
         // 立直
-        internal bool liZhi;
+        private bool liZhi;
+        internal bool LiZhi
+        {
+            get { return liZhi; }
+        }
         // W立直
-        internal bool wLiZhi;
+        private bool wLiZhi;
+        internal bool WLiZhi
+        {
+            get { return wLiZhi; }
+        }
         // 一発
-        internal bool yiFa;
+        private bool yiFa;
+        internal bool YiFa
+        {
+            get { return yiFa; }
+        }
         // 一巡目
-        internal bool yiXunMu;
+        private bool yiXunMu;
+        internal bool YiXunMu
+        {
+            get { return yiXunMu; }
+        }
         // 副露順
-        internal bool fuLuShun;
+        private bool fuLuShun;
+        internal bool FuLuShun
+        {
+            get { return fuLuShun; }
+        }
         // 振聴
-        internal bool zhenTing;
+        private bool zhenTing;
+        internal bool ZhenTing
+        {
+            get { return zhenTing; }
+        }
         // 形聴
-        internal bool xingTing;
+        private bool xingTing;
+        internal bool XingTing
+        {
+            get { return xingTing; }
+        }
         // 自家
-        internal bool jiJia;
+        private bool jiJia;
+        internal bool JiJia
+        {
+            get { return jiJia; }
+        }
         // 和了牌
-        internal int[][] heLePai;
+        private readonly int[][] heLePai;
+        internal int[][] HeLePai
+        {
+            get { return heLePai; }
+        }
         // 和了牌位
-        internal int[] heLePaiWei;
+        private readonly int[] heLePaiWei;
+        internal int[] HeLePaiWei
+        {
+            get { return heLePaiWei; }
+        }
         // 和了可能数
-        internal int heLeKeNengShu;
+        private int heLeKeNengShu;
+        internal int HeLeKeNengShu
+        {
+            get { return heLeKeNengShu; }
+        }
         // 立直牌位
-        internal int[] liZhiPaiWei;
+        private readonly int[] liZhiPaiWei;
+        internal int[] LiZhiPaiWei
+        {
+            get { return liZhiPaiWei; }
+        }
         // 立直可能数
-        internal int liZhiKeNengShu;
+        private int liZhiKeNengShu;
+        internal int LiZhiKeNengShu
+        {
+            get { return liZhiKeNengShu; }
+        }
         // 暗槓牌位
-        internal int[][] anGangPaiWei;
+        private readonly int[][] anGangPaiWei;
+        internal int[][] AnGangPaiWei
+        {
+            get { return anGangPaiWei; }
+        }
         // 暗槓可能数
-        internal int anGangKeNengShu;
+        private int anGangKeNengShu;
+        internal int AnGangKeNengShu
+        {
+            get { return anGangKeNengShu; }
+        }
         // 加槓牌位
-        internal int[][] jiaGangPaiWei;
+        private readonly int[][] jiaGangPaiWei;
+        internal int[][] JiaGangPaiWei
+        {
+            get { return jiaGangPaiWei; }
+        }
         // 加槓可能数
-        internal int jiaGangKeNengShu;
+        private int jiaGangKeNengShu;
+        internal int JiaGangKeNengShu
+        {
+            get { return jiaGangKeNengShu; }
+        }
         // 大明槓牌位
-        internal int[][] daMingGangPaiWei;
+        private readonly int[][] daMingGangPaiWei;
+        internal int[][] DaMingGangPaiWei
+        {
+            get { return daMingGangPaiWei; }
+        }
         // 大明槓可能数
-        internal int daMingGangKeNengShu;
+        private int daMingGangKeNengShu;
+        internal int DaMingGangKeNengShu
+        {
+            get { return daMingGangKeNengShu; }
+        }
         // 石並牌位
-        internal int[][] bingPaiWei;
+        private readonly int[][] bingPaiWei;
+        internal int[][] BingPaiWei
+        {
+            get { return bingPaiWei; }
+        }
         // 石並可能数
-        internal int bingKeNengShu;
+        private int bingKeNengShu;
+        internal int BingKeNengShu
+        {
+            get { return bingKeNengShu; }
+        }
         // 吃牌位
-        internal int[][] chiPaiWei;
+        private readonly int[][] chiPaiWei;
+        internal int[][] ChiPaiWei
+        {
+            get { return chiPaiWei; }
+        }
         // 吃可能数
-        internal int chiKeNengShu;
+        private int chiKeNengShu;
+        internal int ChiKeNengShu
+        {
+            get { return chiKeNengShu; }
+        }
         // 九種九牌
-        internal bool jiuZhongJiuPai;
+        private bool jiuZhongJiuPai;
+        internal bool JiuZhongJiuPai
+        {
+            get { return jiuZhongJiuPai; }
+        }
         // 自摸牌
-        internal int[] ziMoPai;
+        private readonly int[] ziMoPai;
+        internal int[] ZiMoPai
+        {
+            get { return ziMoPai; }
+        }
         // 腰
-        internal Yao[] yao;
+        private readonly Chang.YaoDingYi[] yao;
+        internal Chang.YaoDingYi[] Yao
+        {
+            get { return yao; }
+        }
         // 自摸牌位
-        internal int ziMoPaiWei;
+        private int ziMoPaiWei;
+        internal int ZiMoPaiWei
+        {
+            get { return ziMoPaiWei; }
+        }
         // 受取
-        internal int shouQu;
+        private int shouQu;
+        internal int ShouQu
+        {
+            get { return shouQu; }
+        }
         // 受取(供託)
-        internal int shouQuGongTuo;
+        private int shouQuGongTuo;
+        internal int ShouQuGongTuo
+        {
+            get { return shouQuGongTuo; }
+        }
         // 錯和声
-        internal string cuHeSheng;
+        private string cuHeSheng;
+        internal string CuHeSheng
+        {
+            get { return cuHeSheng; }
+        }
         // 食替牌
-        internal int[] shiTiPai;
+        private readonly int[] shiTiPai;
+        internal int[] ShiTiPai
+        {
+            get { return shiTiPai; }
+        }
         // 食替牌数
-        internal int shiTiPaiShu;
-
-        // 記録
-        internal Maqiao.JiLu jiLu;
+        private int shiTiPaiShu;
+        internal int ShiTiPaiShu
+        {
+            get { return shiTiPaiShu; }
+        }
 
         // コンストラクタ
         internal QiaoShi()
@@ -419,10 +733,10 @@ namespace Sikao
                 goFuLuPai[i] = new Button[fuLuPai[i].Length];
             }
             fuLuJia = new int[fuLuPai.Length];
-            fuLuZhong = new Yao[fuLuPai.Length];
+            fuLuZhong = new Chang.YaoDingYi[fuLuPai.Length];
             shePai = new int[0x50];
             goShePai = new Button[shePai.Length];
-            shePaiYao = new Yao[shePai.Length];
+            shePaiYao = new Chang.YaoDingYi[shePai.Length];
             shePaiZiMoQie = new bool[shePai.Length];
             liZhiHouPai = new int[shePai.Length * 4];
             tongShunPai = new int[0x20];
@@ -449,7 +763,7 @@ namespace Sikao
             {
                 taZi[i] = new int[2];
             }
-            keZiZhong = new Yao[4];
+            keZiZhong = new Chang.YaoDingYi[4];
             shouPaiShu = new int[0x40];
             fuLuPaiShu = new int[0x40];
             gongKaiPaiShu = new int[0x40];
@@ -457,7 +771,7 @@ namespace Sikao
             heLePai = new int[shouPai.Length][];
             for (int i = 0; i < heLePai.Length; i++)
             {
-                heLePai[i] = new int[Pai.PAI.Length];
+                heLePai[i] = new int[Pai.QiaoPai.Length];
             }
             heLePaiWei = new int[heLePai.Length];
             liZhiPaiWei = new int[shouPai.Length];
@@ -487,7 +801,7 @@ namespace Sikao
                 chiPaiWei[i] = new int[2];
             }
             ziMoPai = new int[0x50];
-            yao = new Yao[0x50];
+            yao = new Chang.YaoDingYi[0x50];
             shiTiPai = new int[2];
         }
 
@@ -503,69 +817,6 @@ namespace Sikao
         // 思考他家
         internal abstract void SiKaoTaJia(int jia);
 
-        // 初期化
-        internal static void Init(int[] list, int value)
-        {
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = value;
-            }
-        }
-
-        // 初期化
-        internal static void Init(Yao[] list, Yao value)
-        {
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = value;
-            }
-        }
-
-        // 初期化
-        internal static void Init(bool[] list, bool value)
-        {
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = value;
-            }
-        }
-
-        // 初期化(2次元配列)
-        internal static void Init(int[][] list, int value)
-        {
-            for (int i = 0; i < list.Length; i++)
-            {
-                Init(list[i], value);
-            }
-        }
-
-        // コピー
-        internal static void Copy(int[] from, int[] to)
-        {
-            for (int i = 0; i < from.Length; i++)
-            {
-                to[i] = from[i];
-            }
-        }
-
-        // コピー
-        internal static void Copy(Yao[] from, Yao[] to)
-        {
-            for (int i = 0; i < from.Length; i++)
-            {
-                to[i] = from[i];
-            }
-        }
-
-        // コピー(2次元配列)
-        internal static void Copy(int[][] from, int[][] to)
-        {
-            for (int i = 0; i < from.Length; i++)
-            {
-                Copy(from[i], to[i]);
-            }
-        }
-
         // 荘初期化
         internal void ZhuangChuQiHua()
         {
@@ -577,23 +828,23 @@ namespace Sikao
         internal void JuChuQiHua(int feng)
         {
             this.feng = feng;
-            Init(shouPai, 0xff);
-            Init(shouPaiXuanShang, false);
+            Chang.Init(shouPai, 0xff);
+            Chang.Init(shouPaiXuanShang, false);
             shouPaiWei = 0;
-            Init(fuLuPai, 0xff);
-            Init(fuLuJia, 0);
-            Init(fuLuZhong, Yao.WU);
+            Chang.Init(fuLuPai, 0xff);
+            Chang.Init(fuLuJia, 0);
+            Chang.Init(fuLuZhong, Chang.YaoDingYi.Wu);
             baoZeFan = -1;
             fuLuPaiWei = 0;
             taJiaFuLuShu = 0;
-            Init(shePai, 0xff);
+            Chang.Init(shePai, 0xff);
             shePaiWei = 0;
-            Init(shePaiYao, Yao.WU);
-            Init(shePaiZiMoQie, false);
-            Init(liZhiHouPai, 0xff);
+            Chang.Init(shePaiYao, Chang.YaoDingYi.Wu);
+            Chang.Init(shePaiZiMoQie, false);
+            Chang.Init(liZhiHouPai, 0xff);
             liZhiHouPaiWei = 0;
             liZhiWei = -1;
-            Init(daiPai, 0xff);
+            Chang.Init(daiPai, 0xff);
             daiPaiShu = 0;
             xiangTingShu = 0;
 
@@ -603,8 +854,8 @@ namespace Sikao
             yiXunMu = true;
             fuLuShun = false;
 
-            Init(ziMoPai, 0xff);
-            Init(yao, Yao.WU);
+            Chang.Init(ziMoPai, 0xff);
+            Chang.Init(yao, Chang.YaoDingYi.Wu);
             ziMoPaiWei = 0;
             shouQu = 0;
             shouQuGongTuo = 0;
@@ -616,7 +867,7 @@ namespace Sikao
         {
             jiJia = true;
 
-            ziJiaYao = Yao.WU;
+            ziJiaYao = Chang.YaoDingYi.Wu;
             ziJiaXuanZe = shouPaiWei - 1;
 
             // 初期化
@@ -637,7 +888,7 @@ namespace Sikao
             ShiTiPaiPanDing();
 
             // 和了判定
-            if (HeLePanDing() == TING_PAI)
+            if (HeLePanDing() == Ting.TingPai)
             {
                 heLe = true;
             }
@@ -649,7 +900,7 @@ namespace Sikao
                 return;
             }
 
-            if (Pai.XuanShangPaiShu() <= 4 && Pai.CanShanPaiShu() >= Chang.mianZi)
+            if (Pai.XuanShangPaiShu() <= 4 && Pai.CanShanPaiShu() >= Chang.MianZi)
             {
                 // 暗槓判定
                 AnGangPanDing();
@@ -663,15 +914,15 @@ namespace Sikao
         {
             jiJia = false;
 
-            taJiaYao = Yao.WU;
+            taJiaYao = Chang.YaoDingYi.Wu;
             taJiaXuanZe = 0;
 
             // 初期化
             SiKaoQianChuQiHua();
 
-            shouPai[shouPaiWei++] = Chang.shePai;
+            shouPai[shouPaiWei++] = Chang.ShePai;
             // 和了判定
-            if (HeLePanDing() == TING_PAI)
+            if (HeLePanDing() == Ting.TingPai)
             {
                 // 振聴判定
                 ZhenTingPanDing();
@@ -733,7 +984,7 @@ namespace Sikao
         // 理牌
         internal void LiPai()
         {
-            Sort(shouPai, liPai);
+            Sort(shouPai, liPaiDongZuo);
             // 手牌懸賞判定
             ShouPaiXuanShangPanDing();
         }
@@ -749,20 +1000,20 @@ namespace Sikao
         // 打牌
         internal void DaPai()
         {
-            Chang.shePai = shouPai[Chang.ziJiaXuanZe];
-            shouPai[Chang.ziJiaXuanZe] = 0xff;
-            shePai[shePaiWei] = Chang.shePai;
+            Chang.ShePai = shouPai[Chang.ZiJiaXuanZe];
+            shouPai[Chang.ZiJiaXuanZe] = 0xff;
+            shePai[shePaiWei] = Chang.ShePai;
             if (ziJiaXuanZe == shouPaiWei - 1)
             {
-                Yao y = yao[ziMoPaiWei - 1];
-                if (y == Yao.WU || y == Yao.LI_ZHI)
+                Chang.YaoDingYi y = yao[ziMoPaiWei - 1];
+                if (y == Chang.YaoDingYi.Wu || y == Chang.YaoDingYi.LiZhi)
                 {
                     shePaiZiMoQie[shePaiWei] = true;
                 }
             }
             shouPaiWei--;
             shePaiWei++;
-            Init(tongShunPai, 0xff);
+            Chang.Init(tongShunPai, 0xff);
             tongShunPaiWei = 0;
 
             fuLuShun = false;
@@ -771,7 +1022,7 @@ namespace Sikao
         // 待牌計算
         internal void DaiPaiJiSuan(int ziJiaXuanZe)
         {
-            Init(daiPai, 0xff);
+            Chang.Init(daiPai, 0xff);
             daiPaiShu = 0;
             for (int i = 0; i < heLeKeNengShu; i++)
             {
@@ -790,8 +1041,8 @@ namespace Sikao
             }
         }
 
-        // 和了
-        internal void HeLe()
+        // 和了処理
+        internal void HeLeChuLi()
         {
             // 和了判定
             HeLePanDing();
@@ -802,13 +1053,13 @@ namespace Sikao
                 fu = 0;
             }
 
-            if (Chang.ziJiaYao == Yao.ZI_MO)
+            if (Chang.ZiJiaYao == Chang.YaoDingYi.ZiMo)
             {
-                yao[ziMoPaiWei - 1] = Yao.ZI_MO;
+                yao[ziMoPaiWei - 1] = Chang.YaoDingYi.ZiMo;
             }
-            else if (Chang.taJiaYao == Yao.RONG_HE)
+            else if (Chang.TaJiaYao == Chang.YaoDingYi.RongHe)
             {
-                yao[ziMoPaiWei - 1] = Yao.RONG_HE;
+                yao[ziMoPaiWei - 1] = Chang.YaoDingYi.RongHe;
             }
         }
 
@@ -832,7 +1083,7 @@ namespace Sikao
             fuLuPai[fuLuPaiWei][2] = shouPai[anGangPaiWei[wei][2]];
             fuLuPai[fuLuPaiWei][3] = shouPai[anGangPaiWei[wei][3]];
             fuLuJia[fuLuPaiWei] = 0;
-            fuLuZhong[fuLuPaiWei] = Yao.AN_GANG;
+            fuLuZhong[fuLuPaiWei] = Chang.YaoDingYi.AnGang;
 
             shouPai[anGangPaiWei[wei][0]] = 0xff;
             shouPai[anGangPaiWei[wei][1]] = 0xff;
@@ -845,7 +1096,7 @@ namespace Sikao
             // 理牌
             LiPai();
 
-            yao[ziMoPaiWei - 1] = Yao.AN_GANG;
+            yao[ziMoPaiWei - 1] = Chang.YaoDingYi.AnGang;
         }
 
         // 加槓
@@ -853,19 +1104,19 @@ namespace Sikao
         {
             for (int i = 0; i < fuLuPaiWei; i++)
             {
-                if (fuLuZhong[i] == Yao.BING)
+                if (fuLuZhong[i] == Chang.YaoDingYi.Bing)
                 {
                     if ((fuLuPai[i][0] & QIAO_PAI) == (shouPai[jiaGangPaiWei[wei][0]] & QIAO_PAI))
                     {
                         fuLuPai[i][3] = shouPai[jiaGangPaiWei[wei][0]];
-                        fuLuZhong[i] = Yao.JIA_GANG;
-                        Chang.shePai = shouPai[jiaGangPaiWei[wei][0]];
+                        fuLuZhong[i] = Chang.YaoDingYi.JiaGang;
+                        Chang.ShePai = shouPai[jiaGangPaiWei[wei][0]];
                         shouPai[jiaGangPaiWei[wei][0]] = 0xff;
                         shouPaiWei--;
                         // 理牌
                         LiPai();
 
-                        yao[ziMoPaiWei - 1] = Yao.JIA_GANG;
+                        yao[ziMoPaiWei - 1] = Chang.YaoDingYi.JiaGang;
                         return;
                     }
                 }
@@ -875,11 +1126,11 @@ namespace Sikao
         // 副露家計算
         private int FuLuJiaJiSuan()
         {
-            int mingFan = Chang.mingFan;
-            int ziMoFan = Chang.ziMoFan;
+            int mingFan = Chang.MingFan;
+            int ziMoFan = Chang.ZiMoFan;
             if (mingFan < ziMoFan)
             {
-                mingFan += Chang.mianZi;
+                mingFan += Chang.MianZi;
             }
             return mingFan - ziMoFan;
         }
@@ -902,7 +1153,7 @@ namespace Sikao
             int gangShu = 0;
             for (int i = 0; i < fuLuPaiWei - 1; i++)
             {
-                if (fuLuZhong[i] == Yao.DA_MING_GANG || fuLuZhong[i] == Yao.BING)
+                if (fuLuZhong[i] == Chang.YaoDingYi.DaMingGang || fuLuZhong[i] == Chang.YaoDingYi.Bing)
                 {
                     int p = fuLuPai[i][0] & QIAO_PAI;
                     if (p >= 0x31 && p <= 0x34)
@@ -914,7 +1165,7 @@ namespace Sikao
                         sanYuanShu++;
                     }
                 }
-                if (fuLuZhong[i] == Yao.AN_GANG || fuLuZhong[i] == Yao.JIA_GANG || fuLuZhong[i] == Yao.DA_MING_GANG)
+                if (fuLuZhong[i] == Chang.YaoDingYi.AnGang || fuLuZhong[i] == Chang.YaoDingYi.JiaGang || fuLuZhong[i] == Chang.YaoDingYi.DaMingGang)
                 {
                     gangShu++;
                 }
@@ -922,7 +1173,7 @@ namespace Sikao
             if (fengShu == 3 || sanYuanShu == 2 || gangShu == 3)
             {
                 int wei = fuLuPaiWei - 1;
-                if (fuLuZhong[wei] == Yao.DA_MING_GANG || fuLuZhong[wei] == Yao.BING)
+                if (fuLuZhong[wei] == Chang.YaoDingYi.DaMingGang || fuLuZhong[wei] == Chang.YaoDingYi.Bing)
                 {
                     int p = fuLuPai[wei][0] & QIAO_PAI;
                     if (p >= 0x31 && p <= 0x34)
@@ -935,7 +1186,7 @@ namespace Sikao
                         baoZeFan = fuLuJia[wei];
                         return;
                     }
-                    if (fuLuZhong[wei] == Yao.AN_GANG || fuLuZhong[wei] == Yao.JIA_GANG || fuLuZhong[wei] == Yao.DA_MING_GANG)
+                    if (fuLuZhong[wei] == Chang.YaoDingYi.AnGang || fuLuZhong[wei] == Chang.YaoDingYi.JiaGang || fuLuZhong[wei] == Chang.YaoDingYi.DaMingGang)
                     {
                         baoZeFan = fuLuJia[wei];
                         return;
@@ -947,16 +1198,16 @@ namespace Sikao
         // 大明槓
         internal void DaMingGang()
         {
-            fuLuPai[fuLuPaiWei][0] = Chang.shePai;
-            fuLuPai[fuLuPaiWei][1] = shouPai[daMingGangPaiWei[Chang.taJiaXuanZe][0]];
-            fuLuPai[fuLuPaiWei][2] = shouPai[daMingGangPaiWei[Chang.taJiaXuanZe][1]];
-            fuLuPai[fuLuPaiWei][3] = shouPai[daMingGangPaiWei[Chang.taJiaXuanZe][2]];
+            fuLuPai[fuLuPaiWei][0] = Chang.ShePai;
+            fuLuPai[fuLuPaiWei][1] = shouPai[daMingGangPaiWei[Chang.TaJiaXuanZe][0]];
+            fuLuPai[fuLuPaiWei][2] = shouPai[daMingGangPaiWei[Chang.TaJiaXuanZe][1]];
+            fuLuPai[fuLuPaiWei][3] = shouPai[daMingGangPaiWei[Chang.TaJiaXuanZe][2]];
             fuLuJia[fuLuPaiWei] = FuLuJiaJiSuan();
-            fuLuZhong[fuLuPaiWei] = Yao.DA_MING_GANG;
+            fuLuZhong[fuLuPaiWei] = Chang.YaoDingYi.DaMingGang;
 
-            shouPai[daMingGangPaiWei[Chang.taJiaXuanZe][0]] = 0xff;
-            shouPai[daMingGangPaiWei[Chang.taJiaXuanZe][1]] = 0xff;
-            shouPai[daMingGangPaiWei[Chang.taJiaXuanZe][2]] = 0xff;
+            shouPai[daMingGangPaiWei[Chang.TaJiaXuanZe][0]] = 0xff;
+            shouPai[daMingGangPaiWei[Chang.TaJiaXuanZe][1]] = 0xff;
+            shouPai[daMingGangPaiWei[Chang.TaJiaXuanZe][2]] = 0xff;
 
             fuLuPaiWei++;
             taJiaFuLuShu++;
@@ -964,8 +1215,8 @@ namespace Sikao
             // 理牌
             LiPai();
 
-            ziMoPai[ziMoPaiWei] = Chang.shePai;
-            yao[ziMoPaiWei] = Yao.DA_MING_GANG;
+            ziMoPai[ziMoPaiWei] = Chang.ShePai;
+            yao[ziMoPaiWei] = Chang.YaoDingYi.DaMingGang;
             ziMoPaiWei++;
 
             fuLuShun = true;
@@ -976,14 +1227,14 @@ namespace Sikao
         // 石並
         internal void Bing()
         {
-            fuLuPai[fuLuPaiWei][0] = Chang.shePai;
-            fuLuPai[fuLuPaiWei][1] = shouPai[bingPaiWei[Chang.taJiaXuanZe][0]];
-            fuLuPai[fuLuPaiWei][2] = shouPai[bingPaiWei[Chang.taJiaXuanZe][1]];
+            fuLuPai[fuLuPaiWei][0] = Chang.ShePai;
+            fuLuPai[fuLuPaiWei][1] = shouPai[bingPaiWei[Chang.TaJiaXuanZe][0]];
+            fuLuPai[fuLuPaiWei][2] = shouPai[bingPaiWei[Chang.TaJiaXuanZe][1]];
             fuLuJia[fuLuPaiWei] = FuLuJiaJiSuan();
-            fuLuZhong[fuLuPaiWei] = Yao.BING;
+            fuLuZhong[fuLuPaiWei] = Chang.YaoDingYi.Bing;
 
-            shouPai[bingPaiWei[Chang.taJiaXuanZe][0]] = 0xff;
-            shouPai[bingPaiWei[Chang.taJiaXuanZe][1]] = 0xff;
+            shouPai[bingPaiWei[Chang.TaJiaXuanZe][0]] = 0xff;
+            shouPai[bingPaiWei[Chang.TaJiaXuanZe][1]] = 0xff;
 
             fuLuPaiWei++;
             taJiaFuLuShu++;
@@ -991,8 +1242,8 @@ namespace Sikao
             // 理牌
             LiPai();
 
-            ziMoPai[ziMoPaiWei] = Chang.shePai;
-            yao[ziMoPaiWei] = Yao.BING;
+            ziMoPai[ziMoPaiWei] = Chang.ShePai;
+            yao[ziMoPaiWei] = Chang.YaoDingYi.Bing;
             ziMoPaiWei++;
 
             fuLuShun = true;
@@ -1003,14 +1254,14 @@ namespace Sikao
         // 吃
         internal void Chi()
         {
-            fuLuPai[fuLuPaiWei][0] = Chang.shePai;
-            fuLuPai[fuLuPaiWei][1] = shouPai[chiPaiWei[Chang.taJiaXuanZe][0]];
-            fuLuPai[fuLuPaiWei][2] = shouPai[chiPaiWei[Chang.taJiaXuanZe][1]];
+            fuLuPai[fuLuPaiWei][0] = Chang.ShePai;
+            fuLuPai[fuLuPaiWei][1] = shouPai[chiPaiWei[Chang.TaJiaXuanZe][0]];
+            fuLuPai[fuLuPaiWei][2] = shouPai[chiPaiWei[Chang.TaJiaXuanZe][1]];
             fuLuJia[fuLuPaiWei] = FuLuJiaJiSuan();
-            fuLuZhong[fuLuPaiWei] = Yao.CHI;
+            fuLuZhong[fuLuPaiWei] = Chang.YaoDingYi.Chi;
 
-            shouPai[chiPaiWei[Chang.taJiaXuanZe][0]] = 0xff;
-            shouPai[chiPaiWei[Chang.taJiaXuanZe][1]] = 0xff;
+            shouPai[chiPaiWei[Chang.TaJiaXuanZe][0]] = 0xff;
+            shouPai[chiPaiWei[Chang.TaJiaXuanZe][1]] = 0xff;
 
             fuLuPaiWei++;
             taJiaFuLuShu++;
@@ -1018,8 +1269,8 @@ namespace Sikao
             // 理牌
             LiPai();
 
-            ziMoPai[ziMoPaiWei] = Chang.shePai;
-            yao[ziMoPaiWei] = Yao.CHI;
+            ziMoPai[ziMoPaiWei] = Chang.ShePai;
+            yao[ziMoPaiWei] = Chang.YaoDingYi.Chi;
             ziMoPaiWei++;
 
             fuLuShun = true;
@@ -1028,16 +1279,16 @@ namespace Sikao
         // 振聴牌処理
         internal void ZhenTingPaiChuLi()
         {
-            tongShunPai[tongShunPaiWei++] = Chang.shePai;
+            tongShunPai[tongShunPaiWei++] = Chang.ShePai;
 
             if (liZhi)
             {
-                liZhiHouPai[liZhiHouPaiWei++] = Chang.shePai;
+                liZhiHouPai[liZhiHouPaiWei++] = Chang.ShePai;
             }
         }
 
         // 捨牌処理
-        internal void ShePaiChuLi(Yao yao)
+        internal void ShePaiChuLi(Chang.YaoDingYi yao)
         {
             shePaiYao[shePaiWei - 1] = yao;
         }
@@ -1046,7 +1297,7 @@ namespace Sikao
         internal void LiZiChuLi()
         {
             DianBangJiSuan(-1000, false);
-            yao[ziMoPaiWei - 1] = Yao.LI_ZHI;
+            yao[ziMoPaiWei - 1] = Chang.YaoDingYi.LiZhi;
         }
 
         // 流局
@@ -1054,8 +1305,8 @@ namespace Sikao
         {
             yiMan = false;
 
-            Init(yi, 0);
-            Init(fanShu, 0);
+            Chang.Init(yi, 0);
+            Chang.Init(fanShu, 0);
             yiShu = 0;
             fanShuJi = 0;
 
@@ -1094,10 +1345,10 @@ namespace Sikao
             xingTing = false;
 
             shouPaiWei++;
-            for (int i = 0; i < Pai.PAI.Length; i++)
+            for (int i = 0; i < Pai.QiaoPai.Length; i++)
             {
-                shouPai[shouPaiWei - 1] = Pai.PAI[i];
-                if (HeLePanDing() >= XING_TING)
+                shouPai[shouPaiWei - 1] = Pai.QiaoPai[i];
+                if (HeLePanDing() >= Ting.XingTing)
                 {
                     xingTing = true;
                     break;
@@ -1121,29 +1372,39 @@ namespace Sikao
             }
         }
 
+        internal void ShouQuGongTuoJiSuan(int dian)
+        {
+            shouQuGongTuo = dian;
+        }
+
+        internal void JiJiDianJiSuan(int dian)
+        {
+            jiJiDian = dian;
+        }
+
         // 思考前初期化
         private void SiKaoQianChuQiHua()
         {
             heLe = false;
-            Init(heLePai, 0xff);
+            Chang.Init(heLePai, 0xff);
             heLeKeNengShu = 0;
             liZhiKeNengShu = 0;
             if (jiJia)
             {
-                Init(anGangPaiWei, 0xff);
+                Chang.Init(anGangPaiWei, 0xff);
                 anGangKeNengShu = 0;
-                Init(jiaGangPaiWei, 0xff);
+                Chang.Init(jiaGangPaiWei, 0xff);
                 jiaGangKeNengShu = 0;
-                Init(shiTiPai, 0xff);
+                Chang.Init(shiTiPai, 0xff);
                 shiTiPaiShu = 0;
             }
             else
             {
-                Init(daMingGangPaiWei, 0xff);
+                Chang.Init(daMingGangPaiWei, 0xff);
                 daMingGangKeNengShu = 0;
-                Init(bingPaiWei, 0xff);
+                Chang.Init(bingPaiWei, 0xff);
                 bingKeNengShu = 0;
-                Init(chiPaiWei, 0xff);
+                Chang.Init(chiPaiWei, 0xff);
                 chiKeNengShu = 0;
             }
             jiuZhongJiuPai = false;
@@ -1181,9 +1442,9 @@ namespace Sikao
         {
             int p = pai & QIAO_PAI;
             int xuan = 0;
-            for (int i = 0; i < Pai.xuanShangPaiWei; i++)
+            for (int i = 0; i < Pai.XuanShangPaiWei; i++)
             {
-                if ((Pai.XUAN_SHANG_PAI[Pai.xuanShangPai[i] & QIAO_PAI]) == p)
+                if ((Pai.XuanShangPaiDingYi[Pai.XuanShangPai[i] & QIAO_PAI]) == p)
                 {
                     xuan++;
                 }
@@ -1200,7 +1461,7 @@ namespace Sikao
         {
             int fan = 0;
             int p = pai & QIAO_PAI;
-            if (p == Chang.changFeng)
+            if (p == Chang.ChangFeng)
             {
                 fan++;
             }
@@ -1220,12 +1481,12 @@ namespace Sikao
         protected int HePaiPanDing(int pai)
         {
             int hePai = 0;
-            for (int i = 0; i < Chang.mianZi; i++)
+            for (int i = 0; i < Chang.MianZi; i++)
             {
-                QiaoShi shi = Chang.qiaoShi[i];
+                QiaoShi shi = Chang.QiaoShi[i];
                 for (int j = 0; j < shi.shePaiWei; j++)
                 {
-                    if ((shi.shePai[j] & QIAO_PAI) == (pai & QIAO_PAI))
+                    if ((shi.ShePai[j] & QIAO_PAI) == (pai & QIAO_PAI))
                     {
                         hePai++;
                     }
@@ -1235,7 +1496,7 @@ namespace Sikao
         }
 
         // 和了判定
-        protected int HeLePanDing()
+        protected Ting HeLePanDing()
         {
             fu = 0;
             // 国士無双判定
@@ -1246,7 +1507,7 @@ namespace Sikao
                 if (yiShu > 0)
                 {
                     // 聴牌
-                    return TING_PAI;
+                    return Ting.TingPai;
                 }
             }
             // 七対子判定
@@ -1256,7 +1517,7 @@ namespace Sikao
                 YiManPanDing();
                 if (yiShu > 0)
                 {
-                    return TING_PAI;
+                    return Ting.TingPai;
                 }
                 // 役判定
                 YiPanDing();
@@ -1264,7 +1525,7 @@ namespace Sikao
                 {
                     fu = 25;
                     // 聴牌
-                    return TING_PAI;
+                    return Ting.TingPai;
                 }
             }
 
@@ -1274,7 +1535,7 @@ namespace Sikao
             int maxFanShuJi = 0;
             int maxFu = 0;
             // 不聴
-            int ret = BU_TING;
+            Ting ret = Ting.BuTing;
             for (int i = 0; i < shouPaiWei; i++)
             {
                 // 手牌数計算
@@ -1297,9 +1558,9 @@ namespace Sikao
 
                     for (int y = 0; y < 2; y++)
                     {
-                        for (int j = 0; j < Pai.PAI.Length; j++)
+                        for (int j = 0; j < Pai.QiaoPai.Length; j++)
                         {
-                            int p = Pai.PAI[j];
+                            int p = Pai.QiaoPai[j];
                             if ((x ^ y) == 0)
                             {
                                 // 刻子計算
@@ -1331,7 +1592,7 @@ namespace Sikao
                         if (yiShu > 0)
                         {
                             // 聴牌
-                            return TING_PAI;
+                            return Ting.TingPai;
                         }
                         // 役判定
                         YiPanDing();
@@ -1341,23 +1602,23 @@ namespace Sikao
                             maxYiShu = yiShu;
                             maxFanShuJi = fanShuJi;
                             maxFu = fu;
-                            Copy(yi, maxYi);
-                            Copy(fanShu, maxFanShu);
+                            Chang.Copy(yi, maxYi);
+                            Chang.Copy(fanShu, maxFanShu);
                         }
                         // 形聴
-                        ret = XING_TING;
+                        ret = Ting.XingTing;
                     }
                 }
             }
             if (maxYiShu > 0)
             {
                 // 聴牌
-                ret = TING_PAI;
+                ret = Ting.TingPai;
                 yiShu = maxYiShu;
                 fanShuJi = maxFanShuJi;
                 fu = maxFu;
-                Copy(maxYi, yi);
-                Copy(maxFanShu, fanShu);
+                Chang.Copy(maxYi, yi);
+                Chang.Copy(maxFanShu, fanShu);
             }
             return ret;
         }
@@ -1369,7 +1630,7 @@ namespace Sikao
             int xiang;
 
             int[] shouPaiC = new int[shouPai.Length];
-            Copy(shouPai, shouPaiC);
+            Chang.Copy(shouPai, shouPaiC);
             if (wei >= 0)
             {
                 shouPai[wei] = 0xff;
@@ -1386,9 +1647,9 @@ namespace Sikao
 
                 // 対子種数
                 int chongShu = 0;
-                for (int j = 0; j < Pai.PAI.Length; j++)
+                for (int j = 0; j < Pai.QiaoPai.Length; j++)
                 {
-                    int p = Pai.PAI[j];
+                    int p = Pai.QiaoPai[j];
                     if (shouPaiShu[p] >= 2)
                     {
                         chongShu++;
@@ -1405,9 +1666,9 @@ namespace Sikao
                 ShouPaiShuJiSuan();
                 int shu = 0;
                 bool chuHui = true;
-                for (int i = 0; i < Pai.YAO_JIU_PAI.Length; i++)
+                for (int i = 0; i < Pai.YaoJiuPaiDingYi.Length; i++)
                 {
-                    int p = Pai.YAO_JIU_PAI[i];
+                    int p = Pai.YaoJiuPaiDingYi[i];
                     if (shouPaiShu[p] > 0)
                     {
                         if (chuHui && shouPaiShu[p] > 1)
@@ -1434,9 +1695,9 @@ namespace Sikao
 
                 for (int y = 0; y < 2; y++)
                 {
-                    for (int j = 0; j < Pai.PAI.Length; j++)
+                    for (int j = 0; j < Pai.QiaoPai.Length; j++)
                     {
-                        int p = Pai.PAI[j];
+                        int p = Pai.QiaoPai[j];
                         if ((x ^ y) == 0)
                         {
                             // 刻子計算
@@ -1452,15 +1713,15 @@ namespace Sikao
                 // 副露計算
                 FuLuJiSuan();
 
-                for (int j = 0; j < Pai.PAI.Length; j++)
+                for (int j = 0; j < Pai.QiaoPai.Length; j++)
                 {
-                    int p = Pai.PAI[j];
+                    int p = Pai.QiaoPai[j];
                     // 対子計算
                     DuiZiJiSuan(p);
                 }
-                for (int j = 0; j < Pai.PAI.Length; j++)
+                for (int j = 0; j < Pai.QiaoPai.Length; j++)
                 {
-                    int p = Pai.PAI[j];
+                    int p = Pai.QiaoPai[j];
                     // 塔子計算
                     TaZiJiSuan(p);
                 }
@@ -1488,7 +1749,7 @@ namespace Sikao
                 }
             }
 
-            Copy(shouPaiC, shouPai);
+            Chang.Copy(shouPaiC, shouPai);
         }
 
         // 符計算
@@ -1496,12 +1757,12 @@ namespace Sikao
         {
             for (int i = 0; i < yiShu; i++)
             {
-                if (yi[i] == (int)Yi.QI_DUI_ZI)
+                if (yi[i] == (int)YiDingYi.QiDuiZi)
                 {
                     fu = 25;
                     return;
                 }
-                if (yi[i] == (int)Yi.PING_HE)
+                if (yi[i] == (int)YiDingYi.PingHe)
                 {
                     if (GuiZe.ziMoPingHe && jiJia)
                     {
@@ -1524,7 +1785,7 @@ namespace Sikao
             for (int i = 0; i < duiZiShu; i++)
             {
                 int p = duiZi[i][0] & QIAO_PAI;
-                if (p == Chang.changFeng)
+                if (p == Chang.ChangFeng)
                 {
                     fu += 2;
                 }
@@ -1547,20 +1808,20 @@ namespace Sikao
                 }
                 switch (keZiZhong[i])
                 {
-                    case Yao.WU:
+                    case Chang.YaoDingYi.Wu:
                         // 暗刻
                         fu += (yaoJiu ? 8 : 4);
                         break;
-                    case Yao.BING:
+                    case Chang.YaoDingYi.Bing:
                         // 明刻
                         fu += (yaoJiu ? 4 : 2);
                         break;
-                    case Yao.AN_GANG:
+                    case Chang.YaoDingYi.AnGang:
                         // 暗槓
                         fu += (yaoJiu ? 32 : 16);
                         break;
-                    case Yao.JIA_GANG:
-                    case Yao.DA_MING_GANG:
+                    case Chang.YaoDingYi.JiaGang:
+                    case Chang.YaoDingYi.DaMingGang:
                         // 加槓・大明槓
                         fu += (yaoJiu ? 16 : 8);
                         break;
@@ -1663,14 +1924,14 @@ namespace Sikao
         // 手牌懸賞判定
         internal void ShouPaiXuanShangPanDing()
         {
-            Init(shouPaiXuanShang, false);
-            for (int i = 0; i < Pai.xuanShangPaiWei; i++)
+            Chang.Init(shouPaiXuanShang, false);
+            for (int i = 0; i < Pai.XuanShangPaiWei; i++)
             {
-                int xp = Pai.xuanShangPai[i] & QIAO_PAI;
+                int xp = Pai.XuanShangPai[i] & QIAO_PAI;
                 for (int j = 0; j < shouPaiWei; j++)
                 {
                     int p = shouPai[j] & QIAO_PAI;
-                    if (p == Pai.XUAN_SHANG_PAI[xp] || shouPai[j] > CHI_PAI)
+                    if (p == Pai.XuanShangPaiDingYi[xp] || shouPai[j] > CHI_PAI)
                     {
                         shouPaiXuanShang[j] = true;
                     }
@@ -1696,9 +1957,9 @@ namespace Sikao
         protected int YaoJiuPaiJiSuan()
         {
             int yaoJiuPaiShu = 0;
-            for (int i = 0; i < Pai.YAO_JIU_PAI.Length; i++)
+            for (int i = 0; i < Pai.YaoJiuPaiDingYi.Length; i++)
             {
-                int p = Pai.YAO_JIU_PAI[i];
+                int p = Pai.YaoJiuPaiDingYi[i];
                 for (int j = 0; j < shouPaiWei; j++)
                 {
                     int sp = shouPai[j] & QIAO_PAI;
@@ -1752,7 +2013,7 @@ namespace Sikao
         private void TingPaiPanDing()
         {
             int[] shouPaiC = new int[shouPai.Length];
-            Copy(shouPai, shouPaiC);
+            Chang.Copy(shouPai, shouPaiC);
 
             for (int i = 0; i < shouPaiWei; i++)
             {
@@ -1760,13 +2021,13 @@ namespace Sikao
                 Sort(shouPai);
 
                 int wei = 0;
-                for (int j = 0; j < Pai.PAI.Length; j++)
+                for (int j = 0; j < Pai.QiaoPai.Length; j++)
                 {
-                    shouPai[shouPaiWei - 1] = Pai.PAI[j];
+                    shouPai[shouPaiWei - 1] = Pai.QiaoPai[j];
 
-                    if (HeLePanDing() == TING_PAI)
+                    if (HeLePanDing() == Ting.TingPai)
                     {
-                        heLePai[heLeKeNengShu][wei++] = Pai.PAI[j];
+                        heLePai[heLeKeNengShu][wei++] = Pai.QiaoPai[j];
                     }
                 }
                 if (wei > 0)
@@ -1781,7 +2042,7 @@ namespace Sikao
                     }
                 }
 
-                Copy(shouPaiC, shouPai);
+                Chang.Copy(shouPaiC, shouPai);
             }
         }
 
@@ -1791,14 +2052,14 @@ namespace Sikao
             // 手牌数計算
             ShouPaiShuJiSuan();
 
-            for (int i = 0; i < Pai.PAI.Length; i++)
+            for (int i = 0; i < Pai.QiaoPai.Length; i++)
             {
-                if (shouPaiShu[Pai.PAI[i]] >= 4)
+                if (shouPaiShu[Pai.QiaoPai[i]] >= 4)
                 {
                     int wei = 0;
                     for (int j = 0; j < shouPaiWei; j++)
                     {
-                        if (Pai.PAI[i] == (shouPai[j] & QIAO_PAI))
+                        if (Pai.QiaoPai[i] == (shouPai[j] & QIAO_PAI))
                         {
                             anGangPaiWei[anGangKeNengShu][wei++] = j;
                         }
@@ -1825,16 +2086,16 @@ namespace Sikao
             for (int i = 0; i < anGangKeNengShu; i++)
             {
                 int[] shouPaiC = new int[shouPai.Length];
-                Copy(shouPai, shouPaiC);
+                Chang.Copy(shouPai, shouPaiC);
                 int shouPaiWeiC = shouPaiWei;
                 int[][] fuLuPaiC = new int[fuLuPai.Length][];
                 for (int j = 0; j < fuLuPaiC.Length; j++)
                 {
                     fuLuPaiC[j] = new int[fuLuPai[0].Length];
                 }
-                Copy(fuLuPai, fuLuPaiC);
-                Yao[] fuLuZhongC = new Yao[fuLuZhong.Length];
-                Copy(fuLuZhong, fuLuZhongC);
+                Chang.Copy(fuLuPai, fuLuPaiC);
+                Chang.YaoDingYi[] fuLuZhongC = new Chang.YaoDingYi[fuLuZhong.Length];
+                Chang.Copy(fuLuZhong, fuLuZhongC);
                 int fuLuPaiWeiC = fuLuPaiWei;
 
                 AnGang(i);
@@ -1842,7 +2103,7 @@ namespace Sikao
                 for (int j = 0; j < daiPaiShu; j++)
                 {
                     shouPai[shouPaiWei++] = daiPai[j];
-                    if (HeLePanDing() != TING_PAI)
+                    if (HeLePanDing() != Ting.TingPai)
                     {
                         heLe = false;
                         break;
@@ -1850,16 +2111,16 @@ namespace Sikao
                     shouPaiWei--;
                 }
 
-                Copy(shouPaiC, shouPai);
+                Chang.Copy(shouPaiC, shouPai);
                 shouPaiWei = shouPaiWeiC;
-                Copy(fuLuPaiC, fuLuPai);
-                Copy(fuLuZhongC, fuLuZhong);
+                Chang.Copy(fuLuPaiC, fuLuPai);
+                Chang.Copy(fuLuZhongC, fuLuZhong);
                 fuLuPaiWei = fuLuPaiWeiC;
             }
 
             if (!heLe)
             {
-                Init(anGangPaiWei, 0xff);
+                Chang.Init(anGangPaiWei, 0xff);
                 anGangKeNengShu = 0;
             }
         }
@@ -1869,7 +2130,7 @@ namespace Sikao
         {
             for (int i = 0; i < fuLuPaiWei; i++)
             {
-                if (fuLuZhong[i] != Yao.BING)
+                if (fuLuZhong[i] != Chang.YaoDingYi.Bing)
                 {
                     continue;
                 }
@@ -1890,7 +2151,7 @@ namespace Sikao
             // 手牌数計算
             ShouPaiShuJiSuan();
 
-            int shePai = Chang.shePai & QIAO_PAI;
+            int shePai = Chang.ShePai & QIAO_PAI;
             if (shouPaiShu[shePai] < 3)
             {
                 return;
@@ -1913,7 +2174,7 @@ namespace Sikao
             // 手牌数計算
             ShouPaiShuJiSuan();
 
-            int shePai = Chang.shePai & QIAO_PAI;
+            int shePai = Chang.ShePai & QIAO_PAI;
             if (shouPaiShu[shePai] < 2)
             {
                 return;
@@ -1944,11 +2205,11 @@ namespace Sikao
         // 吃判定
         private void ChiPanDing()
         {
-            if (Chang.mianZi <= 2)
+            if (Chang.MianZi <= 2)
             {
                 return;
             }
-            if (ZiPaiPanDing(Chang.shePai))
+            if (ZiPaiPanDing(Chang.ShePai))
             {
                 return;
             }
@@ -1956,7 +2217,7 @@ namespace Sikao
             {
                 return;
             }
-            int se = Chang.shePai & SE_PAI;
+            int se = Chang.ShePai & SE_PAI;
             for (int i = 0; i < shouPaiWei - 1; i++)
             {
                 int p1 = shouPai[i] & QIAO_PAI;
@@ -1974,7 +2235,7 @@ namespace Sikao
                         continue;
                     }
 
-                    int shePaiShu = Chang.shePai & SHU_PAI;
+                    int shePaiShu = Chang.ShePai & SHU_PAI;
                     if (shePaiShu <= 7)
                     {
                         if (s1 == (shePaiShu + 1) && (s2 == shePaiShu + 2))
@@ -2007,27 +2268,27 @@ namespace Sikao
         }
 
         // 鳴牌判定
-        internal bool MingPaiPanDing(Yao fuLuZhong, int fuLuJia, int wei)
+        internal bool MingPaiPanDing(Chang.YaoDingYi fuLuZhong, int fuLuJia, int wei)
         {
-            if (fuLuZhong == Yao.CHI && wei == 0)
+            if (fuLuZhong == Chang.YaoDingYi.Chi && wei == 0)
             {
                 return true;
             }
-            else if (fuLuZhong == Yao.BING)
+            else if (fuLuZhong == Chang.YaoDingYi.Bing)
             {
                 if ((fuLuJia == 3 && wei == 2) || (fuLuJia == 2 && wei == 1) || (fuLuJia == 1 && wei == 0))
                 {
                     return true;
                 }
             }
-            else if (fuLuZhong == Yao.DA_MING_GANG)
+            else if (fuLuZhong == Chang.YaoDingYi.DaMingGang)
             {
                 if ((fuLuJia == 3 && wei == 3) || (fuLuJia == 2 && wei == 1) || (fuLuJia == 1 && wei == 0))
                 {
                     return true;
                 }
             }
-            else if (fuLuZhong == Yao.JIA_GANG)
+            else if (fuLuZhong == Chang.YaoDingYi.JiaGang)
             {
                 if ((fuLuJia == 3 && wei == 2) || (fuLuJia == 2 && wei == 1) || (fuLuJia == 1 && wei == 0))
                 {
@@ -2079,16 +2340,16 @@ namespace Sikao
             MianZiChuQiHua();
 
             int shu = 0;
-            for (int i = 0; i < Pai.YAO_JIU_PAI.Length; i++)
+            for (int i = 0; i < Pai.YaoJiuPaiDingYi.Length; i++)
             {
-                if (shouPaiShu[Pai.YAO_JIU_PAI[i]] == 0)
+                if (shouPaiShu[Pai.YaoJiuPaiDingYi[i]] == 0)
                 {
                     return false;
                 }
-                if (shouPaiShu[Pai.YAO_JIU_PAI[i]] == 2)
+                if (shouPaiShu[Pai.YaoJiuPaiDingYi[i]] == 2)
                 {
-                    duiZi[duiZiShu][0] = Pai.YAO_JIU_PAI[i];
-                    duiZi[duiZiShu][1] = Pai.YAO_JIU_PAI[i];
+                    duiZi[duiZiShu][0] = Pai.YaoJiuPaiDingYi[i];
+                    duiZi[duiZiShu][1] = Pai.YaoJiuPaiDingYi[i];
                     duiZiShu++;
                     shu++;
                 }
@@ -2112,9 +2373,9 @@ namespace Sikao
             // 面子初期化
             MianZiChuQiHua();
 
-            for (int i = 0; i < Pai.PAI.Length; i++)
+            for (int i = 0; i < Pai.QiaoPai.Length; i++)
             {
-                int p = Pai.PAI[i];
+                int p = Pai.QiaoPai[i];
                 int shu = shouPaiShu[p];
                 if (shu == 0)
                 {
@@ -2157,14 +2418,14 @@ namespace Sikao
         // 面子初期化
         protected void MianZiChuQiHua()
         {
-            Init(duiZi, 0xff);
+            Chang.Init(duiZi, 0xff);
             duiZiShu = 0;
-            Init(keZi, 0xff);
-            Init(keZiZhong, Yao.WU);
+            Chang.Init(keZi, 0xff);
+            Chang.Init(keZiZhong, Chang.YaoDingYi.Wu);
             keZiShu = 0;
-            Init(shunZi, 0xff);
+            Chang.Init(shunZi, 0xff);
             shunZiShu = 0;
-            Init(taZi, 0xff);
+            Chang.Init(taZi, 0xff);
             taZiShu = 0;
         }
 
@@ -2175,8 +2436,8 @@ namespace Sikao
         {
             yiMan = false;
 
-            Init(yi, 0);
-            Init(fanShu, 0);
+            Chang.Init(yi, 0);
+            Chang.Init(fanShu, 0);
             yiShu = 0;
             fanShuJi = 0;
 
@@ -2226,7 +2487,7 @@ namespace Sikao
             }
             if (yiXunMu)
             {
-                YiZhuiJia(YiMan.TIAN_HE, 1);
+                YiZhuiJia(YiManDingYi.TianHe, 1);
             }
         }
 
@@ -2241,11 +2502,11 @@ namespace Sikao
             {
                 if (jiJia)
                 {
-                    YiZhuiJia(YiMan.DE_HE, 1);
+                    YiZhuiJia(YiManDingYi.DeHe, 1);
                 }
                 else
                 {
-                    YiZhuiJia(YiMan.REN_HE, 1);
+                    YiZhuiJia(YiManDingYi.RenHe, 1);
                 }
             }
         }
@@ -2257,11 +2518,11 @@ namespace Sikao
             {
                 if ((shouPai[shouPaiWei - 1] & QIAO_PAI) == duiZi[0][0])
                 {
-                    YiZhuiJia(YiMan.GUO_SHI_SHI_SAN_MIAN, 2);
+                    YiZhuiJia(YiManDingYi.GuoShiShiSanMian, 2);
                 }
                 else
                 {
-                    YiZhuiJia(YiMan.GUO_SHI_WU_SHUANG, 1);
+                    YiZhuiJia(YiManDingYi.GuoShiWuShuang, 1);
                 }
             }
         }
@@ -2277,11 +2538,11 @@ namespace Sikao
             int gangZi = 0;
             for (int i = 0; i < keZiShu; i++)
             {
-                if (keZiZhong[i] == Yao.WU || keZiZhong[i] == Yao.AN_GANG)
+                if (keZiZhong[i] == Chang.YaoDingYi.Wu || keZiZhong[i] == Chang.YaoDingYi.AnGang)
                 {
                     anKe++;
                 }
-                if (keZiZhong[i] == Yao.AN_GANG || keZiZhong[i] == Yao.JIA_GANG || keZiZhong[i] == Yao.DA_MING_GANG)
+                if (keZiZhong[i] == Chang.YaoDingYi.AnGang || keZiZhong[i] == Chang.YaoDingYi.JiaGang || keZiZhong[i] == Chang.YaoDingYi.DaMingGang)
                 {
                     gangZi++;
                 }
@@ -2290,16 +2551,16 @@ namespace Sikao
             {
                 if ((shouPai[shouPaiWei - 1] & QIAO_PAI) == duiZi[0][0])
                 {
-                    YiZhuiJia(YiMan.SI_AN_KE_DAN_QI, 2);
+                    YiZhuiJia(YiManDingYi.SiAnKeDanQi, 2);
                 }
                 else
                 {
-                    YiZhuiJia(YiMan.SI_AN_KE, 1);
+                    YiZhuiJia(YiManDingYi.SiAnKe, 1);
                 }
             }
             if (gangZi == 4)
             {
-                YiZhuiJia(YiMan.SI_GANG_ZI, 1);
+                YiZhuiJia(YiManDingYi.SiGangZi, 1);
             }
         }
 
@@ -2325,7 +2586,7 @@ namespace Sikao
             }
             if ((p[0] + 1 == p[1]) && (p[0] + 2 == p[2]) && (p[0] + 3 == p[3]))
             {
-                YiZhuiJia(YiMan.SI_LIAN_KE, 1);
+                YiZhuiJia(YiManDingYi.SiLianKe, 1);
             }
         }
 
@@ -2347,7 +2608,7 @@ namespace Sikao
             }
             if (yuan == 3)
             {
-                YiZhuiJia(YiMan.DA_SAN_YUAN, 1);
+                YiZhuiJia(YiManDingYi.DaSanYuan, 1);
             }
         }
 
@@ -2376,11 +2637,11 @@ namespace Sikao
             }
             if (sixi == 4)
             {
-                YiZhuiJia(YiMan.DA_SI_XI, 2);
+                YiZhuiJia(YiManDingYi.DaSiXi, 2);
             }
             if (sixi == 3 && dui == 1)
             {
-                YiZhuiJia(YiMan.XIAO_SI_XI, 1);
+                YiZhuiJia(YiManDingYi.XiaoSiXi, 1);
             }
         }
 
@@ -2409,7 +2670,7 @@ namespace Sikao
                     }
                 }
             }
-            YiZhuiJia(YiMan.ZI_YI_SE, 1);
+            YiZhuiJia(YiManDingYi.ZiYiSe, 1);
         }
 
         // 清老頭
@@ -2448,7 +2709,7 @@ namespace Sikao
                     }
                 }
             }
-            YiZhuiJia(YiMan.QING_LAO_TOU, 1);
+            YiZhuiJia(YiManDingYi.QingLaoTou, 1);
         }
 
         // 九連宝燈・純正九連宝燈
@@ -2459,7 +2720,7 @@ namespace Sikao
                 return;
             }
             int[] jiuLian = new int[10];
-            Init(jiuLian, 0);
+            Chang.Init(jiuLian, 0);
             int se = -1;
             for (int i = 0; i < shouPaiWei; i++)
             {
@@ -2518,11 +2779,11 @@ namespace Sikao
             }
             if (chunZheng)
             {
-                YiZhuiJia(YiMan.CHUN_ZHENG_JIU_LIAN, 2);
+                YiZhuiJia(YiManDingYi.ChunZhengJiuLian, 2);
             }
             else
             {
-                YiZhuiJia(YiMan.JIU_LIAN_BAO_DENG, 1);
+                YiZhuiJia(YiManDingYi.JiuLianBaoDegn, 1);
             }
         }
 
@@ -2533,9 +2794,9 @@ namespace Sikao
             {
                 int p = shouPai[i] & QIAO_PAI;
                 bool luYi = false;
-                for (int j = 0; j < Pai.LU_YI_SE_PAI.Length; j++)
+                for (int j = 0; j < Pai.LuYiSePaiDingYi.Length; j++)
                 {
-                    if (p == Pai.LU_YI_SE_PAI[j])
+                    if (p == Pai.LuYiSePaiDingYi[j])
                     {
                         luYi = true;
                         break;
@@ -2556,9 +2817,9 @@ namespace Sikao
                         continue;
                     }
                     bool luYi = false;
-                    for (int k = 0; k < Pai.LU_YI_SE_PAI.Length; k++)
+                    for (int k = 0; k < Pai.LuYiSePaiDingYi.Length; k++)
                     {
-                        if (p == Pai.LU_YI_SE_PAI[k])
+                        if (p == Pai.LuYiSePaiDingYi[k])
                         {
                             luYi = true;
                             break;
@@ -2570,7 +2831,7 @@ namespace Sikao
                     }
                 }
             }
-            YiZhuiJia(YiMan.LU_YI_SE, 1);
+            YiZhuiJia(YiManDingYi.LuYiSe, 1);
         }
 
         // 大車輪
@@ -2585,15 +2846,15 @@ namespace Sikao
                     return;
                 }
             }
-            YiZhuiJia(YiMan.DA_CHE_LUN, 1);
+            YiZhuiJia(YiManDingYi.DaCheLun, 1);
         }
 
         // 十三不塔判定
         private bool ShiSanBuTaPanDing()
         {
             yiMan = false;
-            Init(yi, 0);
-            Init(fanShu, 0);
+            Chang.Init(yi, 0);
+            Chang.Init(fanShu, 0);
             yiShu = 0;
             fanShuJi = 0;
 
@@ -2610,18 +2871,18 @@ namespace Sikao
             ShouPaiShuJiSuan();
             // 面子初期化
             MianZiChuQiHua();
-            for (int i = 0; i < Pai.PAI.Length; i++)
+            for (int i = 0; i < Pai.QiaoPai.Length; i++)
             {
-                if (shouPaiShu[Pai.PAI[i]] == 2)
+                if (shouPaiShu[Pai.QiaoPai[i]] == 2)
                 {
-                    DuiZiJiSuan(Pai.PAI[i]);
-                    shouPaiShu[Pai.PAI[i]] += 2;
+                    DuiZiJiSuan(Pai.QiaoPai[i]);
+                    shouPaiShu[Pai.QiaoPai[i]] += 2;
                     break;
                 }
             }
-            for (int i = 0; i < Pai.PAI.Length; i++)
+            for (int i = 0; i < Pai.QiaoPai.Length; i++)
             {
-                int p = Pai.PAI[i];
+                int p = Pai.QiaoPai[i];
                 int shu = shouPaiShu[p];
                 if (shu > 1)
                 {
@@ -2652,7 +2913,7 @@ namespace Sikao
             }
 
             yiMan = true;
-            YiZhuiJia(YiMan.SHI_SAN_BU_TA, 1);
+            YiZhuiJia(YiManDingYi.ShiSanBuTa, 1);
             fanShuJi = 1;
             return true;
         }
@@ -2660,8 +2921,8 @@ namespace Sikao
         // 役判定
         private void YiPanDing()
         {
-            Init(yi, 0);
-            Init(fanShu, 0);
+            Chang.Init(yi, 0);
+            Chang.Init(fanShu, 0);
             yiShu = 0;
             fanShuJi = 0;
 
@@ -2719,15 +2980,15 @@ namespace Sikao
         {
             if (wLiZhi)
             {
-                YiZhuiJia(Yi.W_LI_ZI, 2);
+                YiZhuiJia(YiDingYi.WLiZi, 2);
             }
             else if (liZhi)
             {
-                YiZhuiJia(Yi.LI_ZI, 1);
+                YiZhuiJia(YiDingYi.LiZi, 1);
             }
             if (yiFa)
             {
-                YiZhuiJia(Yi.YI_FA, 1);
+                YiZhuiJia(YiDingYi.YiFa, 1);
             }
         }
 
@@ -2736,7 +2997,7 @@ namespace Sikao
         {
             if (jiJia && taJiaFuLuShu == 0)
             {
-                YiZhuiJia(Yi.MIAN_QIAN_QING_ZI_MO_HE, 1);
+                YiZhuiJia(YiDingYi.MianQianQingZiMoHe, 1);
             }
         }
 
@@ -2745,7 +3006,7 @@ namespace Sikao
         {
             if (Pai.LingShanKaiHuaPanDing())
             {
-                YiZhuiJia(Yi.LING_SHANG_KAI_HUA, 1);
+                YiZhuiJia(YiDingYi.LingShangKaiHua, 1);
             }
         }
 
@@ -2754,7 +3015,7 @@ namespace Sikao
         {
             if (Pai.QiangGangPanDing())
             {
-                YiZhuiJia(Yi.QIANG_GANG, 1);
+                YiZhuiJia(YiDingYi.QiangGang, 1);
             }
         }
 
@@ -2770,11 +3031,11 @@ namespace Sikao
             {
                 if (jiJia)
                 {
-                    YiZhuiJia(Yi.HAI_DI_LAO_YUE, 1);
+                    YiZhuiJia(YiDingYi.HaiDiLaoYue, 1);
                 }
                 else
                 {
-                    YiZhuiJia(Yi.HE_DI_LAO_YU, 1);
+                    YiZhuiJia(YiDingYi.HeDiLaoYu, 1);
                 }
             }
         }
@@ -2796,7 +3057,7 @@ namespace Sikao
                 return;
             }
             int tou = duiZi[0][0] & QIAO_PAI;
-            if (tou > 0x34 || tou == Chang.changFeng || tou == feng)
+            if (tou > 0x34 || tou == Chang.ChangFeng || tou == feng)
             {
                 return;
             }
@@ -2806,7 +3067,7 @@ namespace Sikao
                 if ((shunZi[i][0] == heLePai && (heLePai & SHU_PAI) != 7)
                     || (shunZi[i][2] == heLePai && (heLePai & SHU_PAI) != 3))
                 {
-                    YiZhuiJia(Yi.PING_HE, 1);
+                    YiZhuiJia(YiDingYi.PingHe, 1);
                     return;
                 }
             }
@@ -2843,7 +3104,7 @@ namespace Sikao
                     }
                 }
             }
-            YiZhuiJia(Yi.DUAN_YAO_JIU, 1);
+            YiZhuiJia(YiDingYi.DuanYaoJiu, 1);
         }
 
         // 一盃口・二盃口
@@ -2895,16 +3156,16 @@ namespace Sikao
                 }
                 if (chongFu)
                 {
-                    YiZhuiJia(Yi.YI_BEI_KOU, 1);
+                    YiZhuiJia(YiDingYi.YiBeiKou, 1);
                 }
                 else
                 {
-                    YiZhuiJia(Yi.ER_BEI_KOU, 2);
+                    YiZhuiJia(YiDingYi.ErBeiKou, 2);
                 }
             }
             if (beiKou == 1)
             {
-                YiZhuiJia(Yi.YI_BEI_KOU, 1);
+                YiZhuiJia(YiDingYi.YiBeiKou, 1);
             }
         }
 
@@ -2915,7 +3176,7 @@ namespace Sikao
             for (int i = 0; i < keZiShu; i++)
             {
                 int p = keZi[i][0];
-                if (p == Chang.changFeng)
+                if (p == Chang.ChangFeng)
                 {
                     fan++;
                 }
@@ -2931,7 +3192,7 @@ namespace Sikao
 
             if (fan > 0)
             {
-                YiZhuiJia(Yi.YI_PAI, fan);
+                YiZhuiJia(YiDingYi.YiPai, fan);
             }
         }
 
@@ -2963,11 +3224,11 @@ namespace Sikao
                 {
                     if (taJiaFuLuShu > 0)
                     {
-                        YiZhuiJia(Yi.SAN_SE_TONG_SHUN, 1);
+                        YiZhuiJia(YiDingYi.SanSeTongShun, 1);
                     }
                     else
                     {
-                        YiZhuiJia(Yi.SAN_SE_TONG_SHUN, 2);
+                        YiZhuiJia(YiDingYi.SanSeTongShun, 2);
                     }
                     return;
                 }
@@ -3011,11 +3272,11 @@ namespace Sikao
                 {
                     if (taJiaFuLuShu > 0)
                     {
-                        YiZhuiJia(Yi.YI_QI_TONG_GUAN, 1);
+                        YiZhuiJia(YiDingYi.YiQiTongGuan, 1);
                     }
                     else
                     {
-                        YiZhuiJia(Yi.YI_QI_TONG_GUAN, 2);
+                        YiZhuiJia(YiDingYi.YiQiTongGuan, 2);
                     }
                     return;
                 }
@@ -3072,26 +3333,26 @@ namespace Sikao
             {
                 if (shunZiShu == 0)
                 {
-                    YiZhuiJia(Yi.HUN_LAO_TOU, 2);
+                    YiZhuiJia(YiDingYi.HunLaoTou, 2);
                 }
                 else if (taJiaFuLuShu > 0)
                 {
-                    YiZhuiJia(Yi.QUAN_DAI_YAO, 1);
+                    YiZhuiJia(YiDingYi.QuanDaiYao, 1);
                 }
                 else
                 {
-                    YiZhuiJia(Yi.QUAN_DAI_YAO, 2);
+                    YiZhuiJia(YiDingYi.QuanDaiYao, 2);
                 }
             }
             else
             {
                 if (taJiaFuLuShu > 0)
                 {
-                    YiZhuiJia(Yi.CHUN_QUAN_DAI, 2);
+                    YiZhuiJia(YiDingYi.ChunQuanDai, 2);
                 }
                 else
                 {
-                    YiZhuiJia(Yi.CHUN_QUAN_DAI, 3);
+                    YiZhuiJia(YiDingYi.ChunQuanDai, 3);
                 }
             }
         }
@@ -3101,7 +3362,7 @@ namespace Sikao
         {
             if (keZiShu == 4)
             {
-                YiZhuiJia(Yi.DUI_DUI_HE, 2);
+                YiZhuiJia(YiDingYi.DuiDuiHe, 2);
             }
         }
 
@@ -3116,22 +3377,22 @@ namespace Sikao
             int gang = 0;
             for (int i = 0; i < keZiShu; i++)
             {
-                if (keZiZhong[i] == Yao.WU || keZiZhong[i] == Yao.AN_GANG)
+                if (keZiZhong[i] == Chang.YaoDingYi.Wu || keZiZhong[i] == Chang.YaoDingYi.AnGang)
                 {
                     anKe++;
                 }
-                if (keZiZhong[i] == Yao.AN_GANG || keZiZhong[i] == Yao.JIA_GANG || keZiZhong[i] == Yao.DA_MING_GANG)
+                if (keZiZhong[i] == Chang.YaoDingYi.AnGang || keZiZhong[i] == Chang.YaoDingYi.JiaGang || keZiZhong[i] == Chang.YaoDingYi.DaMingGang)
                 {
                     gang++;
                 }
             }
             if (anKe == 3)
             {
-                YiZhuiJia(Yi.SAN_AN_KE, 2);
+                YiZhuiJia(YiDingYi.SanAnKe, 2);
             }
             if (gang == 3)
             {
-                YiZhuiJia(Yi.SAN_GANG_ZI, 2);
+                YiZhuiJia(YiDingYi.SanGangZi, 2);
             }
         }
 
@@ -3155,7 +3416,7 @@ namespace Sikao
                 Sort(p);
                 if ((p[0] + 1 == p[1]) && (p[0] + 2 == p[2]))
                 {
-                    YiZhuiJia(Yi.SAN_LIAN_KE, 2);
+                    YiZhuiJia(YiDingYi.SanLianKe, 2);
                 }
             }
         }
@@ -3187,7 +3448,7 @@ namespace Sikao
             }
             if (dui == 1 && yuan == 2)
             {
-                YiZhuiJia(Yi.XIAO_SAN_YUAN, 2);
+                YiZhuiJia(YiDingYi.XiaoSanYuan, 2);
             }
         }
 
@@ -3251,22 +3512,22 @@ namespace Sikao
             {
                 if (taJiaFuLuShu > 0)
                 {
-                    YiZhuiJia(Yi.HUN_YI_SE, 2);
+                    YiZhuiJia(YiDingYi.HunYiSe, 2);
                 }
                 else
                 {
-                    YiZhuiJia(Yi.HUN_YI_SE, 3);
+                    YiZhuiJia(YiDingYi.HunYiSe, 3);
                 }
             }
             else
             {
                 if (taJiaFuLuShu > 0)
                 {
-                    YiZhuiJia(Yi.QING_YI_SE, 5);
+                    YiZhuiJia(YiDingYi.QingYiSe, 5);
                 }
                 else
                 {
-                    YiZhuiJia(Yi.QING_YI_SE, 6);
+                    YiZhuiJia(YiDingYi.QingYiSe, 6);
                 }
             }
         }
@@ -3276,7 +3537,7 @@ namespace Sikao
         {
             if (duiZiShu == 7)
             {
-                YiZhuiJia(Yi.QI_DUI_ZI, 2);
+                YiZhuiJia(YiDingYi.QiDuiZi, 2);
             }
         }
 
@@ -3285,8 +3546,8 @@ namespace Sikao
         {
             for (int i = 0; i < shePaiWei; i++)
             {
-                Yao yao = shePaiYao[i];
-                if (yao != Yao.WU && yao != Yao.LI_ZHI)
+                Chang.YaoDingYi yao = shePaiYao[i];
+                if (yao != Chang.YaoDingYi.Wu && yao != Chang.YaoDingYi.LiZhi)
                 {
                     return;
                 }
@@ -3301,7 +3562,7 @@ namespace Sikao
                 }
             }
 
-            YiZhuiJia(Yi.LIU_MAN_GUAN, 5);
+            YiZhuiJia(YiDingYi.LiuManGuan, 5);
         }
 
         // 懸賞牌
@@ -3314,14 +3575,14 @@ namespace Sikao
             int[] xuanShangPaiQuDe = Pai.XuanShangPaiQuDe();
             for (int i = 0; i < xuanShangPaiQuDe.Length; i++)
             {
-                xuan += shouPaiShu[Pai.XUAN_SHANG_PAI[xuanShangPaiQuDe[i] & QIAO_PAI]];
+                xuan += shouPaiShu[Pai.XuanShangPaiDingYi[xuanShangPaiQuDe[i] & QIAO_PAI]];
             }
             if (liZhi)
             {
                 int[] liXuanShangPaiQuDe = Pai.LiXuanShangPaiQuDe();
                 for (int i = 0; i < liXuanShangPaiQuDe.Length; i++)
                 {
-                    xuan += shouPaiShu[Pai.XUAN_SHANG_PAI[liXuanShangPaiQuDe[i] & QIAO_PAI]];
+                    xuan += shouPaiShu[Pai.XuanShangPaiDingYi[liXuanShangPaiQuDe[i] & QIAO_PAI]];
                 }
             }
             for (int i = 0; i < shouPaiWei; i++)
@@ -3348,16 +3609,16 @@ namespace Sikao
             }
             if (xuan > 0)
             {
-                YiZhuiJia(Yi.XUAN_SHANG, xuan);
+                YiZhuiJia(YiDingYi.XuanShang, xuan);
             }
         }
 
         // 役追加
-        private void YiZhuiJia(YiMan ming, int fan)
+        private void YiZhuiJia(YiManDingYi ming, int fan)
         {
             YiZhuiJia((int)ming, fan);
         }
-        private void YiZhuiJia(Yi ming, int fan)
+        private void YiZhuiJia(YiDingYi ming, int fan)
         {
             YiZhuiJia((int)ming, fan);
         }
@@ -3395,7 +3656,7 @@ namespace Sikao
                 keZi[keZiShu][0] = p;
                 keZi[keZiShu][1] = p;
                 keZi[keZiShu][2] = p;
-                keZiZhong[keZiShu] = Yao.WU;
+                keZiZhong[keZiShu] = Chang.YaoDingYi.Wu;
                 keZiShu++;
             }
         }
@@ -3487,7 +3748,7 @@ namespace Sikao
         {
             for (int i = 0; i < fuLuPaiWei; i++)
             {
-                if (fuLuZhong[i] == Yao.CHI)
+                if (fuLuZhong[i] == Chang.YaoDingYi.Chi)
                 {
                     shunZi[shunZiShu][0] = fuLuPai[i][0] & QIAO_PAI;
                     shunZi[shunZiShu][1] = fuLuPai[i][1] & QIAO_PAI;
@@ -3527,9 +3788,9 @@ namespace Sikao
             }
             for (int i = 0; i < keZiShu; i++)
             {
-                if (keZiZhong[i] == Yao.WU && keZi[i][0] == heLePai && !jiJia)
+                if (keZiZhong[i] == Chang.YaoDingYi.Wu && keZi[i][0] == heLePai && !jiJia)
                 {
-                    keZiZhong[i] = Yao.BING;
+                    keZiZhong[i] = Chang.YaoDingYi.Bing;
                     return;
                 }
             }
@@ -3542,7 +3803,7 @@ namespace Sikao
         }
         protected void ShouPaiShuJiSuan(bool fuLu)
         {
-            Init(shouPaiShu, 0);
+            Chang.Init(shouPaiShu, 0);
             for (int i = 0; i < shouPaiWei; i++)
             {
                 int p = shouPai[i] & QIAO_PAI;
@@ -3570,17 +3831,17 @@ namespace Sikao
         // 公開牌数計算
         internal void GongKaiPaiShuJiSuan()
         {
-            Init(gongKaiPaiShu, 0);
-            Init(liZhiJiaShePaiShu, 0);
-            for (int i = 0; i < Chang.mianZi; i++)
+            Chang.Init(gongKaiPaiShu, 0);
+            Chang.Init(liZhiJiaShePaiShu, 0);
+            for (int i = 0; i < Chang.MianZi; i++)
             {
-                QiaoShi shi = Chang.qiaoShi[i];
+                QiaoShi shi = Chang.QiaoShi[i];
                 // 捨牌
                 for (int j = 0; j < shi.shePaiWei; j++)
                 {
-                    int p = shi.shePai[j] & QIAO_PAI;
+                    int p = shi.ShePai[j] & QIAO_PAI;
                     gongKaiPaiShu[p]++;
-                    if (shi.liZhi && i != Chang.ziMoFan)
+                    if (shi.liZhi && i != Chang.ZiMoFan)
                     {
                         liZhiJiaShePaiShu[p]++;
                     }
@@ -3595,7 +3856,7 @@ namespace Sikao
                         {
                             continue;
                         }
-                        if (shi.fuLuZhong[j] == Yao.JIA_GANG && j == 3)
+                        if (shi.fuLuZhong[j] == Chang.YaoDingYi.JiaGang && j == 3)
                         {
                             continue;
                         }
@@ -3608,9 +3869,9 @@ namespace Sikao
                 }
             }
             // 懸賞牌
-            for (int i = 0; i < Pai.xuanShangPaiWei; i++)
+            for (int i = 0; i < Pai.XuanShangPaiWei; i++)
             {
-                int p = Pai.xuanShangPai[i] & QIAO_PAI;
+                int p = Pai.XuanShangPai[i] & QIAO_PAI;
                 gongKaiPaiShu[p]++;
             }
             // 手牌
@@ -3624,7 +3885,7 @@ namespace Sikao
         // 副露牌数計算
         protected void FuLuPaiShuSuan()
         {
-            Init(fuLuPaiShu, 0);
+            Chang.Init(fuLuPaiShu, 0);
             for (int i = 0; i < fuLuPaiWei; i++)
             {
                 for (int j = 0; j < fuLuPai[i].Length; j++)
@@ -3652,7 +3913,7 @@ namespace Sikao
             {
                 switch (ziJiaYao)
                 {
-                    case Yao.WU:
+                    case Chang.YaoDingYi.Wu:
                         // 無
                         if (ziJiaXuanZe != shouPaiWei - 1)
                         {
@@ -3661,7 +3922,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.JIA_GANG:
+                    case Chang.YaoDingYi.JiaGang:
                         // 加槓
                         if (jiaGangKeNengShu <= ziJiaXuanZe)
                         {
@@ -3670,7 +3931,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.AN_GANG:
+                    case Chang.YaoDingYi.AnGang:
                         // 暗槓
                         if (anGangKeNengShu <= ziJiaXuanZe)
                         {
@@ -3679,7 +3940,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.ZI_MO:
+                    case Chang.YaoDingYi.ZiMo:
                         // 自摸
                         if (!heLe)
                         {
@@ -3698,7 +3959,7 @@ namespace Sikao
             {
                 switch (ziJiaYao)
                 {
-                    case Yao.WU:
+                    case Chang.YaoDingYi.Wu:
                         // 無
                         if (ziJiaXuanZe > shouPaiWei - 1)
                         {
@@ -3707,7 +3968,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.JIA_GANG:
+                    case Chang.YaoDingYi.JiaGang:
                         // 加槓
                         if (jiaGangKeNengShu <= ziJiaXuanZe)
                         {
@@ -3716,7 +3977,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.AN_GANG:
+                    case Chang.YaoDingYi.AnGang:
                         // 暗槓
                         if (anGangKeNengShu <= ziJiaXuanZe)
                         {
@@ -3725,7 +3986,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.LI_ZHI:
+                    case Chang.YaoDingYi.LiZhi:
                         // 立直
                         if (taJiaFuLuShu > 0)
                         {
@@ -3734,7 +3995,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.ZI_MO:
+                    case Chang.YaoDingYi.ZiMo:
                         // 自摸
                         if (!heLe)
                         {
@@ -3743,7 +4004,7 @@ namespace Sikao
                         }
                         break;
 
-                    case Yao.JIU_ZHONG_JIU_PAI:
+                    case Chang.YaoDingYi.JiuZhongJiuPai:
                         // 九種九牌
                         if (!jiuZhongJiuPai)
                         {
@@ -3782,11 +4043,11 @@ namespace Sikao
 
             switch (taJiaYao)
             {
-                case Yao.WU:
+                case Chang.YaoDingYi.Wu:
                     // 無
                     break;
 
-                case Yao.CHI:
+                case Chang.YaoDingYi.Chi:
                     // 吃
                     if (chiKeNengShu <= taJiaXuanZe)
                     {
@@ -3795,7 +4056,7 @@ namespace Sikao
                     }
                     break;
 
-                case Yao.BING:
+                case Chang.YaoDingYi.Bing:
                     // 石並
                     if (bingKeNengShu <= taJiaXuanZe)
                     {
@@ -3804,7 +4065,7 @@ namespace Sikao
                     }
                     break;
 
-                case Yao.DA_MING_GANG:
+                case Chang.YaoDingYi.DaMingGang:
                     // 大明槓
                     if (daMingGangKeNengShu <= taJiaXuanZe)
                     {
@@ -3813,7 +4074,7 @@ namespace Sikao
                     }
                     break;
 
-                case Yao.RONG_HE:
+                case Chang.YaoDingYi.RongHe:
                     // 栄和
                     if (!heLe)
                     {

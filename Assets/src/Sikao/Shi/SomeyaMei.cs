@@ -2,7 +2,7 @@ namespace Sikao.Shi
 {
     internal class SomeyaMei : QiaoJiXie
     {
-        internal static readonly string MING_QIAN = "染谷鳴";
+        internal const string MING_QIAN = "染谷鳴";
         internal SomeyaMei() : base(MING_QIAN)
         {
             nao = new()

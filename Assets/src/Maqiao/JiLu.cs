@@ -39,8 +39,8 @@ namespace Maqiao
         public int fangChongDian = 0;
 
         // 役満数
-        public int[] yiManShu = new int[Sikao.QiaoShi.YI_MAN_MING.Length];
+        public int[] yiManShu = new int[Sikao.QiaoShi.YiManMing.Length];
         // 役数
-        public int[] yiShu = new int[Sikao.QiaoShi.YI_MING.Length];
+        public int[] yiShu = new int[Sikao.QiaoShi.YiMing.Length];
     }
 }

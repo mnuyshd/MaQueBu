@@ -2,7 +2,7 @@ namespace Sikao.Shi
 {
     internal class YakudaJunji : QiaoJiXie
     {
-        internal static readonly string MING_QIAN = "役田順字";
+        internal const string MING_QIAN = "役田順字";
         internal YakudaJunji() : base(MING_QIAN)
         {
             nao = new()

@@ -8,48 +8,91 @@ namespace Gongtong
     // 牌
     internal class Pai
     {
-        // 牌
-        internal static int[] PAI4 = new int[] {
+        // 牌定義
+        private static int[] Pai4DingYi = new int[] {
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
             0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
             0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
             0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37
         };
-        internal static readonly int[] PAI3 = new int[] {
+        // 牌定義(3人打)
+        private static readonly int[] Pai3DingYi = new int[] {
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
             0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
             0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37
         };
-        internal static int[] PAI = PAI4;
-        // 赤牌
-        internal static readonly int[] CHI_PAI = new int[] { 0x05, 0x15, 0x25 };
-        // 幺九牌
-        internal static readonly int[] YAO_JIU_PAI = new int[] { 0x01, 0x09, 0x11, 0x19, 0x21, 0x29, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
-        // 緑一色牌
-        internal static readonly int[] LU_YI_SE_PAI = new int[] { 0x22, 0x23, 0x24, 0x26, 0x28, 0x36 };
-        // 風牌
-        internal static readonly int[] FENG_PAI = new int[] { 0x31, 0x32, 0x33, 0x34 };
+        private static int[] qiaoPai = Pai4DingYi;
+        internal static int[] QiaoPai
+        {
+            get { return qiaoPai; }
+        }
 
-        // 懸賞牌
-        internal static readonly int[] XUAN_SHANG_PAI = new int[] {
+        // 赤牌定義
+        private static readonly int[] chiPaiDingYi = new int[] { 0x05, 0x15, 0x25 };
+        internal static int[] ChiPaiDingYi
+        {
+            get { return chiPaiDingYi; }
+        }
+        // 幺九牌定義
+        private static readonly int[] yaoJiuPaiDingYi = new int[] { 0x01, 0x09, 0x11, 0x19, 0x21, 0x29, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
+        internal static int[] YaoJiuPaiDingYi
+        {
+            get { return yaoJiuPaiDingYi; }
+        }
+        // 緑一色牌定義
+        private static readonly int[] luYiSePaiDingYi = new int[] { 0x22, 0x23, 0x24, 0x26, 0x28, 0x36 };
+        internal static int[] LuYiSePaiDingYi
+        {
+            get { return luYiSePaiDingYi; }
+        }
+        // 風牌定義
+        private static readonly int[] fengPaiDingYi = new int[] { 0x31, 0x32, 0x33, 0x34 };
+        internal static int[] FengPaiDingYi
+        {
+            get { return fengPaiDingYi; }
+        }
+        // 懸賞牌定義
+        private static readonly int[] xuanShangPaiDingYi = new int[] {
             -1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x01, -1, -1, -1, -1, -1, -1,
             -1, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x11, -1, -1, -1, -1, -1, -1,
             -1, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x21, -1, -1, -1, -1, -1, -1,
             -1, 0x32, 0x33, 0x34, 0x31, 0x36, 0x37, 0x35
         };
-        // 風牌名
-        internal static readonly string[] FENG_PAI_MING = new string[] { "東", "南", "西", "北" };
+        internal static int[] XuanShangPaiDingYi
+        {
+            get { return xuanShangPaiDingYi; }
+        }
+        // 風牌名定義
+        private static readonly string[] fengPaiMing = new string[] { "東", "南", "西", "北" };
+        internal static string[] FengPaiMing
+        {
+            get { return fengPaiMing; }
+        }
 
         // 山牌自摸位
-        private static readonly int[] SHAN_PAI_ZI_MO_WEI = new int[] { 0, 1, 2, 3, 16, 17, 18, 19, 32, 33, 34, 35, 48, 52 };
+        private static readonly int[] ShanPaiZiMoWei = new int[] { 0, 1, 2, 3, 16, 17, 18, 19, 32, 33, 34, 35, 48, 52 };
+
         // 懸賞牌
-        internal static int[] xuanShangPai;
+        private static readonly int[] xuanShangPai;
+        internal static int[] XuanShangPai
+        {
+            get { return xuanShangPai; }
+        }
         internal static Button[] goXuanShangPai;
         // 裏懸賞牌
-        internal static int[] liXuanShangPai;
+        private static readonly int[] liXuanShangPai;
+        internal static int[] LiXuanShangPai
+        {
+            get { return liXuanShangPai; }
+        }
         internal static Button[] goLiXuanShangPai;
         // 懸賞牌位
-        internal static int xuanShangPaiWei;
+        private static int xuanShangPaiWei;
+        internal static int XuanShangPaiWei
+        {
+            get { return xuanShangPaiWei; }
+        }
+
         // 山牌
         private static int[] shanPai;
         // 山牌位
@@ -80,32 +123,32 @@ namespace Gongtong
 
         // 洗牌
         internal static void XiPai() {
-            if (Chang.mianZi == 3)
+            if (Chang.MianZi == 3)
             {
-                // 3人打ちの場合、萬子を抜く
-                PAI = PAI3;
+                // 3人打ちの場合
+                qiaoPai = Pai3DingYi;
             }
             else
             {
-                PAI = PAI4;
+                qiaoPai = Pai4DingYi;
             }
-            shanPai = new int[4 * PAI.Length];
+            shanPai = new int[4 * qiaoPai.Length];
             // 山牌
             for (int i = 0; i < 4; i++)
             {
-                for (int j = 0; j < PAI.Length; j++)
+                for (int j = 0; j < qiaoPai.Length; j++)
                 {
-                    shanPai[i * PAI.Length + j] = PAI[j];
+                    shanPai[i * qiaoPai.Length + j] = qiaoPai[j];
                 }
             }
             // 赤牌
-            for (int i = 0; i < CHI_PAI.Length; i++)
+            for (int i = 0; i < ChiPaiDingYi.Length; i++)
             {
                 for (int j = 0; j < GuiZe.chiPaiShu[i]; j++)
                 {
                     for (int k = 0; k < shanPai.Length; k++)
                     {
-                        if (CHI_PAI[i] == shanPai[k])
+                        if (ChiPaiDingYi[i] == shanPai[k])
                         {
                             shanPai[k] += 0x40;
                             break;
@@ -146,7 +189,7 @@ namespace Gongtong
                 wei++;
             }
             xuanShangPaiWei = 1;
-            QiaoShi.Init(gangJia, 0xff);
+            Chang.Init(gangJia, 0xff);
 
             lingShangKaiHua = false;
             qiangGang = false;
@@ -157,7 +200,7 @@ namespace Gongtong
         internal static void JiRu(int jia, List<List<int>> jiRuPai)
         {
             int[] shanPaiC = new int[shanPai.Length];
-            QiaoShi.Copy(shanPai, shanPaiC);
+            Chang.Copy(shanPai, shanPaiC);
 
             for (int i = 0; i < jiRuPai.Count; i++)
             {
@@ -170,11 +213,11 @@ namespace Gongtong
                             int wei;
                             if (j < 12)
                             {
-                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % Chang.mianZi * 4);
+                                wei = ShanPaiZiMoWei[j] + ((jia + i) % Chang.MianZi * 4);
                             }
                             else
                             {
-                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % Chang.mianZi);
+                                wei = ShanPaiZiMoWei[j] + ((jia + i) % Chang.MianZi);
                             }
                             int p = shanPai[wei];
                             shanPai[wei] = shanPai[k];
@@ -273,10 +316,10 @@ namespace Gongtong
         {
             gangJia[xuanShangPaiWei - 1] = jia;
             xuanShangPaiWei++;
-            for (int i = 0; i < Chang.mianZi; i++)
+            for (int i = 0; i < Chang.MianZi; i++)
             {
-                QiaoShi shi = Chang.qiaoShi[i];
-                if (shi.player)
+                QiaoShi shi = Chang.QiaoShi[i];
+                if (shi.Player)
                 {
                     shi.ShouPaiXuanShangPanDing();
                 }

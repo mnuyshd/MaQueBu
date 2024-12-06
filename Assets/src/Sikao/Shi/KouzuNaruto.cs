@@ -2,7 +2,7 @@ namespace Sikao.Shi
 {
     internal class KouzuNaruto : QiaoJiXie
     {
-        internal static readonly string MING_QIAN = "河津鳴人";
+        internal const string MING_QIAN = "河津鳴人";
         internal KouzuNaruto() : base(MING_QIAN)
         {
             nao = new()
