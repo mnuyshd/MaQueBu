@@ -115,7 +115,6 @@ namespace Maqiao
         private bool isKaiShiCoroutine;
         private bool isQiaoShiXuanZeCoroutine;
         private bool isFollowQiaoShiXuanZeCoroutine;
-        private bool isChangJueCoroutine;
         private bool isQinJueCoroutine;
         private bool isPeiPaiCoroutine;
         private bool isDuiJuCoroutine;
@@ -1084,10 +1083,7 @@ namespace Maqiao
 
                 // 場決
                 case Event.CHANG_JUE:
-                    if (!isChangJueCoroutine)
-                    {
-                        StartCoroutine(ChangJue());
-                    }
+                    ChangJue();
                     break;
 
                 // 親決
@@ -1801,10 +1797,8 @@ namespace Maqiao
         }
 
         // 【ゲーム】場決
-        private IEnumerator ChangJue()
+        private void ChangJue()
         {
-            isChangJueCoroutine = true;
-
             ClearScreen();
 
             if (qiaoShi[0] == null)
@@ -1828,8 +1822,6 @@ namespace Maqiao
                     if (fengPai[j] == i)
                     {
                         Chang.QiaoShi[jia] = qiaoShi[j];
-                        float y = -(paiWidth * 2.5f + paiHeight * 2f);
-                        DrawPai(ref goButton[jia], i, Cal(0, y, jia), 90 * GetDrawOrder(jia));
                         jia++;
                     }
                 }
@@ -1872,12 +1864,9 @@ namespace Maqiao
                 }
             }
 
-            yield return Pause(ForwardMode.NORMAL);
-
             ClearGameObject(ref goButton);
 
             eventStatus = Event.QIN_JUE;
-            isChangJueCoroutine = false;
         }
 
         // 【ゲーム】親決
