@@ -507,7 +507,7 @@ namespace Sikao
             get { return fuLuPaiShu; }
         }
         // 公開牌数
-        private int[] gongKaiPaiShu;
+        private readonly int[] gongKaiPaiShu;
         internal int[] GongKaiPaiShu
         {
             get { return gongKaiPaiShu; }

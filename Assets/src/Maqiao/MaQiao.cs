@@ -221,7 +221,8 @@ namespace Maqiao
         // 雀士名前
         private readonly Dictionary<string, bool> qiaoShiMingQian = new()
         {
-            { "機械雀士", true },
+            { "効率雀士", true },
+            //{ "機械雀士", true },
             { HikitaMamoru.MING_QIAN, true },
             { UchidaKou.MING_QIAN, true },
             { SomeyaMei.MING_QIAN, false },
@@ -235,6 +236,8 @@ namespace Maqiao
         {
             return mingQian switch
             {
+                "効率雀士" => new QiaoXiaoLu(mingQian),
+                //"機械雀士" => new QiaoJiXie(mingQian),
                 HikitaMamoru.MING_QIAN => new HikitaMamoru(),
                 SomeyaMei.MING_QIAN => new SomeyaMei(),
                 UchidaKou.MING_QIAN => new UchidaKou(),
@@ -242,7 +245,8 @@ namespace Maqiao
                 KouzuTorako.MING_QIAN => new KouzuTorako(),
                 YakudaJunji.MING_QIAN => new KouzuTorako(),
                 MenzenJunko.MING_QIAN => new MenzenJunko(),
-                _ => new QiaoJiXie(mingQian),
+                //_ => new QiaoJiXie(mingQian),
+                _ => new QiaoXiaoLu(mingQian),
             };
         }
 
