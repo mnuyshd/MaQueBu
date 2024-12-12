@@ -81,7 +81,7 @@ namespace Sikao
             {
                 // 自摸
                 ZiJiaYao = Chang.YaoDingYi.ZiMo;
-                ZiJiaXuanZe = 0;
+                ZiJiaXuanZe = ShouPaiWei - 1;
                 return;
             }
 
@@ -92,7 +92,7 @@ namespace Sikao
                 {
                     // 九種九牌
                     ZiJiaYao = Chang.YaoDingYi.JiuZhongJiuPai;
-                    ZiJiaXuanZe = 0;
+                    ZiJiaXuanZe = ShouPaiWei - 1;
                     return;
                 }
             }
@@ -158,7 +158,7 @@ namespace Sikao
                 }
                 // 立直後自摸切
                 ZiJiaYao = Chang.YaoDingYi.Wu;
-                ZiJiaXuanZe = (ShouPaiWei - 1);
+                ZiJiaXuanZe = ShouPaiWei - 1;
                 return;
             }
 

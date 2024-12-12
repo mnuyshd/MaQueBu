@@ -7,20 +7,27 @@ namespace Sikao
     // 効率雀士
     internal class QiaoXiaoLu : QiaoShi
     {
-        // 手牌点数
-        private readonly int[] shouPaiDian;
+        // 手牌有効度
+        private readonly int[] shouPaiYouXiao;
+        // 手牌危険度
+        private readonly int[] shouPaiWeiXian;
 
         // コンストラクタ
         internal QiaoXiaoLu(string mingQian) : base(mingQian)
         {
-            shouPaiDian = new int[14];
+            shouPaiYouXiao = new int[14];
+            shouPaiWeiXian = new int[ShouPai.Length];
         }
 
-        // 手牌点数計算
-        private void ShouPaiDianShuJiSuan()
+        // 手牌有効度計算
+        private void ShouPaiYouXiaoJiSuan()
         {
-            Chang.Init(shouPaiDian, 0);
+            Chang.Init(shouPaiYouXiao, 0);
+            Chang.Init(shouPaiYouXiao, 0);
 
+            // 公開牌数計算
+            GongKaiPaiShuJiSuan();
+            // 有効度計算
             for (int i = 0; i < ShouPaiWei; i++)
             {
                 int dian = 0;
@@ -33,9 +40,110 @@ namespace Sikao
                 else
                 {
                     int s = p & SHU_PAI;
-                    dian += 5 - Math.Abs(s - 5);
+                    if (s == 1)
+                    {
+                        dian += GongKaiPaiShu[p] + GongKaiPaiShu[p + 1] + GongKaiPaiShu[p + 2];
+                    }
+                    else if (s == 2)
+                    {
+                        dian += GongKaiPaiShu[p - 1] + GongKaiPaiShu[p] + GongKaiPaiShu[p + 1] + GongKaiPaiShu[p + 2];
+                    }
+                    else if (s <= 3 || s <= 7)
+                    {
+                        dian += GongKaiPaiShu[p - 2] + GongKaiPaiShu[p - 1] + GongKaiPaiShu[p] + GongKaiPaiShu[p + 1] + GongKaiPaiShu[p + 2];
+                    }
+                    else if (s == 8)
+                    {
+                        dian += GongKaiPaiShu[p - 2] + GongKaiPaiShu[p - 1] + GongKaiPaiShu[p] + GongKaiPaiShu[p + 1];
+                    }
+                    else if (s == 9)
+                    {
+                        dian += GongKaiPaiShu[p - 2] + GongKaiPaiShu[p - 1] + GongKaiPaiShu[p];
+                    }
                 }
-                shouPaiDian[i] = dian;
+                shouPaiYouXiao[i] = dian;
+            }
+        }
+        private int LiZhiZheShu()
+        {
+            int liZhiShu = 0;
+            for (int i = 0; i < Chang.MianZi; i++)
+            {
+                QiaoShi shi = Chang.QiaoShi[i];
+                if (shi.Player)
+                {
+                    continue;
+                }
+                if (shi.LiZhi)
+                {
+                    liZhiShu++;
+                }
+            }
+            return liZhiShu;
+        }
+
+        // 手牌危険度計算
+        private void ShouPaiWeiXianJiSuan()
+        {
+            // 公開牌数計算
+            GongKaiPaiShuJiSuan();
+            Chang.Init(shouPaiWeiXian, 10 * LiZhiZheShu());
+            for (int i = 0; i < Chang.MianZi; i++)
+            {
+                QiaoShi shi = Chang.QiaoShi[i];
+                if (shi.Player)
+                {
+                    continue;
+                }
+                if (shi.LiZhi)
+                {
+                    for (int j = 0; j < ShouPaiWei; j++)
+                    {
+                        int p = ShouPai[j] & QIAO_PAI;
+                        int s = p & SHU_PAI;
+
+                        if (shi.ShePaiShu[p] > 0)
+                        {
+                            // 現物
+                            shouPaiWeiXian[j] -= 10;
+                        }
+                        else
+                        {
+                            if ((p & ZI_PAI) == ZI_PAI)
+                            {
+                                // 字牌
+                                shouPaiWeiXian[j] -= GongKaiPaiShu[p] * 3;
+                            }
+                            else
+                            {
+                                // 数牌
+                                if ((s == 1 && shi.ShePaiShu[p + 3] > 0) || (s == 9 && shi.ShePaiShu[p - 3] > 0))
+                                {
+                                    shouPaiWeiXian[j] -= 9;
+                                }
+                                else if ((s == 2 && shi.ShePaiShu[p + 3] > 0) || (s == 8 && shi.ShePaiShu[p - 3] > 0))
+                                {
+                                    shouPaiWeiXian[j] -= 8;
+                                }
+                                else if ((s == 3 && shi.ShePaiShu[p + 3] > 0) || (s == 7 && shi.ShePaiShu[p - 3] > 0))
+                                {
+                                    shouPaiWeiXian[j] -= 7;
+                                }
+                                else if (s >= 4 && s <= 6)
+                                {
+                                    if (shi.ShePaiShu[p - 3] > 0)
+                                    {
+                                        shouPaiWeiXian[j] -= 4;
+                                    }
+                                    if (shi.ShePaiShu[p + 3] > 0)
+                                    {
+                                        shouPaiWeiXian[j] -= 4;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -88,24 +196,45 @@ namespace Sikao
                     }
                 }
                 ZiJiaYao = Chang.YaoDingYi.LiZhi;
-                ZiJiaXuanZe = wei;
+                ZiJiaXuanZe = PaiXuanZe(wei);
                 return;
             }
 
-            // 手牌点計算
-            ShouPaiDianShuJiSuan();
-            // 有効牌数計算
-            YouXiaoPaiShuJiSuan();
             int xuanZe = ShouPaiWei - 1;
-            int maxYouXiaoPai = 0;
-            int minDian = 99;
-            for (int i = 0; i < ShouPaiWei; i++)
+            XiangTingShuJiSuan(ShouPaiWei - 1);
+            if (LiZhiZheShu() >= 1)// && XiangTingShu >= 2)
             {
-                if (maxYouXiaoPai < YouXiaoPaiShu[i] || (maxYouXiaoPai == YouXiaoPaiShu[i] && minDian >= shouPaiDian[i]))
+                UnityEngine.Debug.Log("べたおり");
+                // 手牌危険度計算
+                ShouPaiWeiXianJiSuan();
+                int minWeiXian = 99;
+                for (int i = 0; i < ShouPaiWei; i++)
                 {
-                    maxYouXiaoPai = YouXiaoPaiShu[i];
-                    minDian = shouPaiDian[i];
-                    xuanZe = i;
+                    UnityEngine.Debug.Log("shouPaiWeiXian[" + i + "]=" + shouPaiWeiXian[i]);
+                    if (minWeiXian > shouPaiWeiXian[i])
+                    {
+                        minWeiXian = shouPaiWeiXian[i];
+                        xuanZe = i;
+                    }
+                }
+            }
+            else
+            {
+                // 手牌有効度計算
+                ShouPaiYouXiaoJiSuan();
+                // 有効牌数計算
+                YouXiaoPaiShuJiSuan();
+                int maxYouXiaoPai = 0;
+                int minDian = 99;
+                for (int i = 0; i < ShouPaiWei; i++)
+                {
+                    if (maxYouXiaoPai < YouXiaoPaiShu[i] || (maxYouXiaoPai == YouXiaoPaiShu[i] && minDian >= shouPaiYouXiao[i]))
+                    {
+                        maxYouXiaoPai = YouXiaoPaiShu[i];
+                        minDian = shouPaiYouXiao[i];
+                        xuanZe = i;
+                    }
+
                 }
             }
             ZiJiaYao = Chang.YaoDingYi.Wu;
@@ -126,6 +255,24 @@ namespace Sikao
 
             TaJiaYao = Chang.YaoDingYi.Wu;
             TaJiaXuanZe = 0;
+        }
+
+        // 牌選択(赤牌以外を優先)
+        private int PaiXuanZe(int wei)
+        {
+            if (ShouPai[wei] < 0x40)
+            {
+                return wei;
+            }
+            int p = ShouPai[wei] & QIAO_PAI;
+            for (int i = 0; i < ShouPaiWei; i++)
+            {
+                if (p == ShouPai[i])
+                {
+                    return i;
+                }
+            }
+            return wei;
         }
     }
 }

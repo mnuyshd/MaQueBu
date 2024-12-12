@@ -501,7 +501,7 @@ namespace Sikao
             get { return taZiShu; }
         }
         // 手牌数
-        private int[] shouPaiShu;
+        private readonly int[] shouPaiShu;
         internal int[] ShouPaiShu
         {
             get { return shouPaiShu; }
@@ -511,6 +511,12 @@ namespace Sikao
         internal int[] FuLuPaiShu
         {
             get { return fuLuPaiShu; }
+        }
+        // 捨牌数
+        private readonly int[] shePaiShu;
+        internal int[] ShePaiShu
+        {
+            get { return shePaiShu; }
         }
         // 公開牌数
         private readonly int[] gongKaiPaiShu;
@@ -773,6 +779,7 @@ namespace Sikao
             keZiZhong = new Chang.YaoDingYi[4];
             shouPaiShu = new int[0x40];
             fuLuPaiShu = new int[0x40];
+            shePaiShu = new int[0x40];
             gongKaiPaiShu = new int[0x40];
             liZhiJiaShePaiShu = new int[0x40];
             heLePai = new int[shouPai.Length][];
@@ -848,6 +855,7 @@ namespace Sikao
             shePaiWei = 0;
             Chang.Init(shePaiYao, Chang.YaoDingYi.Wu);
             Chang.Init(shePaiZiMoQie, false);
+            Chang.Init(shePaiShu, 0);
             Chang.Init(liZhiHouPai, 0xff);
             liZhiHouPaiWei = 0;
             liZhiWei = -1;
@@ -1009,6 +1017,7 @@ namespace Sikao
         internal void DaPai()
         {
             Chang.ShePai = shouPai[Chang.ZiJiaXuanZe];
+            shePaiShu[Chang.ShePai & QIAO_PAI]++;
             shouPai[Chang.ZiJiaXuanZe] = 0xff;
             shePai[shePaiWei] = Chang.ShePai;
             if (ziJiaXuanZe == shouPaiWei - 1)
@@ -1646,6 +1655,7 @@ namespace Sikao
                     minXiangTingShu = XiangTingShu;
                 }
             }
+            GongKaiPaiShuJiSuan();
             for (int i = 0; i < ShouPaiWei; i++)
             {
                 if (xiangTingShu[i] != minXiangTingShu)
@@ -1658,7 +1668,8 @@ namespace Sikao
                 for (int j = 0; j < Pai.QiaoPai.Length; j++)
                 {
                     ShouPai[i] = Pai.QiaoPai[j];
-                    GongKaiPaiShuJiSuan();
+                    gongKaiPaiShu[ShouPai[i]]--;
+                    gongKaiPaiShu[Pai.QiaoPai[j]]++;
                     for (int k = 0; k < ShouPaiWei; k++)
                     {
                         if (i == k)
@@ -1672,6 +1683,8 @@ namespace Sikao
                             break;
                         }
                     }
+                    gongKaiPaiShu[ShouPai[i]]++;
+                    gongKaiPaiShu[Pai.QiaoPai[j]]--;
                 }
                 youXiaoPaiShu[i] = youXiaoPai;
                 Chang.Copy(shouPaiC, ShouPai);
