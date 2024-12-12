@@ -47,7 +47,7 @@ namespace Sikao
             {
                 // 自摸
                 ZiJiaYao = Chang.YaoDingYi.ZiMo;
-                ZiJiaXuanZe = 0;
+                ZiJiaXuanZe = ShouPaiWei - 1;
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace Sikao
             {
                 // 立直後自摸切
                 ZiJiaYao = Chang.YaoDingYi.Wu;
-                ZiJiaXuanZe = (ShouPaiWei - 1);
+                ZiJiaXuanZe = ShouPaiWei - 1;
                 return;
             }
 
@@ -92,58 +92,22 @@ namespace Sikao
                 return;
             }
 
+            // 手牌点計算
             ShouPaiDianShuJiSuan();
-
-            int minXiangTingShu = 99;
+            // 有効牌数計算
+            YouXiaoPaiShuJiSuan();
             int xuanZe = ShouPaiWei - 1;
-            int[] xiangTingShu = new int[ShouPaiWei];
-            for (int i = 0; i < ShouPaiWei; i++)
-            {
-                XiangTingShuJiSuan(i);
-                xiangTingShu[i] = XiangTingShu;
-                if (minXiangTingShu > XiangTingShu)
-                {
-                    minXiangTingShu = XiangTingShu;
-                }
-            }
-
             int maxYouXiaoPai = 0;
+            int minDian = 99;
             for (int i = 0; i < ShouPaiWei; i++)
             {
-                if (xiangTingShu[i] != minXiangTingShu)
+                if (maxYouXiaoPai < YouXiaoPaiShu[i] || (maxYouXiaoPai == YouXiaoPaiShu[i] && minDian >= shouPaiDian[i]))
                 {
-                    continue;
-                }
-                int youXiaoPai = 0;
-                int[] shouPaiC = new int[ShouPai.Length];
-                Chang.Copy(ShouPai, shouPaiC);
-                for (int j = 0; j < Pai.QiaoPai.Length; j++)
-                {
-                    ShouPai[i] = Pai.QiaoPai[j];
-                    for (int k = 0; k < ShouPaiWei; k++)
-                    {
-                        XiangTingShuJiSuan(k);
-                        if (minXiangTingShu > XiangTingShu)
-                        {
-                            GongKaiPaiShuJiSuan();
-                            youXiaoPai += 4 - GongKaiPaiShu[Pai.QiaoPai[j]];
-                            break;
-                        }
-                    }
-                }
-                UnityEngine.Debug.Log("i=" + i + " youXiaoPai=" + youXiaoPai);
-                if (maxYouXiaoPai == youXiaoPai)
-                {
-                    UnityEngine.Debug.Log("i=" + i + " shouPaiDian[xuanZe]=" + shouPaiDian[xuanZe] + " shouPaiDian[i]=" + shouPaiDian[i]);
-                }
-                if (maxYouXiaoPai < youXiaoPai || (maxYouXiaoPai == youXiaoPai && shouPaiDian[xuanZe] >= shouPaiDian[i]))
-                {
-                    maxYouXiaoPai = youXiaoPai;
+                    maxYouXiaoPai = YouXiaoPaiShu[i];
+                    minDian = shouPaiDian[i];
                     xuanZe = i;
                 }
-                Chang.Copy(shouPaiC, ShouPai);
             }
-
             ZiJiaYao = Chang.YaoDingYi.Wu;
             ZiJiaXuanZe = xuanZe;
         }

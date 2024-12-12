@@ -433,6 +433,12 @@ namespace Sikao
         {
             get { return daiPaiShu; }
         }
+        // 有効牌数
+        private readonly int[] youXiaoPaiShu;
+        internal int[] YouXiaoPaiShu
+        {
+            get { return youXiaoPaiShu; }
+        }
         // 向聴数
         private int xiangTingShu;
         internal int XiangTingShu
@@ -743,6 +749,7 @@ namespace Sikao
             daiPai = new int[13];
             goDaiPai = new Button[daiPai.Length];
             goCanPaiShu = new TextMeshProUGUI[daiPai.Length];
+            youXiaoPaiShu = new int[shouPai.Length];
             duiZi = new int[7][];
             for (int i = 0; i < duiZi.Length; i++)
             {
@@ -846,6 +853,7 @@ namespace Sikao
             liZhiWei = -1;
             Chang.Init(daiPai, 0xff);
             daiPaiShu = 0;
+            Chang.Init(youXiaoPaiShu, 0);
             xiangTingShu = 0;
 
             liZhi = false;
@@ -1623,10 +1631,57 @@ namespace Sikao
             return ret;
         }
 
+        // 有効牌数計算
+        internal void YouXiaoPaiShuJiSuan()
+        {
+            Chang.Init(youXiaoPaiShu, 0);
+            int minXiangTingShu = 99;
+            int[] xiangTingShu = new int[ShouPaiWei];
+            for (int i = 0; i < ShouPaiWei; i++)
+            {
+                XiangTingShuJiSuan(i);
+                xiangTingShu[i] = XiangTingShu;
+                if (minXiangTingShu > XiangTingShu)
+                {
+                    minXiangTingShu = XiangTingShu;
+                }
+            }
+            for (int i = 0; i < ShouPaiWei; i++)
+            {
+                if (xiangTingShu[i] != minXiangTingShu)
+                {
+                    continue;
+                }
+                int youXiaoPai = 0;
+                int[] shouPaiC = new int[ShouPai.Length];
+                Chang.Copy(ShouPai, shouPaiC);
+                for (int j = 0; j < Pai.QiaoPai.Length; j++)
+                {
+                    ShouPai[i] = Pai.QiaoPai[j];
+                    GongKaiPaiShuJiSuan();
+                    for (int k = 0; k < ShouPaiWei; k++)
+                    {
+                        if (i == k)
+                        {
+                            continue;
+                        }
+                        XiangTingShuJiSuan(k);
+                        if (minXiangTingShu > XiangTingShu)
+                        {
+                            youXiaoPai += 4 - GongKaiPaiShu[Pai.QiaoPai[j]];
+                            break;
+                        }
+                    }
+                }
+                youXiaoPaiShu[i] = youXiaoPai;
+                Chang.Copy(shouPaiC, ShouPai);
+            }
+        }
+
         // 向聴数計算
         internal void XiangTingShuJiSuan(int wei)
         {
-            xiangTingShu = 999;
+            xiangTingShu = 99;
             int xiang;
 
             int[] shouPaiC = new int[shouPai.Length];
