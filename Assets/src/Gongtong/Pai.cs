@@ -316,14 +316,6 @@ namespace Gongtong
         {
             gangJia[xuanShangPaiWei - 1] = jia;
             xuanShangPaiWei++;
-            for (int i = 0; i < Chang.MianZi; i++)
-            {
-                QiaoShi shi = Chang.QiaoShi[i];
-                if (shi.Player)
-                {
-                    shi.ShouPaiXuanShangPanDing();
-                }
-            }
         }
 
         // 槍槓

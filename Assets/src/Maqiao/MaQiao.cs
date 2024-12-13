@@ -3100,7 +3100,7 @@ namespace Maqiao
                     }
                     if (sheDing.xuanShangYin)
                     {
-                        shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = shi.ShouPaiXuanShang[i] ? "▼" : "";
+                        shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = (shi.XuanShangPaiPanDing(shi.ShouPai[i]) > 0) ? "▼" : "";
                     }
                 }
                 if (p != 0xff)

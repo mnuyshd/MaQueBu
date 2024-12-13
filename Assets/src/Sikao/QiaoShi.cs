@@ -314,12 +314,6 @@ namespace Sikao
             get { return shouPai; }
         }
         internal Button[] goShouPai;
-        // 手牌懸賞
-        private readonly bool[] shouPaiXuanShang;
-        internal bool[] ShouPaiXuanShang
-        {
-            get { return shouPaiXuanShang; }
-        }
         // 手牌位
         private int shouPaiWei;
         internal int ShouPaiWei
@@ -735,7 +729,6 @@ namespace Sikao
             yi = new int[0x10];
             fanShu = new int[yi.Length];
             shouPai = new int[14];
-            shouPaiXuanShang = new bool[shouPai.Length];
             goShouPai = new Button[shouPai.Length];
             fuLuPai = new int[4][];
             goFuLuPai = new Button[fuLuPai.Length][];
@@ -843,7 +836,6 @@ namespace Sikao
         {
             this.feng = feng;
             Chang.Init(shouPai, 0xff);
-            Chang.Init(shouPaiXuanShang, false);
             shouPaiWei = 0;
             Chang.Init(fuLuPai, 0xff);
             Chang.Init(fuLuJia, 0);
@@ -888,8 +880,6 @@ namespace Sikao
 
             // 初期化
             SiKaoQianChuQiHua();
-            // 手牌懸賞判定
-            ShouPaiXuanShangPanDing();
 
             // 九種九牌判定
             JiuZhongJiuPaiPanDing();
@@ -1001,8 +991,6 @@ namespace Sikao
         internal void LiPai()
         {
             Sort(shouPai, liPaiDongZuo);
-            // 手牌懸賞判定
-            ShouPaiXuanShangPanDing();
         }
 
         // 自摸
@@ -1455,7 +1443,7 @@ namespace Sikao
         }
 
         // 懸賞牌判定
-        protected int XuanShangPaiPanDing(int pai)
+        internal int XuanShangPaiPanDing(int pai)
         {
             int p = pai & QIAO_PAI;
             int xuan = 0;
@@ -1986,24 +1974,6 @@ namespace Sikao
             else
             {
                 heLeDian = (feng == 0x31 ? 48000 : 32000) * fanShuJi;
-            }
-        }
-
-        // 手牌懸賞判定
-        internal void ShouPaiXuanShangPanDing()
-        {
-            Chang.Init(shouPaiXuanShang, false);
-            for (int i = 0; i < Pai.XuanShangPaiWei; i++)
-            {
-                int xp = Pai.XuanShangPai[i] & QIAO_PAI;
-                for (int j = 0; j < shouPaiWei; j++)
-                {
-                    int p = shouPai[j] & QIAO_PAI;
-                    if (p == Pai.XuanShangPaiDingYi[xp] || shouPai[j] > CHI_PAI)
-                    {
-                        shouPaiXuanShang[j] = true;
-                    }
-                }
             }
         }
 
