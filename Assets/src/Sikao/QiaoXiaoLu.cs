@@ -260,7 +260,7 @@ namespace Sikao
         // 牌選択(赤牌以外を優先)
         private int PaiXuanZe(int wei)
         {
-            if (ShouPai[wei] < 0x40)
+            if (ShouPai[wei] < CHI_PAI)
             {
                 return wei;
             }

@@ -150,7 +150,7 @@ namespace Gongtong
                     {
                         if (ChiPaiDingYi[i] == shanPai[k])
                         {
-                            shanPai[k] += 0x40;
+                            shanPai[k] += QiaoShi.CHI_PAI;
                             break;
                         }
                     }
