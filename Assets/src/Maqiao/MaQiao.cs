@@ -221,13 +221,13 @@ namespace Maqiao
         // 雀士名前
         private readonly Dictionary<string, bool> qiaoShiMingQian = new()
         {
-            { "効率雀士", true },
+            { "効率雀士", false },
             { "機械雀士", true },
             { HikitaMamoru.MING_QIAN, false },
             { UchidaKou.MING_QIAN, false },
             { SomeyaMei.MING_QIAN, false },
             { KouzuNaruto.MING_QIAN, false },
-            { KouzuTorako.MING_QIAN, false },
+            { KouzuTorako.MING_QIAN, true },
             { YakudaJunji.MING_QIAN, true },
             { MenzenJunko.MING_QIAN, false },
         };

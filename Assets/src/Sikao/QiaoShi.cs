@@ -512,6 +512,12 @@ namespace Sikao
         {
             get { return shePaiShu; }
         }
+        // 立直後捨牌数
+        private readonly int[] liZhiShePaiShu;
+        internal int[] LiZhiShePaiShu
+        {
+            get { return liZhiShePaiShu; }
+        }
         // 公開牌数
         private readonly int[] gongKaiPaiShu;
         internal int[] GongKaiPaiShu
@@ -767,6 +773,7 @@ namespace Sikao
             shouPaiShu = new int[0x40];
             fuLuPaiShu = new int[0x40];
             shePaiShu = new int[0x40];
+            liZhiShePaiShu = new int[0x40];
             gongKaiPaiShu = new int[0x40];
             heLePai = new int[shouPai.Length][];
             for (int i = 0; i < heLePai.Length; i++)
@@ -841,6 +848,7 @@ namespace Sikao
             Chang.Init(shePaiYao, Chang.YaoDingYi.Wu);
             Chang.Init(shePaiZiMoQie, false);
             Chang.Init(shePaiShu, 0);
+            Chang.Init(liZhiShePaiShu, 0);
             Chang.Init(liZhiHouPai, 0xff);
             liZhiHouPaiWei = 0;
             liZhiWei = -1;
@@ -999,6 +1007,14 @@ namespace Sikao
         {
             Chang.ShePai = shouPai[Chang.ZiJiaXuanZe];
             shePaiShu[Chang.ShePai & QIAO_PAI]++;
+            for (int i = 0; i < Chang.MianZi; i++)
+            {
+                QiaoShi shi = Chang.QiaoShi[i];
+                if (i != Chang.ZiMoFan && shi.LiZhi)
+                {
+                    shi.liZhiShePaiShu[Chang.ShePai & QIAO_PAI]++;
+                }
+            }
             shouPai[Chang.ZiJiaXuanZe] = 0xff;
             shePai[shePaiWei] = Chang.ShePai;
             if (ziJiaXuanZe == shouPaiWei - 1)
@@ -1657,6 +1673,10 @@ namespace Sikao
         // 向聴数計算
         internal void XiangTingShuJiSuan(int wei)
         {
+            XiangTingShuJiSuan(wei, 0);
+        }
+        internal void XiangTingShuJiSuan(int wei, int plusMianZiShu)
+        {
             xiangTingShu = 99;
             int xiang;
 
@@ -1757,7 +1777,7 @@ namespace Sikao
                     TaZiJiSuan(p);
                 }
                 // 計
-                int mianZiShu = keZiShu + shunZiShu;
+                int mianZiShu = keZiShu + shunZiShu + plusMianZiShu;
                 int xingShu = mianZiShu;
                 while (xingShu < 4 && taZiShu > 0)
                 {
@@ -2248,28 +2268,28 @@ namespace Sikao
                         continue;
                     }
 
-                    int shePaiShu = Chang.ShePai & SHU_PAI;
-                    if (shePaiShu <= 7)
+                    int sps = Chang.ShePai & SHU_PAI;
+                    if (sps <= 7)
                     {
-                        if (s1 == (shePaiShu + 1) && (s2 == shePaiShu + 2))
+                        if (s1 == (sps + 1) && (s2 == sps + 2))
                         {
                             chiPaiWei[chiKeNengShu][0] = i;
                             chiPaiWei[chiKeNengShu][1] = j;
                             chiKeNengShu++;
                         }
                     }
-                    if (shePaiShu >= 2 && shePaiShu <= 8)
+                    if (sps >= 2 && sps <= 8)
                     {
-                        if (s1 == (shePaiShu - 1) && (s2 == shePaiShu + 1))
+                        if (s1 == (sps - 1) && (s2 == sps + 1))
                         {
                             chiPaiWei[chiKeNengShu][0] = i;
                             chiPaiWei[chiKeNengShu][1] = j;
                             chiKeNengShu++;
                         }
                     }
-                    if (shePaiShu >= 3)
+                    if (sps >= 3)
                     {
-                        if (s1 == (shePaiShu - 2) && (s2 == shePaiShu - 1))
+                        if (s1 == (sps - 2) && (s2 == sps - 1))
                         {
                             chiPaiWei[chiKeNengShu][0] = i;
                             chiPaiWei[chiKeNengShu][1] = j;
@@ -2309,6 +2329,42 @@ namespace Sikao
                 }
             }
             return false;
+        }
+
+        // 鳴選択
+        protected int MingXuanZe(int[][] paiWei, int keNengShu)
+        {
+            // 向聴数計算
+            XiangTingShuJiSuan(-1);
+            int xiangTing = XiangTingShu;
+            int xuanZe = -1;
+            for (int i = 0; i < keNengShu; i++)
+            {
+                int[] shouPaiC = new int[ShouPai.Length];
+                Chang.Copy(ShouPai, shouPaiC);
+                for (int j = 0; j < paiWei[i].Length; j++)
+                {
+                    ShouPai[paiWei[i][j]] = 0xff;
+                }
+                LiPai();
+                int minXiangTing = 99;
+                for (int j = 0; j < ShouPaiWei - paiWei[i].Length; j++)
+                {
+                    // 向聴数計算(副露牌は処理していない状態なので面子数を1加算して計算)
+                    XiangTingShuJiSuan(j, 1);
+                    if (minXiangTing > XiangTingShu)
+                    {
+                        minXiangTing = XiangTingShu;
+                    }
+                }
+                if (xiangTing > minXiangTing)
+                {
+                    xiangTing = minXiangTing;
+                    xuanZe = i;
+                }
+                Chang.Copy(shouPaiC, ShouPai);
+            }
+            return xuanZe;
         }
 
         // 食替牌判定
@@ -3768,7 +3824,6 @@ namespace Sikao
                     shunZi[shunZiShu][2] = fuLuPai[i][2] & QIAO_PAI;
                     Sort(shunZi[shunZiShu]);
                     shunZiShu++;
-
                 }
                 else
                 {
