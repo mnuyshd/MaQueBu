@@ -1475,24 +1475,6 @@ namespace Sikao
             return fan;
         }
 
-        // 河牌判定
-        protected int HePaiPanDing(int pai)
-        {
-            int hePai = 0;
-            for (int i = 0; i < Chang.MianZi; i++)
-            {
-                QiaoShi shi = Chang.QiaoShi[i];
-                for (int j = 0; j < shi.shePaiWei; j++)
-                {
-                    if ((shi.ShePai[j] & QIAO_PAI) == (pai & QIAO_PAI))
-                    {
-                        hePai++;
-                    }
-                }
-            }
-            return hePai;
-        }
-
         // 和了判定
         protected Ting HeLePanDing()
         {
