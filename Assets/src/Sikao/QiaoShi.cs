@@ -518,12 +518,6 @@ namespace Sikao
         {
             get { return gongKaiPaiShu; }
         }
-        // 立直家捨牌数
-        private readonly int[] liZhiJiaShePaiShu;
-        internal int[] LiZhiJiaShePaiShu
-        {
-            get { return liZhiJiaShePaiShu; }
-        }
         // 和了
         private bool heLe;
         internal bool HeLe
@@ -774,7 +768,6 @@ namespace Sikao
             fuLuPaiShu = new int[0x40];
             shePaiShu = new int[0x40];
             gongKaiPaiShu = new int[0x40];
-            liZhiJiaShePaiShu = new int[0x40];
             heLePai = new int[shouPai.Length][];
             for (int i = 0; i < heLePai.Length; i++)
             {
@@ -3870,7 +3863,6 @@ namespace Sikao
         internal void GongKaiPaiShuJiSuan()
         {
             Chang.Init(gongKaiPaiShu, 0);
-            Chang.Init(liZhiJiaShePaiShu, 0);
             for (int i = 0; i < Chang.MianZi; i++)
             {
                 QiaoShi shi = Chang.QiaoShi[i];
@@ -3879,10 +3871,6 @@ namespace Sikao
                 {
                     int p = shi.ShePai[j] & QIAO_PAI;
                     gongKaiPaiShu[p]++;
-                    if (shi.liZhi && i != Chang.ZiMoFan)
-                    {
-                        liZhiJiaShePaiShu[p]++;
-                    }
                 }
                 // 副露牌
                 for (int j = 0; j < shi.fuLuPaiWei; j++)

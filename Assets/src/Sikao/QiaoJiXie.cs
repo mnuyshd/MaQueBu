@@ -529,6 +529,24 @@ namespace Sikao
             // 色
             (int se, int gao) = SeSuan();
 
+            int[] liZhiJiaShePaiShu = new int[0x40];
+            Chang.Init(liZhiJiaShePaiShu, 0);
+            for (int i = 0; i < Chang.MianZi; i++)
+            {
+                QiaoShi shi = Chang.QiaoShi[i];
+                if (shi.Player)
+                {
+                    continue;
+                }
+                if (shi.LiZhi)
+                {
+                    for (int j = 0; j < shi.ShePaiShu.Length; j++)
+                    {
+                        liZhiJiaShePaiShu[j] += shi.ShePaiShu[j];
+                    }
+                }
+            }
+
             for (int i = 0; i < ShouPaiWei; i++)
             {
                 int p = ShouPai[i] & QIAO_PAI;
@@ -558,10 +576,10 @@ namespace Sikao
                     shouPaiDian[i] += nao[XingGe.GUO_SHI_WU_SHUANG];
                 }
                 int taoDian = nao[XingGe.TAO];
-                if (LiZhiJiaShePaiShu[p] > 0)
+                if (liZhiJiaShePaiShu[p] > 0)
                 {
                     // 安牌
-                    shouPaiDian[i] -= (taoDian / 5) * LiZhiJiaShePaiShu[p];
+                    shouPaiDian[i] -= (taoDian / 5) * liZhiJiaShePaiShu[p];
                     // 壁
                     if (p < ZI_PAI)
                     {
