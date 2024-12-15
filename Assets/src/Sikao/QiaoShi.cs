@@ -1658,7 +1658,7 @@ namespace Sikao
                         XiangTingShuJiSuan(k);
                         if (minXiangTingShu > XiangTingShu)
                         {
-                            youXiaoPai += 4 - GongKaiPaiShu[Pai.QiaoPai[j]];
+                            youXiaoPai += Pai.CanShu(GongKaiPaiShu[Pai.QiaoPai[j]]);
                             break;
                         }
                     }

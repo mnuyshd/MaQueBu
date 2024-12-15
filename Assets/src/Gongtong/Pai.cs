@@ -392,5 +392,11 @@ namespace Gongtong
             }
             return shu;
         }
+
+        // 残牌計算
+        internal static int CanShu(int shu)
+        {
+            return 4 - shu;
+        }
     }
 }

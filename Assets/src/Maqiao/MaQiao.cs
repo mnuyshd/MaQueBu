@@ -1316,7 +1316,8 @@ namespace Maqiao
         // フォロー無しクリック
         private void OnClickScreenFollowNone()
         {
-            qiaoShi[0] = new QiaoJiXie(PLAYER_NAME)
+            //qiaoShi[0] = new QiaoJiXie(PLAYER_NAME)
+            qiaoShi[0] = new QiaoXiaoLu(PLAYER_NAME)
             {
                 Follow = false,
                 Player = true
@@ -3343,7 +3344,7 @@ namespace Maqiao
                     else
                     {
                         DrawPai(ref shi.goDaiPai[i], p, Cal(x, y, shi.PlayOrder), 0);
-                        DrawText(ref shi.goCanPaiShu[i], (4 - shi.GongKaiPaiShu[p]).ToString(), Cal(x, y + paiWidth * 1.2f, shi.PlayOrder), 0, 17);
+                        DrawText(ref shi.goCanPaiShu[i], Pai.CanShu(shi.GongKaiPaiShu[p]).ToString(), Cal(x, y + paiWidth * 1.2f, shi.PlayOrder), 0, 17);
                     }
                     x += paiWidth;
                 }
