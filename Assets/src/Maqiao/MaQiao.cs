@@ -221,14 +221,14 @@ namespace Maqiao
         // 雀士名前
         private readonly Dictionary<string, bool> qiaoShiMingQian = new()
         {
-            { "効率雀士", false },
+            { "効率雀士", true },
             { "機械雀士", true },
-            { HikitaMamoru.MING_QIAN, false },
+            { HikitaMamoru.MING_QIAN, true },
             { UchidaKou.MING_QIAN, false },
             { SomeyaMei.MING_QIAN, false },
             { KouzuNaruto.MING_QIAN, false },
-            { KouzuTorako.MING_QIAN, true },
-            { YakudaJunji.MING_QIAN, true },
+            { KouzuTorako.MING_QIAN, false },
+            { YakudaJunji.MING_QIAN, false },
             { MenzenJunko.MING_QIAN, false },
         };
         // 雀士取得
@@ -245,8 +245,7 @@ namespace Maqiao
                 KouzuTorako.MING_QIAN => new KouzuTorako(),
                 YakudaJunji.MING_QIAN => new YakudaJunji(),
                 MenzenJunko.MING_QIAN => new MenzenJunko(),
-                //_ => new QiaoJiXie(mingQian),
-                _ => new QiaoXiaoLu(mingQian),
+                _ => new QiaoJiXie(mingQian),
             };
         }
 
@@ -1316,8 +1315,8 @@ namespace Maqiao
         // フォロー無しクリック
         private void OnClickScreenFollowNone()
         {
-            //qiaoShi[0] = new QiaoJiXie(PLAYER_NAME)
-            qiaoShi[0] = new QiaoXiaoLu(PLAYER_NAME)
+            qiaoShi[0] = new QiaoJiXie(PLAYER_NAME)
+            //qiaoShi[0] = new QiaoXiaoLu(PLAYER_NAME)
             {
                 Follow = false,
                 Player = true
