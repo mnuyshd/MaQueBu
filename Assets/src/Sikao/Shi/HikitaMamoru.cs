@@ -1,6 +1,6 @@
 namespace Sikao.Shi
 {
-    internal class HikitaMamoru : QiaoJiXie
+    internal class HikitaMamoru : QiaoXiaoLu
     {
         internal const string MING_QIAN = "引田守";
         internal HikitaMamoru() : base(MING_QIAN)
@@ -9,12 +9,8 @@ namespace Sikao.Shi
             {
                 { XingGe.XUAN_SHANG, 10 },
                 { XingGe.YI_PAI, 60 },
-                { XingGe.SHUN_ZI, 20 },
-                { XingGe.KE_ZI, 20 },
                 { XingGe.LI_ZHI, 0 },
                 { XingGe.MING, 0 },
-                { XingGe.RAN, 0 },
-                { XingGe.GUO_SHI_WU_SHUANG, 60 },
                 { XingGe.TAO, 100 },
             };
         }

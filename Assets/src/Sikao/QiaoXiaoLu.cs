@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Gongtong;
 
 namespace Sikao
@@ -5,6 +7,30 @@ namespace Sikao
     // 効率雀士
     internal class QiaoXiaoLu : QiaoShi
     {
+        protected enum XingGe
+        {
+            // 懸賞
+            XUAN_SHANG,
+            // 役牌
+            YI_PAI,
+            // 立直
+            LI_ZHI,
+            // 鳴き
+            MING,
+            // 逃げ
+            TAO,
+        }
+
+        // 脳
+        protected Dictionary<XingGe, int> nao = new()
+        {
+            { XingGe.XUAN_SHANG, 50 },
+            { XingGe.YI_PAI, 50 },
+            { XingGe.LI_ZHI, 50 },
+            { XingGe.MING, 50 },
+            { XingGe.TAO, 50 },
+        };
+
         // 手牌有効度
         private readonly int[] shouPaiYouXiao;
         // 手牌安全度
@@ -27,11 +53,11 @@ namespace Sikao
             for (int i = 0; i < ShouPaiWei; i++)
             {
                 int dian = 0;
-                dian += XuanShangPaiPanDing(ShouPai[i]) * 4;
+                dian += XuanShangPaiPanDing(ShouPai[i]) * (nao[XingGe.XUAN_SHANG] / 10);
                 int p = ShouPai[i] & QIAO_PAI;
                 if (p > ZI_PAI)
                 {
-                    dian += YiPaiPanDing(p);
+                    dian += YiPaiPanDing(p) * (nao[XingGe.YI_PAI] / 30);
                 }
                 else
                 {
@@ -138,6 +164,7 @@ namespace Sikao
                                 }
                             }
                         }
+                        shouPaiAnQuan[j] *= nao[XingGe.TAO] / 50;
                     }
                 }
             }
@@ -192,7 +219,11 @@ namespace Sikao
             }
             if (wei >= 0)
             {
-                ZiJiaYao = LiZhiKeNengShu > 0 ? Chang.YaoDingYi.LiZhi : Chang.YaoDingYi.Wu;
+                ZiJiaYao = Chang.YaoDingYi.Wu;
+                if (LiZhiKeNengShu > 0 && nao[XingGe.LI_ZHI] / 10 * Pai.CanShanPaiShu() >= 25)
+                {
+                    ZiJiaYao = Chang.YaoDingYi.LiZhi;
+                }
                 ZiJiaXuanZe = PaiXuanZe(wei);
                 return;
             }
@@ -257,53 +288,64 @@ namespace Sikao
                 return;
             }
 
-            bool fulu = false;
+            bool isBing = false;
+            bool isChi = false;
             if (TaJiaFuLuShu > 0)
             {
-                fulu = true;
+                isBing = true;
+                isChi = true;
             }
-            if (YiPaiPanDing(Chang.ShePai & QIAO_PAI) > 0)
+            int p = Chang.ShePai & QIAO_PAI;
+            int s = p & SHU_PAI;
+            if (YiPaiPanDing(p) * 10 > (nao[XingGe.TAO] - nao[XingGe.MING]) / 10)
             {
-                fulu = true;
+                isBing = true;
+            }
+            if (p < ZI_PAI && s != 1 && s != 9 && YaoJiuPaiJiSuan() == 0 && (nao[XingGe.TAO] < nao[XingGe.MING]))
+            {
+                isBing = true;
+                isChi = true;
             }
             if (LiZhiZheShu() >= 1)
             {
                 // 向聴数計算
                 XiangTingShuJiSuan(-1);
-                if (XiangTingShu >= 2)
+                if (XiangTingShu >= (nao[XingGe.TAO] - nao[XingGe.MING]) / 10)
                 {
-                    fulu = false;
+                    isBing = false;
+                    isChi = false;
                 }
             }
-            if (!fulu)
+
+            if (isBing)
             {
-                TaJiaYao = Chang.YaoDingYi.Wu;
-                TaJiaXuanZe = 0;
-                return;
+                // 大明槓
+                int daMingGangXuanZe = MingXuanZe(DaMingGangPaiWei, DaMingGangKeNengShu);
+                if (daMingGangXuanZe >= 0 && (nao[XingGe.MING] - nao[XingGe.TAO] >= 70))
+                {
+                    TaJiaYao = Chang.YaoDingYi.DaMingGang;
+                    TaJiaXuanZe = daMingGangXuanZe;
+                    return;
+                }
+                // 石並
+                int bingXuanZe = MingXuanZe(BingPaiWei, BingKeNengShu);
+                if (bingXuanZe >= 0)
+                {
+                    TaJiaYao = Chang.YaoDingYi.Bing;
+                    TaJiaXuanZe = bingXuanZe;
+                    return;
+                }
             }
-            //// 大明槓
-            //int daMingGangXuanZe = MingXuanZe(DaMingGangPaiWei, DaMingGangKeNengShu);
-            //if (fulu && daMingGangXuanZe >= 0)
-            //{
-            //    TaJiaYao = Chang.YaoDingYi.DaMingGang;
-            //    TaJiaXuanZe = daMingGangXuanZe;
-            //    return;
-            //}
-            // 石並
-            int bingXuanZe = MingXuanZe(BingPaiWei, BingKeNengShu);
-            if (bingXuanZe >= 0)
+            if (isChi)
             {
-                TaJiaYao = Chang.YaoDingYi.Bing;
-                TaJiaXuanZe = bingXuanZe;
-                return;
-            }
-            // 吃
-            int chiXuanZe = MingXuanZe(ChiPaiWei, ChiKeNengShu);
-            if (chiXuanZe >= 0)
-            {
-                TaJiaYao = Chang.YaoDingYi.Chi;
-                TaJiaXuanZe = chiXuanZe;
-                return;
+                // 吃
+                int chiXuanZe = MingXuanZe(ChiPaiWei, ChiKeNengShu);
+                if (chiXuanZe >= 0)
+                {
+                    TaJiaYao = Chang.YaoDingYi.Chi;
+                    TaJiaXuanZe = chiXuanZe;
+                    return;
+                }
             }
 
             TaJiaYao = Chang.YaoDingYi.Wu;
