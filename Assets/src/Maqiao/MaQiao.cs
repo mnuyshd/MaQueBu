@@ -725,7 +725,7 @@ namespace Maqiao
             goScoreReset.onClick.AddListener(delegate {
                 goScoreDialogPanel.SetActive(true);
             });
-            DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight));
+            DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight * 1.5f));
 
             EventTrigger etResetPanel = goScoreDialogPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eResetPanel = new();
