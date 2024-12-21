@@ -171,68 +171,30 @@ namespace Sikao
                 return;
             }
 
-            int wei;
-            // 立直判定
-            if (LiZhiKeNengShu > 0)
+            int maxYuXiangDian = 0;
+            int wei = -1;
+            GongKaiPaiShuJiSuan();
+            for (int i = 0; i < HeLeKeNengShu; i++)
             {
-                wei = 0;
-                int maxDaiPaiShu = 0;
-                for (int i = 0; i < LiZhiKeNengShu; i++)
+                int dian = 0;
+                for (int j = 0; j < YuXiangDian[i].Length; j++)
                 {
-                    DaiPaiJiSuan(LiZhiPaiWei[i]);
-                    GongKaiPaiShuJiSuan();
-                    int geHeDaiPaiShu = 0;
-                    for (int j = 0; j < DaiPaiShu; j++)
+                    if (YuXiangDian[i][j] > 0)
                     {
-                        int p = DaiPai[j] & QIAO_PAI;
-                        if (p == 0xff)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            geHeDaiPaiShu += Pai.CanShu(GongKaiPaiShu[p]);
-                        }
-                    }
-                    if (maxDaiPaiShu < geHeDaiPaiShu)
-                    {
-                        maxDaiPaiShu = geHeDaiPaiShu;
-                        wei = LiZhiPaiWei[i];
+                        dian += YuXiangDian[i][j] * Pai.CanShu(GongKaiPaiShu[j]);
                     }
                 }
-                ZiJiaYao = Chang.YaoDingYi.LiZhi;
+                if (maxYuXiangDian < dian)
+                {
+                    maxYuXiangDian = dian;
+                    wei = HeLePaiWei[i];
+                }
+            }
+            if (wei >= 0)
+            {
+                ZiJiaYao = LiZhiKeNengShu > 0 ? Chang.YaoDingYi.LiZhi : Chang.YaoDingYi.Wu;
                 ZiJiaXuanZe = PaiXuanZe(wei);
                 return;
-            }
-            else
-            {
-                // 当牌の多い待ちを選択
-                wei = -1;
-                int maxDaiPaiShu = 0;
-                for (int i = 0; i < ShouPaiWei; i++)
-                {
-                    DaiPaiJiSuan(i);
-                    bool shiTi = false;
-                    for (int j = 0; j < ShiTiPaiShu; j++)
-                    {
-                        if (ShouPai[i] == ShiTiPai[j])
-                        {
-                            shiTi = true;
-                            break;
-                        }
-                    }
-                    if (DaiPaiShu > maxDaiPaiShu && !shiTi)
-                    {
-                        maxDaiPaiShu = DaiPaiShu;
-                        wei = i;
-                    }
-                }
-                if (wei >= 0)
-                {
-                    ZiJiaYao = Chang.YaoDingYi.Wu;
-                    ZiJiaXuanZe = PaiXuanZe(wei);
-                    return;
-                }
             }
 
             // 加槓
@@ -304,6 +266,21 @@ namespace Sikao
             {
                 fulu = true;
             }
+            if (LiZhiZheShu() >= 1)
+            {
+                // 向聴数計算
+                XiangTingShuJiSuan(-1);
+                if (XiangTingShu >= 2)
+                {
+                    fulu = false;
+                }
+            }
+            if (!fulu)
+            {
+                TaJiaYao = Chang.YaoDingYi.Wu;
+                TaJiaXuanZe = 0;
+                return;
+            }
             //// 大明槓
             //int daMingGangXuanZe = MingXuanZe(DaMingGangPaiWei, DaMingGangKeNengShu);
             //if (fulu && daMingGangXuanZe >= 0)
@@ -314,7 +291,7 @@ namespace Sikao
             //}
             // 石並
             int bingXuanZe = MingXuanZe(BingPaiWei, BingKeNengShu);
-            if (fulu && bingXuanZe >= 0)
+            if (bingXuanZe >= 0)
             {
                 TaJiaYao = Chang.YaoDingYi.Bing;
                 TaJiaXuanZe = bingXuanZe;
@@ -322,7 +299,7 @@ namespace Sikao
             }
             // 吃
             int chiXuanZe = MingXuanZe(ChiPaiWei, ChiKeNengShu);
-            if (fulu && chiXuanZe >= 0)
+            if (chiXuanZe >= 0)
             {
                 TaJiaYao = Chang.YaoDingYi.Chi;
                 TaJiaXuanZe = chiXuanZe;

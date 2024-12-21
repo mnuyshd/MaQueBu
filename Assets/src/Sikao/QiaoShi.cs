@@ -608,6 +608,12 @@ namespace Sikao
         {
             get { return liZhiKeNengShu; }
         }
+        // 予想点
+        private readonly int[][] yuXiangDian;
+        internal int[][] YuXiangDian
+        {
+            get { return yuXiangDian; }
+        }
         // 暗槓牌位
         private readonly int[][] anGangPaiWei;
         internal int[][] AnGangPaiWei
@@ -781,6 +787,11 @@ namespace Sikao
                 heLePai[i] = new int[Pai.QiaoPai.Length];
             }
             heLePaiWei = new int[heLePai.Length];
+            yuXiangDian = new int[shouPai.Length][];
+            for (int i = 0; i < yuXiangDian.Length; i++)
+            {
+                yuXiangDian[i] = new int[0x40];
+            }
             liZhiPaiWei = new int[shouPai.Length];
             anGangPaiWei = new int[3][];
             for (int i = 0; i < anGangPaiWei.Length; i++)
@@ -1401,6 +1412,7 @@ namespace Sikao
         {
             heLe = false;
             Chang.Init(heLePai, 0xff);
+            Chang.Init(yuXiangDian, 0);
             heLeKeNengShu = 0;
             liZhiKeNengShu = 0;
             if (jiJia)
@@ -1937,7 +1949,6 @@ namespace Sikao
                             heLeDian = 8000;
                         }
                     }
-
                 }
                 else if (fanShuJi == 5)
                 {
@@ -2060,7 +2071,10 @@ namespace Sikao
 
                     if (HeLePanDing() == Ting.TingPai)
                     {
-                        heLePai[heLeKeNengShu][wei++] = Pai.QiaoPai[j];
+                        heLePai[heLeKeNengShu][wei] = Pai.QiaoPai[j];
+                        DianJiSuan();
+                        yuXiangDian[heLeKeNengShu][Pai.QiaoPai[j]] = heLeDian;
+                        wei++;
                     }
                 }
                 if (wei > 0)
