@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -89,8 +90,6 @@ namespace Maqiao
         private static int banZhuangShu = 0;
         // 連荘
         private static Zhuang tingPaiLianZhuang;
-        // 雀士
-        private static QiaoShi[] qiaoShi;
 
         // 設定
         private SheDing sheDing;
@@ -274,7 +273,6 @@ namespace Maqiao
             SetGameObject();
 
             goQiaoShi = new Button[qiaoShiMingQian.Count];
-            qiaoShi = new QiaoShi[4];
 
             eventStatus = Event.KAI_SHI;
         }
@@ -308,20 +306,15 @@ namespace Maqiao
             // 牌
             goPais = new GameObject[0xff];
             goPais[0x00] = GameObject.Find("0x00");
-            for (int i = 0; i < 3; i++)
+            foreach (int p in Pai.QiaoPai)
             {
-                for (int j = 1; j <= 9; j++)
-                {
-                    goPais[(i * 0x10) + j] = GameObject.Find("0x" + i + j);
-                }
+                goPais[p] = GameObject.Find("0x" + p.ToString("x2"));
             }
-            for (int i = 1; i <= 7; i++)
+            foreach (int p in Pai.ChiPaiDingYi)
             {
-                goPais[0x30 + i] = GameObject.Find("0x3" + i);
+                int cp = p + QiaoShi.CHI_PAI;
+                goPais[cp] = GameObject.Find("0x" + cp.ToString("x2"));
             }
-            goPais[0x45] = GameObject.Find("0x45");
-            goPais[0x55] = GameObject.Find("0x55");
-            goPais[0x65] = GameObject.Find("0x65");
             // プレイヤー以外の手牌画像作成
             Sprite sprite = GameObject.Find("0x00").GetComponent<SpriteRenderer>().sprite;
             int spriteHeight = sprite.texture.height;
@@ -768,9 +761,8 @@ namespace Maqiao
                 }
             }
 
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 if (shi != null)
                 {
                     shi.JiLu = new JiLu();
@@ -1162,76 +1154,74 @@ namespace Maqiao
             DrawMingQian();
 
             bool isHeLe = false;
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 if (shi.Player)
                 {
                     continue;
                 }
-                Chang.YaoDingYi yao = shi.ZiJiaYao;
+                QiaoShi.YaoDingYi yao = QiaoShi.YaoDingYi.Wu;
                 int xuanZe = shi.ZiJiaXuanZe;
-                if (shi.TaJiaYao != Chang.YaoDingYi.Wu)
+                if (shi.TaJiaYao != QiaoShi.YaoDingYi.Wu)
                 {
                     yao = shi.TaJiaYao;
                     xuanZe = shi.TaJiaXuanZe;
                 }
-                if (yao == Chang.YaoDingYi.ZiMo || yao == Chang.YaoDingYi.RongHe)
+                if (yao == QiaoShi.YaoDingYi.ZiMo || yao == QiaoShi.YaoDingYi.RongHe)
                 {
-                    yao = Chang.YaoDingYi.HeLe;
+                    yao = QiaoShi.YaoDingYi.HeLe;
                     isHeLe = true;
                 }
                 DrawShouPai(i, yao, xuanZe, shi.Player, shi.Follow);
             }
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 if (!shi.Player)
                 {
                     continue;
                 }
                 if (isHeLe)
                 {
-                    DrawShouPai(i, Chang.YaoDingYi.Wu, -2);
+                    DrawShouPai(i, QiaoShi.YaoDingYi.Wu, -2);
                     break;
                 }
                 if (goYao[0] != null)
                 {
-                    DrawZiJiaYao(shi, 0, shi.ShouPaiWei - 1, true, false);
+                    DrawZiJiaYao(shi, 0, shi.ShouPai.Count - 1, true, false);
                     if (goYao[0] == null)
                     {
                         DrawTaJiaYao(i, shi, 0, shi.Follow);
                         if (goYao[0] != null)
                         {
-                            DrawShouPai(i, Chang.YaoDingYi.Wu, -2);
+                            DrawShouPai(i, QiaoShi.YaoDingYi.Wu, -2);
                             break;
                         }
                     }
                 }
                 if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
                 {
-                    int x = shi.Follow ? shi.ZiJiaXuanZe : shi.ShouPaiWei - 1;
+                    int x = shi.Follow ? shi.ZiJiaXuanZe : shi.ShouPai.Count - 1;
                     DrawSelectDaPai(i, shi, x);
                     DrawDaiPai(i, x);
                 }
                 else
                 {
-                    Chang.YaoDingYi yao = shi.ZiJiaYao;
+                    QiaoShi.YaoDingYi yao = QiaoShi.YaoDingYi.Wu;
                     int xuanZe = shi.ZiJiaXuanZe;
-                    if (shi.TaJiaYao != Chang.YaoDingYi.Wu)
+                    if (shi.TaJiaYao != QiaoShi.YaoDingYi.Wu)
                     {
                         yao = shi.TaJiaYao;
                         xuanZe = shi.TaJiaXuanZe;
                     }
-                    if (yao == Chang.YaoDingYi.ZiMo || yao == Chang.YaoDingYi.RongHe)
+                    if (yao == QiaoShi.YaoDingYi.ZiMo || yao == QiaoShi.YaoDingYi.RongHe)
                     {
-                        yao = Chang.YaoDingYi.HeLe;
+                        yao = QiaoShi.YaoDingYi.HeLe;
                     }
                     DrawShouPai(i, yao, xuanZe, shi.Player, shi.Follow);
                 }
             }
 
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
                 DrawDaiPai(i, -2);
                 DrawShePai(i);
@@ -1279,12 +1269,11 @@ namespace Maqiao
                     }
                     if (isQuXiao && !sheDing.mingQuXiao)
                     {
-                        for (int i = 0; i < Chang.MianZi; i++)
+                        foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
                         {
-                            QiaoShi shi = Chang.QiaoShi[i];
-                            if (shi.Player)
+                            if (shi.Player && !shi.JiJia)
                             {
-                                OnClickTaJiaYao(i, shi, Chang.YaoDingYi.Wu, 0);
+                                OnClickTaJiaYao(i, shi, QiaoShi.YaoDingYi.Wu, 0);
                                 break;
                             }
                         }
@@ -1306,8 +1295,6 @@ namespace Maqiao
             }
             if (selectedCount == 3 || selectedCount == 2 || selectedCount == 1)
             {
-                Chang.MianZi = selectedCount + 1;
-                Chang.QiaoShi = new QiaoShi[Chang.MianZi];
                 keyPress = true;
             }
         }
@@ -1315,12 +1302,10 @@ namespace Maqiao
         // フォロー無しクリック
         private void OnClickScreenFollowNone()
         {
-            qiaoShi[0] = new QiaoJiXie(PLAYER_NAME)
-            //qiaoShi[0] = new QiaoXiaoLu(PLAYER_NAME)
-            {
-                Follow = false,
-                Player = true
-            };
+            Chang.QiaoShis.Insert(0, new QiaoJiXie(PLAYER_NAME));
+            //Chang.QiaoShi.Insert(0, new QiaoXiaoLu(PLAYER_NAME));
+            Chang.QiaoShis[0].Follow = false;
+            Chang.QiaoShis[0].Player = true;
             keyPress = true;
         }
 
@@ -1384,6 +1369,8 @@ namespace Maqiao
         {
             isQiaoShiXuanZeCoroutine = true;
 
+            Chang.QiaoShis = new List<QiaoShi>();
+
             // 描画
             ClearScreen();
             DrawTitle();
@@ -1405,12 +1392,11 @@ namespace Maqiao
                 OnClickScreenQiaoShiXuanZe();
             }
 
-            int index = 1;
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
                 if (kvp.Value)
                 {
-                    qiaoShi[index++] = GetQiaoShi(kvp.Key);
+                    Chang.QiaoShis.Add(GetQiaoShi(kvp.Key));
                 }
             }
 
@@ -1548,10 +1534,10 @@ namespace Maqiao
             int dianPlayer = 0;
             if (isDianCha)
             {
-                for (int i = 0; i < Chang.MianZi; i++)
+                for (int i = 0; i < Chang.QiaoShis.Count; i++)
                 {
-                    int jia = (Chang.Qin + i) % Chang.MianZi;
-                    QiaoShi shi = Chang.QiaoShi[jia];
+                    int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                    QiaoShi shi = Chang.QiaoShis[jia];
                     if (shi.Player)
                     {
                         dianPlayer = shi.DianBang;
@@ -1562,10 +1548,10 @@ namespace Maqiao
 
             float x = 0f;
             float y = -(paiWidth * 2.5f);
-            for (int i = 0; i < Chang.MianZi; i++)
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                int jia = (Chang.Qin + i) % Chang.MianZi;
-                QiaoShi shi = Chang.QiaoShi[jia];
+                int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
                 Color background = shi.Feng == 0x31 ? new Color(1f, 0.5f, 0.5f) : Color.black;
                 ClearGameObject(ref goFeng[i]);
                 goFeng[i] = Instantiate(goFrame, goJuFrame.transform.parent);
@@ -1703,12 +1689,17 @@ namespace Maqiao
         private void RandomQiaoShiXuanZe()
         {
             var keys = new List<string>(qiaoShiMingQian.Keys);
+            int mianz = 0;
             foreach (string key in keys)
             {
-                qiaoShiMingQian[key] = false;
+                if (qiaoShiMingQian[key])
+                {
+                    mianz++;
+                    qiaoShiMingQian[key] = false;
+                }
             }
             int cnt = 0;
-            while (cnt < Chang.MianZi - 1)
+            while (cnt < mianz)
             {
                 System.Random r = new();
                 int n = r.Next(0, qiaoShiMingQian.Count);
@@ -1793,10 +1784,10 @@ namespace Maqiao
         // 名前クリック
         private void OnClickFollowQiaoShi(string mingQian)
         {
-            qiaoShi[0] = GetQiaoShi(mingQian);
-            qiaoShi[0].MingQian = PLAYER_NAME;
-            qiaoShi[0].Follow = true;
-            qiaoShi[0].Player = true;
+            Chang.QiaoShis.Insert(0, GetQiaoShi(mingQian));
+            Chang.QiaoShis[0].MingQian = PLAYER_NAME;
+            Chang.QiaoShis[0].Follow = true;
+            Chang.QiaoShis[0].Player = true;
             keyPress = true;
         }
 
@@ -1805,58 +1796,57 @@ namespace Maqiao
         {
             ClearScreen();
 
-            if (qiaoShi[0] == null)
+            if (Chang.QiaoShis[0] == null)
             {
                 OnClickScreenFollowNone();
             }
-            int[] fengPai = new int[Pai.FengPaiDingYi.Length - (4 - Chang.MianZi)];
-            for (int i = 0; i < Pai.FengPaiDingYi.Length - (4 - Chang.MianZi); i++)
+            List<int> fengPai = new();
+            for (int i = 0; i < Pai.FengPaiDingYi.Length - (4 - Chang.QiaoShis.Count); i++)
             {
-                fengPai[i] = Pai.FengPaiDingYi[i];
+                fengPai.Add(Pai.FengPaiDingYi[i]);
             }
             Chang.Shuffle(fengPai, 20);
 
-            Button[] goButton = new Button[Chang.MianZi];
+            Button[] goButton = new Button[Chang.QiaoShis.Count];
 
-            int jia = 0;
-            for (int i = 0x31; i <= 0x34 - (4 - Chang.MianZi); i++)
+            int idx = 0;
+            for (int i = 0x31; i <= 0x34 - (4 - Chang.QiaoShis.Count); i++)
             {
-                for (int j = 0; j < fengPai.Length; j++)
+                for (int j = 0; j < fengPai.Count; j++)
                 {
                     if (fengPai[j] == i)
                     {
-                        Chang.QiaoShi[jia] = qiaoShi[j];
-                        jia++;
+                        QiaoShi shi = Chang.QiaoShis[idx];
+                        Chang.QiaoShis[idx] = Chang.QiaoShis[j];
+                        Chang.QiaoShis[j] = shi;
                     }
                 }
+                idx++;
             }
 
             int order = 0;
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 shi.PlayOrder = i;
                 if (shi.Player)
                 {
                     order = i;
                 }
             }
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 shi.PlayOrder -= order;
                 if (shi.PlayOrder < 0)
                 {
-                    shi.PlayOrder += Chang.MianZi;
+                    shi.PlayOrder += Chang.QiaoShis.Count;
                 }
             }
 
             DrawMingQian();
 
             // 記録の読込
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 string filePath = Application.persistentDataPath + "/" + shi.MingQian + ".json";
                 if (File.Exists(filePath))
                 {
@@ -1906,7 +1896,7 @@ namespace Maqiao
             yield return Pause(ForwardMode.NORMAL);
 
             // 親
-            Chang.Qin = (sai1 + sai2 - 1) % Chang.MianZi;
+            Chang.Qin = (sai1 + sai2 - 1) % Chang.QiaoShis.Count;
             // 起家
             Chang.QiaJia = Chang.Qin;
             Chang.ChangFeng = 0x31;
@@ -1921,9 +1911,9 @@ namespace Maqiao
         // 【描画】名前(4人分)
         private void DrawMingQian()
         {
-            for (int i = 0; i < Chang.MianZi; i++)
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                int jia = (Chang.Qin + i) % Chang.MianZi;
+                int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
                 DrawMingQian(jia);
             }
         }
@@ -1931,7 +1921,7 @@ namespace Maqiao
         // 【描画】名前
         private void DrawMingQian(int jia)
         {
-            QiaoShi shi = Chang.QiaoShi[jia];
+            QiaoShi shi = Chang.QiaoShis[jia];
             float x;
             float y;
             switch (eventStatus)
@@ -1968,7 +1958,7 @@ namespace Maqiao
             ClearGameObject(ref go);
             go = Instantiate(goSais[mu - 1].GetComponent<Image>(), goSais[mu - 1].GetComponent<Image>().transform.parent);
             RectTransform rt = go.GetComponent<RectTransform>();
-            QiaoShi shi = Chang.QiaoShi[jia];
+            QiaoShi shi = Chang.QiaoShis[jia];
             go.transform.Rotate(0, 0, 90 * shi.PlayOrder);
             float x = 0;
             float y = -(paiWidth * 1.2f);
@@ -1990,13 +1980,13 @@ namespace Maqiao
                     y = -(paiHeight * 4.9f);
                     break;
             }
-            for (int i = 0; i < Chang.MianZi; i++)
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                int jia = (Chang.Qin + i) % Chang.MianZi;
+                int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
                 if (Chang.QiaJia == jia)
                 {
                     ClearGameObject(ref goQiJia);
-                    QiaoShi shi = Chang.QiaoShi[jia];
+                    QiaoShi shi = Chang.QiaoShis[jia];
                     if (shi.Player && orientation != ScreenOrientation.Portrait)
                     {
                         x -= paiWidth * 1.2f;
@@ -2018,9 +2008,9 @@ namespace Maqiao
         private void ZhuangChuQiHua()
         {
             Chang.ZhuangChuQiHua();
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                Chang.QiaoShi[i].ZhuangChuQiHua();
+                shi.ZhuangChuQiHua();
             }
 
             eventStatus = Event.PEI_PAI;
@@ -2047,33 +2037,33 @@ namespace Maqiao
             // 配牌
             for (int i = 0; i < 3; i++)
             {
-                for (int j = 0; j < Chang.MianZi; j++)
+                for (int j = 0; j < Chang.QiaoShis.Count; j++)
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        Chang.QiaoShi[(Chang.Qin + j) % Chang.MianZi].ZiMo(Pai.ShanPaiZiMo());
+                        Chang.QiaoShis[(Chang.Qin + j) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
                     }
-                    DrawShouPai((Chang.Qin + j) % Chang.MianZi, Chang.YaoDingYi.Wu, -1);
+                    DrawShouPai((Chang.Qin + j) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
                     yield return new WaitForSeconds(waitTime / 3);
                 }
             }
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
                 // 理牌
-                Chang.QiaoShi[(Chang.Qin + i) % Chang.MianZi].LiPai();
-                DrawShouPai((Chang.Qin + i) % Chang.MianZi, Chang.YaoDingYi.Wu, -1);
+                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].LiPai();
+                DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
-                Chang.QiaoShi[(Chang.Qin + i) % Chang.MianZi].ZiMo(Pai.ShanPaiZiMo());
-                DrawShouPai((Chang.Qin + i) % Chang.MianZi, Chang.YaoDingYi.Wu, -1);
+                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
+                DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
-                Chang.QiaoShi[(Chang.Qin + i) % Chang.MianZi].LiPai();
-                DrawShouPai((Chang.Qin + i) % Chang.MianZi, Chang.YaoDingYi.Wu, -1);
+                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].LiPai();
+                DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
             }
 
             eventStatus = Event.DUI_JU;
@@ -2087,10 +2077,10 @@ namespace Maqiao
             Chang.JuChuQiHua();
             // 雀士初期化
             int w = 0;
-            for (int i = 0; i < Chang.MianZi; i++)
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                int jia = (Chang.Qin + i) % Chang.MianZi;
-                QiaoShi shi = Chang.QiaoShi[jia];
+                int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
                 shi.JuChuQiHua(Pai.FengPaiDingYi[i]);
 
                 if (shi.Player)
@@ -2138,21 +2128,20 @@ namespace Maqiao
             float y = Y;
             for (int i = 0; i <= 4; i++)
             {
-                int p = Pai.XuanShangPai[i];
                 Pai.goXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
                 Pai.goXuanShangPai[i].transform.SetSiblingIndex(1);
-                DrawPai(ref Pai.goXuanShangPai[i], i < Pai.XuanShangPaiWei ? p : 0x00, new Vector2(x, y), 0);
+                DrawPai(ref Pai.goXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.XuanShangPai[i] : 0x00, new Vector2(x, y), 0);
                 x += paiWidth;
             }
 
             bool isLiXuanShangPai = false;
-            if (Chang.HeleFan >= 0 && Chang.QiaoShi[Chang.HeleFan].LiZhi)
+            if (Chang.HeleFan >= 0 && Chang.QiaoShis[Chang.HeleFan].LiZhi)
             {
                 isLiXuanShangPai = true;
             }
-            for (int i = 0; i < Chang.RongHeShu; i++)
+            foreach (int fan in Chang.RongHeFan)
             {
-                QiaoShi shi = Chang.QiaoShi[Chang.RongHeFan[i]];
+                QiaoShi shi = Chang.QiaoShis[fan];
                 if (shi.LiZhi)
                 {
                     isLiXuanShangPai = true;
@@ -2165,10 +2154,9 @@ namespace Maqiao
                 y -= paiHeight;
                 for (int i = 0; i <= 4; i++)
                 {
-                    int p = Pai.LiXuanShangPai[i];
                     Pai.goLiXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
                     Pai.goLiXuanShangPai[i].transform.SetSiblingIndex(0);
-                    DrawPai(ref Pai.goLiXuanShangPai[i], i < Pai.XuanShangPaiWei ? p : 0x00, new Vector2(x, y), 0);
+                    DrawPai(ref Pai.goLiXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.LiXuanShangPai[i] : 0x00, new Vector2(x, y), 0);
                     x += paiWidth;
                 }
             }
@@ -2179,29 +2167,29 @@ namespace Maqiao
         {
             isDuiJuCoroutine = true;
 
-            QiaoShi ziJiaShi = Chang.QiaoShi[Chang.ZiMoFan];
-            if ((Chang.ZiJiaYao == Chang.YaoDingYi.Wu || Chang.ZiJiaYao == Chang.YaoDingYi.LiZhi) && Chang.TaJiaYao == Chang.YaoDingYi.Wu)
+            QiaoShi ziJiaShi = Chang.QiaoShis[Chang.ZiMoFan];
+            if ((Chang.ZiJiaYao == QiaoShi.YaoDingYi.Wu || Chang.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi) && Chang.TaJiaYao == QiaoShi.YaoDingYi.Wu)
             {
                 // 山牌自摸
                 ziJiaShi.ZiMo(Pai.ShanPaiZiMo());
             }
-            if (Chang.ZiJiaYao == Chang.YaoDingYi.AnGang || Chang.ZiJiaYao == Chang.YaoDingYi.JiaGang || Chang.TaJiaYao == Chang.YaoDingYi.DaMingGang)
+            if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.AnGang || Chang.ZiJiaYao == QiaoShi.YaoDingYi.JiaGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.DaMingGang)
             {
                 // 嶺上牌自摸
                 ziJiaShi.ZiMo(Pai.LingShangPaiZiMo());
             }
             // 描画
-            DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -2, true, false);
+            DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -2, true, false);
             DrawJuFrame();
             yield return new WaitForSeconds(waitTime);
-            if (Chang.TaJiaYao != Chang.YaoDingYi.Wu)
+            if (Chang.TaJiaYao != QiaoShi.YaoDingYi.Wu)
             {
                 yield return new WaitForSeconds(waitTime);
             }
             ClearGameObject(ref goSheng);
 
             // 思考自家判定
-            ziJiaShi.TaJiaYao = Chang.YaoDingYi.Wu;
+            ziJiaShi.TaJiaYao = QiaoShi.YaoDingYi.Wu;
             ziJiaShi.TaJiaXuanZe = 0;
             ziJiaShi.SiKaoZiJiaPanDing();
             DrawDianBang();
@@ -2210,24 +2198,24 @@ namespace Maqiao
             if (ziJiaShi.Player)
             {
                 ziJiaShi.SiKaoZiJia();
-                DrawZiJiaYao(ziJiaShi, 0, ziJiaShi.ShouPaiWei - 1, true, false);
+                DrawZiJiaYao(ziJiaShi, 0, ziJiaShi.ShouPai.Count - 1, true, false);
                 if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
                 {
-                    int x = ziJiaShi.Follow ? ziJiaShi.ZiJiaXuanZe : ziJiaShi.ShouPaiWei - 1;
+                    int x = ziJiaShi.Follow ? ziJiaShi.ZiJiaXuanZe : ziJiaShi.ShouPai.Count - 1;
                     DrawSelectDaPai(Chang.ZiMoFan, ziJiaShi, x);
                     DrawDaiPai(Chang.ZiMoFan, x);
                 }
-                else if (ziJiaShi.ZiJiaYao == Chang.YaoDingYi.JiuZhongJiuPai || ziJiaShi.ZiJiaYao == Chang.YaoDingYi.ZiMo || ziJiaShi.ZiJiaYao == Chang.YaoDingYi.LiZhi || ziJiaShi.ZiJiaYao == Chang.YaoDingYi.AnGang || ziJiaShi.ZiJiaYao == Chang.YaoDingYi.JiaGang)
+                else if (ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.JiuZhongJiuPai || ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.ZiMo || ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi || ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.AnGang || ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.JiaGang)
                 {
-                    DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -1, true, false);
+                    DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1, true, false);
                 }
                 else
                 {
-                    DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -1, true, ziJiaShi.Follow);
+                    DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1, true, ziJiaShi.Follow);
                 }
-                if (!(sheDing.liZhiAuto && ziJiaShi.LiZhi) || ziJiaShi.HeLe || ziJiaShi.AnGangKeNengShu > 0 || ziJiaShi.JiaGangKeNengShu > 0)
+                if (!(sheDing.liZhiAuto && ziJiaShi.LiZhi) || ziJiaShi.HeLe || ziJiaShi.AnGangPaiWei.Count > 0 || ziJiaShi.JiaGangPaiWei.Count > 0)
                 {
-                    if (ziJiaShi.Follow && ziJiaShi.ZiJiaYao == Chang.YaoDingYi.Wu)
+                    if (ziJiaShi.Follow && ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.Wu)
                     {
                         DrawDaiPai(Chang.ZiMoFan, ziJiaShi.ZiJiaXuanZe);
                     }
@@ -2250,9 +2238,9 @@ namespace Maqiao
             if (ziJiaShi.CuHeZiJiaPanDing())
             {
                 // 錯和
-                Chang.CuHe(Chang.QiaoShi, Chang.ZiMoFan);
+                Chang.CuHe(Chang.ZiMoFan);
                 // 描画
-                DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -1);
+                DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1);
                 DrawShePai(Chang.ZiMoFan);
                 DrawCuHe(Chang.ZiMoFan);
                 tingPaiLianZhuang = Zhuang.LIAN_ZHUANG;
@@ -2263,23 +2251,23 @@ namespace Maqiao
 
             switch (Chang.ZiJiaYao)
             {
-                case Chang.YaoDingYi.ZiMo:
+                case QiaoShi.YaoDingYi.ZiMo:
                     // 自摸
                     ziJiaShi.HeLeChuLi();
                     Chang.HeleFan = Chang.ZiMoFan;
                     // 描画
                     DrawZiMo(Chang.ZiMoFan);
-                    DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.HeLe, -1);
+                    DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.HeLe, -1);
                     DrawXuanShangPai();
                     tingPaiLianZhuang = (Chang.ZiMoFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG);
                     yield return Pause(ForwardMode.FAST_FORWARD);
                     eventStatus = Event.YI_BIAO_SHI;
                     yield break;
 
-                case Chang.YaoDingYi.JiuZhongJiuPai:
+                case QiaoShi.YaoDingYi.JiuZhongJiuPai:
                     // 九種九牌
                     // 描画
-                    Chang.jiuZhongJiuPaiChuLi();
+                    Chang.JiuZhongJiuPaiChuLi();
                     DrawJiuZhongJiuPai(Chang.ZiMoFan);
                     tingPaiLianZhuang = GuiZe.jiuZhongJiuPaiLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                     DrawShouPai(Chang.ZiMoFan, Chang.ZiJiaYao, 0);
@@ -2287,7 +2275,7 @@ namespace Maqiao
                     eventStatus = Event.DIAN_BIAO_SHI;
                     yield break;
 
-                case Chang.YaoDingYi.LiZhi:
+                case QiaoShi.YaoDingYi.LiZhi:
                     // 立直
                     // 消
                     ziJiaShi.Xiao();
@@ -2297,21 +2285,21 @@ namespace Maqiao
                     ziJiaShi.LiZi();
                     break;
 
-                case Chang.YaoDingYi.AnGang:
+                case QiaoShi.YaoDingYi.AnGang:
                     // 暗槓
                     ziJiaShi.AnGang(Chang.ZiJiaXuanZe);
                     // 描画
                     // 消
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    foreach (QiaoShi shi in Chang.QiaoShis)
                     {
-                        Chang.QiaoShi[i].Xiao();
+                        shi.Xiao();
                     }
                     // 嶺上牌処理
-                    Pai.LingShangPaiChuLi(Chang.ZiMoFan);
+                    Pai.LingShangPaiChuLi();
                     // 描画
                     DrawAnGang(Chang.ZiMoFan);
                     DrawJuFrame();
-                    DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -1);
+                    DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1);
                     DrawXuanShangPai();
                     // 四開槓判定
                     if (Pai.SiKaiGangPanDing())
@@ -2329,7 +2317,7 @@ namespace Maqiao
                     eventStatus = Event.DUI_JU;
                     yield break;
 
-                case Chang.YaoDingYi.JiaGang:
+                case QiaoShi.YaoDingYi.JiaGang:
                     // 加槓
                     // 消
                     ziJiaShi.Xiao();
@@ -2340,7 +2328,7 @@ namespace Maqiao
                     Pai.QiangGang();
                     // 描画
                     DrawJuFrame();
-                    DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -1);
+                    DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1);
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
                     break;
@@ -2353,27 +2341,30 @@ namespace Maqiao
                     break;
             }
 
-            if (Chang.ZiJiaYao == Chang.YaoDingYi.Wu || Chang.ZiJiaYao == Chang.YaoDingYi.LiZhi)
+            if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.Wu || Chang.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi)
             {
-                // 打牌
                 // 描画
                 DrawDaiPai(Chang.ZiMoFan, Chang.ZiJiaXuanZe);
-                DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -2, true, false);
-                ziJiaShi.DaPai();
-                DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -2, false, false);
-                Chang.QiaoShi[Chang.ZiMoFan].ShePaiChuLi(Chang.ZiJiaYao);
+                // 打牌前
+                int dp = ziJiaShi.DaPaiQian();
+                DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -2, true, false);
+                yield return new WaitForSeconds(waitTime / 2);
+                // 打牌
+                ziJiaShi.DaPai(dp);
+                DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -2, false, false);
+                Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(Chang.ZiJiaYao);
                 DrawShePai(Chang.ZiMoFan);
-                if (Chang.ZiJiaYao == Chang.YaoDingYi.LiZhi)
+                if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi)
                 {
                     DrawLiZi(Chang.ZiMoFan);
                 }
                 yield return new WaitForSeconds(waitTime / 2);
                 ziJiaShi.LiPai();
-                DrawShouPai(Chang.ZiMoFan, Chang.YaoDingYi.Wu, -2);
+                DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -2);
                 // 四風子連打処理
                 Chang.SiFengZiLianDaChuLi(Chang.ShePai);
                 // 四風子連打判定
-                if (Chang.SiFengZiLianDaPanDing())
+                if (Chang.SiFengZiLianDa)
                 {
                     // 描画
                     DrawSiFengZiLianDa(Chang.ZiMoFan);
@@ -2386,10 +2377,10 @@ namespace Maqiao
 
             switch (Chang.TaJiaYao)
             {
-                case Chang.YaoDingYi.DaMingGang:
+                case QiaoShi.YaoDingYi.DaMingGang:
                     // 大明槓成立
                     // 嶺上牌処理
-                    Pai.LingShangPaiChuLi(Chang.ZiMoFan);
+                    Pai.LingShangPaiChuLi();
                     // 描画
                     DrawXuanShangPai();
                     // 四開槓判定
@@ -2409,14 +2400,14 @@ namespace Maqiao
             }
 
             // 副露判定初期化
-            Chang.TaJiaYao = Chang.YaoDingYi.Wu;
+            Chang.TaJiaYao = QiaoShi.YaoDingYi.Wu;
             Chang.MingFan = Chang.ZiMoFan;
-            for (int i = Chang.ZiMoFan + 1; i < Chang.ZiMoFan + Chang.MianZi; i++)
+            for (int i = Chang.ZiMoFan + 1; i < Chang.ZiMoFan + Chang.QiaoShis.Count; i++)
             {
-                int jia = i % Chang.MianZi;
-                QiaoShi taJiaShi = Chang.QiaoShi[jia];
+                int jia = i % Chang.QiaoShis.Count;
+                QiaoShi taJiaShi = Chang.QiaoShis[jia];
                 // 思考他家判定
-                taJiaShi.ZiJiaYao = Chang.YaoDingYi.Wu;
+                taJiaShi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 taJiaShi.ZiJiaXuanZe = 0;
                 taJiaShi.SiKaoTaJiaPanDing(i - Chang.ZiMoFan);
                 // 思考他家
@@ -2428,7 +2419,7 @@ namespace Maqiao
                 // 錯和他家判定
                 if (taJiaShi.CuHeTaJiaPanDing())
                 {
-                    Chang.CuHe(Chang.QiaoShi, jia);
+                    Chang.CuHe(jia);
                     // 描画
                     DrawCuHe(jia);
                     tingPaiLianZhuang = Zhuang.LIAN_ZHUANG;
@@ -2436,27 +2427,26 @@ namespace Maqiao
                     eventStatus = Event.DIAN_BIAO_SHI;
                     yield break;
                 }
-                if ((taJiaShi.TaJiaYao == Chang.YaoDingYi.RongHe && Chang.TaJiaYao < Chang.YaoDingYi.RongHe)
-                    || (taJiaShi.TaJiaYao == Chang.YaoDingYi.DaMingGang && Chang.TaJiaYao < Chang.YaoDingYi.DaMingGang)
-                    || (taJiaShi.TaJiaYao == Chang.YaoDingYi.Bing && Chang.TaJiaYao < Chang.YaoDingYi.Bing)
-                    || (taJiaShi.TaJiaYao == Chang.YaoDingYi.Chi && Chang.TaJiaYao < Chang.YaoDingYi.Chi))
+                if ((taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe && Chang.TaJiaYao < QiaoShi.YaoDingYi.RongHe)
+                    || (taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.DaMingGang && Chang.TaJiaYao < QiaoShi.YaoDingYi.DaMingGang)
+                    || (taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.Bing && Chang.TaJiaYao < QiaoShi.YaoDingYi.Bing)
+                    || (taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.Chi && Chang.TaJiaYao < QiaoShi.YaoDingYi.Chi))
                 {
                     // 栄和、大明槓、石並、吃
                     Chang.TaJiaYao = taJiaShi.TaJiaYao;
                     Chang.TaJiaXuanZe = taJiaShi.TaJiaXuanZe;
                     Chang.MingFan = jia;
                 }
-                if (GuiZe.wRongHe && taJiaShi.TaJiaYao == Chang.YaoDingYi.RongHe)
+                if (GuiZe.wRongHe && taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
                 {
-                    Chang.RongHeFan[Chang.RongHeShu] = jia;
-                    Chang.RongHeShu++;
+                    Chang.RongHeFan.Add(jia);
                 }
             }
             // 思考他家プレイヤー分
-            for (int i = Chang.ZiMoFan + 1; i < Chang.ZiMoFan + Chang.MianZi; i++)
+            for (int i = Chang.ZiMoFan + 1; i < Chang.ZiMoFan + Chang.QiaoShis.Count; i++)
             {
-                int jia = i % Chang.MianZi;
-                QiaoShi taJiaShi = Chang.QiaoShi[jia];
+                int jia = i % Chang.QiaoShis.Count;
+                QiaoShi taJiaShi = Chang.QiaoShis[jia];
                 if (!taJiaShi.Player)
                 {
                     continue;
@@ -2465,58 +2455,56 @@ namespace Maqiao
                 {
                     continue;
                 }
-                if (taJiaShi.HeLe || taJiaShi.ChiKeNengShu > 0 || taJiaShi.BingKeNengShu > 0 || taJiaShi.DaMingGangKeNengShu > 0)
+                if (taJiaShi.HeLe || taJiaShi.ChiPaiWei.Count > 0 || taJiaShi.BingPaiWei.Count > 0 || taJiaShi.DaMingGangPaiWei.Count > 0)
                 {
-                    if ((taJiaShi.HeLe && Chang.TaJiaYao < Chang.YaoDingYi.RongHe)
+                    if ((taJiaShi.HeLe && Chang.TaJiaYao < QiaoShi.YaoDingYi.RongHe)
                         || (GuiZe.wRongHe && taJiaShi.HeLe)
-                        || (taJiaShi.DaMingGangKeNengShu > 0 && Chang.TaJiaYao < Chang.YaoDingYi.DaMingGang)
-                        || (taJiaShi.BingKeNengShu > 0 && Chang.TaJiaYao < Chang.YaoDingYi.Bing)
-                        || (taJiaShi.ChiKeNengShu > 0 && Chang.TaJiaYao < Chang.YaoDingYi.Chi))
+                        || (taJiaShi.DaMingGangPaiWei.Count > 0 && Chang.TaJiaYao < QiaoShi.YaoDingYi.DaMingGang)
+                        || (taJiaShi.BingPaiWei.Count > 0 && Chang.TaJiaYao < QiaoShi.YaoDingYi.Bing)
+                        || (taJiaShi.ChiPaiWei.Count > 0 && Chang.TaJiaYao < QiaoShi.YaoDingYi.Chi))
                     {
                         DrawShePai(Chang.ZiMoFan, true);
 
                         taJiaShi.SiKaoTaJia(jia);
                         DrawTaJiaYao(jia, taJiaShi, 0, true);
-                        DrawShouPai(jia, Chang.YaoDingYi.Wu, -2);
+                        DrawShouPai(jia, QiaoShi.YaoDingYi.Wu, -2);
                         yield return Pause(ForwardMode.NORMAL);
                         ClearGameObject(ref goYao);
-                        if (Chang.RongHeShu == 0)
+                        if (Chang.RongHeFan.Count == 0)
                         {
                             Chang.TaJiaYao = taJiaShi.TaJiaYao;
                             Chang.TaJiaXuanZe = taJiaShi.TaJiaXuanZe;
                             Chang.MingFan = jia;
                         }
-                        if (GuiZe.wRongHe && taJiaShi.TaJiaYao == Chang.YaoDingYi.RongHe)
+                        if (GuiZe.wRongHe && taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
                         {
-                            Chang.RongHeFan[Chang.RongHeShu] = jia;
-                            Chang.RongHeShu++;
+                            Chang.RongHeFan.Add(jia);
                         }
                         DrawShePai(Chang.ZiMoFan);
                     }
                 }
             }
 
-            if (Chang.TaJiaYao == Chang.YaoDingYi.RongHe)
+            if (Chang.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
             {
                 // 栄和
-                if (Chang.RongHeShu == 0)
+                if (Chang.RongHeFan.Count == 0)
                 {
-                    Chang.RongHeShu = 1;
-                    Chang.RongHeFan[0] = Chang.MingFan;
+                    Chang.RongHeFan.Add(Chang.MingFan);
                 }
-                QiaoShi.Sort(Chang.RongHeFan);
+                Chang.RongHeFan.Sort();
                 Chang.MingFan = Chang.RongHeFan[0];
 
                 // 捨牌処理
-                Chang.QiaoShi[Chang.ZiMoFan].ShePaiChuLi(Chang.YaoDingYi.RongHe);
-                for (int i = 0; i < Chang.RongHeShu; i++)
+                Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.RongHe);
+                foreach (int fan in Chang.RongHeFan)
                 {
                     // 描画
-                    DrawRongHe(Chang.RongHeFan[i]);
-                    DrawShouPai(Chang.RongHeFan[i], Chang.YaoDingYi.HeLe, -1);
-                    Chang.QiaoShi[Chang.RongHeFan[i]].ZiMo(Chang.ShePai);
+                    DrawRongHe(fan);
+                    DrawShouPai(fan, QiaoShi.YaoDingYi.HeLe, -1);
+                    Chang.QiaoShis[fan].ZiMo(Chang.ShePai);
                     // 和了
-                    Chang.QiaoShi[Chang.RongHeFan[i]].HeLeChuLi();
+                    Chang.QiaoShis[fan].HeLeChuLi();
                 }
                 Chang.HeleFan = Chang.MingFan;
                 DrawXuanShangPai();
@@ -2526,19 +2514,19 @@ namespace Maqiao
                 yield break;
             }
 
-            for (int i = Chang.ZiMoFan + 1; i < Chang.ZiMoFan + Chang.MianZi; i++)
+            for (int i = Chang.ZiMoFan + 1; i < Chang.ZiMoFan + Chang.QiaoShis.Count; i++)
             {
                 // 振聴牌処理
-                Chang.QiaoShi[i % Chang.MianZi].ZhenTingPaiChuLi();
+                Chang.QiaoShis[i % Chang.QiaoShis.Count].ZhenTingPaiChuLi();
             }
 
             switch (Chang.ZiJiaYao)
             {
-                case Chang.YaoDingYi.LiZhi:
+                case QiaoShi.YaoDingYi.LiZhi:
                     // 立直成立
                     Chang.LiZhiChuLi();
-                    Chang.QiaoShi[Chang.ZiMoFan].LiZiChuLi();
-                    Chang.QiaoShi[Chang.ZiMoFan].ShePaiChuLi(Chang.YaoDingYi.LiZhi);
+                    Chang.QiaoShis[Chang.ZiMoFan].LiZiChuLi();
+                    Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.LiZhi);
                     // 描画
                     DrawShePai(Chang.ZiMoFan);
                     DrawLiZi(Chang.ZiMoFan);
@@ -2555,17 +2543,17 @@ namespace Maqiao
                     }
                     break;
 
-                case Chang.YaoDingYi.JiaGang:
+                case QiaoShi.YaoDingYi.JiaGang:
                     // 加槓成立
                     // 消
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    foreach (QiaoShi shi in Chang.QiaoShis)
                     {
-                        Chang.QiaoShi[i].Xiao();
+                        shi.Xiao();
                     }
                     // 加槓処理
                     Pai.QiangGangChuLi();
                     // 嶺上牌処理
-                    Pai.LingShangPaiChuLi(Chang.ZiMoFan);
+                    Pai.LingShangPaiChuLi();
                     // 描画
                     DrawJuFrame();
                     DrawJiaGang(Chang.ZiMoFan);
@@ -2590,22 +2578,22 @@ namespace Maqiao
 
             switch (Chang.TaJiaYao)
             {
-                case Chang.YaoDingYi.DaMingGang:
+                case QiaoShi.YaoDingYi.DaMingGang:
                     // 大明槓
-                    Chang.QiaoShi[Chang.MingFan].DaMingGang();
+                    Chang.QiaoShis[Chang.MingFan].DaMingGang();
                     // 描画
                     DrawDaMingGang(Chang.MingFan);
                     // 捨牌処理
-                    Chang.QiaoShi[Chang.ZiMoFan].ShePaiChuLi(Chang.YaoDingYi.DaMingGang);
+                    Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.DaMingGang);
                     // 消
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    foreach (QiaoShi shi in Chang.QiaoShis)
                     {
-                        Chang.QiaoShi[i].Xiao();
+                        shi.Xiao();
                     }
                     // 描画
                     DrawShePai(Chang.ZiMoFan);
                     DrawJuFrame();
-                    DrawShouPai(Chang.MingFan, Chang.YaoDingYi.Wu, -1);
+                    DrawShouPai(Chang.MingFan, QiaoShi.YaoDingYi.Wu, -1);
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
 
@@ -2614,21 +2602,21 @@ namespace Maqiao
                     isDuiJuCoroutine = false;
                     yield break;
 
-                case Chang.YaoDingYi.Bing:
+                case QiaoShi.YaoDingYi.Bing:
                     // 石並
-                    Chang.QiaoShi[Chang.MingFan].Bing();
+                    Chang.QiaoShis[Chang.MingFan].Bing();
                     // 描画
                     DrawBing(Chang.MingFan);
                     // 捨牌処理
-                    Chang.QiaoShi[Chang.ZiMoFan].ShePaiChuLi(Chang.YaoDingYi.Bing);
+                    Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.Bing);
                     // 消
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    foreach (QiaoShi shi in Chang.QiaoShis)
                     {
-                        Chang.QiaoShi[i].Xiao();
+                        shi.Xiao();
                     }
                     // 描画
                     DrawShePai(Chang.ZiMoFan);
-                    DrawShouPai(Chang.MingFan, Chang.YaoDingYi.Wu, -1);
+                    DrawShouPai(Chang.MingFan, QiaoShi.YaoDingYi.Wu, -1);
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
 
@@ -2637,21 +2625,21 @@ namespace Maqiao
                     isDuiJuCoroutine = false;
                     yield break;
 
-                case Chang.YaoDingYi.Chi:
+                case QiaoShi.YaoDingYi.Chi:
                     // 吃
-                    Chang.QiaoShi[Chang.MingFan].Chi();
+                    Chang.QiaoShis[Chang.MingFan].Chi();
                     // 描画
                     DrawChi(Chang.MingFan);
                     // 捨牌処理
-                    Chang.QiaoShi[Chang.ZiMoFan].ShePaiChuLi(Chang.YaoDingYi.Chi);
+                    Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.Chi);
                     // 消
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    foreach (QiaoShi shi in Chang.QiaoShis)
                     {
-                        Chang.QiaoShi[i].Xiao();
+                        shi.Xiao();
                     }
                     // 描画
                     DrawShePai(Chang.ZiMoFan);
-                    DrawShouPai(Chang.MingFan, Chang.YaoDingYi.Wu, -1);
+                    DrawShouPai(Chang.MingFan, QiaoShi.YaoDingYi.Wu, -1);
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
 
@@ -2671,12 +2659,12 @@ namespace Maqiao
                 int liuManGuan = -1;
                 if (GuiZe.liuManGuan)
                 {
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    for (int i = 0; i < Chang.QiaoShis.Count; i++)
                     {
-                        int jia = (Chang.Qin + i) % Chang.MianZi;
-                        if (Chang.QiaoShi[jia].LiuJu())
+                        int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                        if (Chang.QiaoShis[jia].LiuJu())
                         {
-                            Chang.ZiJiaYao = Chang.YaoDingYi.ZiMo;
+                            Chang.ZiJiaYao = QiaoShi.YaoDingYi.ZiMo;
                             Chang.ZiMoFan = jia;
                             Chang.HeleFan = jia;
                             liuManGuan = jia;
@@ -2689,10 +2677,10 @@ namespace Maqiao
                 {
                     tingPaiLianZhuang = Zhuang.LIAN_ZHUANG;
                 }
-                for (int i = 0; i < Chang.MianZi; i++)
+                for (int i = 0; i < Chang.QiaoShis.Count; i++)
                 {
-                    int jia = (Chang.Qin + i) % Chang.MianZi;
-                    QiaoShi shi = Chang.QiaoShi[jia];
+                    int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                    QiaoShi shi = Chang.QiaoShis[jia];
                     // 形聴判定
                     shi.XingTingPanDing();
                     if (jia == liuManGuan)
@@ -2722,7 +2710,7 @@ namespace Maqiao
                         if (shi.LiZhi)
                         {
                             // 錯和(不聴立直)
-                            Chang.CuHe(Chang.QiaoShi, jia);
+                            Chang.CuHe(jia);
                             // 描画
                             DrawCuHe(jia);
                             tingPaiLianZhuang = Zhuang.LIAN_ZHUANG;
@@ -2742,7 +2730,7 @@ namespace Maqiao
                 yield break;
             }
 
-            Chang.ZiMoFan = (Chang.ZiMoFan + 1) % Chang.MianZi;
+            Chang.ZiMoFan = (Chang.ZiMoFan + 1) % Chang.QiaoShis.Count;
             eventStatus = Event.DUI_JU;
             isDuiJuCoroutine = false;
         }
@@ -2766,65 +2754,65 @@ namespace Maqiao
             }
 
             int index = 0;
-            if (shi.HeLe && shi.TaJiaYao == Chang.YaoDingYi.Wu)
+            if (shi.HeLe && shi.TaJiaYao == QiaoShi.YaoDingYi.Wu)
             {
-                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), Chang.YaoDingYi.ZiMo, mingWei, ShouPaiWei, isFollow);
+                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.ZiMo, mingWei, ShouPaiWei, isFollow);
                 x += width;
                 index++;
             }
-            if (!shi.LiZhi && shi.LiZhiKeNengShu > 0)
+            if (!shi.LiZhi && shi.LiZhiPaiWei.Count > 0)
             {
                 int wei = mingWei;
-                if (isFollow && shi.ZiJiaYao == Chang.YaoDingYi.LiZhi)
+                if (isFollow && shi.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi)
                 {
-                    for (int i = 0; i < shi.LiZhiKeNengShu; i++)
+                    foreach ((int w, int i) in shi.LiZhiPaiWei.Select((v, i) => (v, i)))
                     {
-                        if (shi.LiZhiPaiWei[i] == shi.ZiJiaXuanZe)
+                        if (w == shi.ZiJiaXuanZe)
                         {
                             wei = i;
                             break;
                         }
                     }
                 }
-                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), Chang.YaoDingYi.LiZhi, wei, ShouPaiWei, isFollow);
+                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.LiZhi, wei, ShouPaiWei, isFollow);
                 x += width;
                 index++;
             }
-            if (shi.AnGangKeNengShu > 0)
+            if (shi.AnGangPaiWei.Count > 0)
             {
-                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), Chang.YaoDingYi.AnGang, mingWei, ShouPaiWei, isFollow);
+                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.AnGang, mingWei, ShouPaiWei, isFollow);
                 x += width;
                 index++;
             }
-            if (shi.JiaGangKeNengShu > 0)
+            if (shi.JiaGangPaiWei.Count > 0)
             {
-                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), Chang.YaoDingYi.JiaGang, mingWei, ShouPaiWei, isFollow);
+                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.JiaGang, mingWei, ShouPaiWei, isFollow);
                 x += width;
                 index++;
             }
             if (shi.JiuZhongJiuPai)
             {
-                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), Chang.YaoDingYi.JiuZhongJiuPai, mingWei, ShouPaiWei, isFollow);
+                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.JiuZhongJiuPai, mingWei, ShouPaiWei, isFollow);
             }
             if (isPass)
             {
-                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(paiWidth * 7.5f, y), Chang.YaoDingYi.Wu, mingWei, ShouPaiWei, isFollow);
+                DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(paiWidth * 7.5f, y), QiaoShi.YaoDingYi.Wu, mingWei, ShouPaiWei, isFollow);
             }
         }
 
         // 【描画】自家腰
-        private void DrawOnClickZiJiaYao(ref Button go, QiaoShi shi, Vector2 xy, Chang.YaoDingYi yao, int mingWei, int ShouPaiWei, bool isFollow)
+        private void DrawOnClickZiJiaYao(ref Button go, QiaoShi shi, Vector2 xy, QiaoShi.YaoDingYi yao, int mingWei, int ShouPaiWei, bool isFollow)
         {
             go = Instantiate(goButton, goButton.transform.parent);
             go.onClick.AddListener(delegate {
                 OnClickZiJiaYao(Chang.ZiMoFan, shi, yao, mingWei, ShouPaiWei, isFollow);
             });
             string value = shi.YaoMingButton(yao);
-            if (yao == Chang.YaoDingYi.Wu)
+            if (yao == QiaoShi.YaoDingYi.Wu)
             {
-                value = shi.YaoMingButton(Chang.YaoDingYi.Clear);
+                value = shi.YaoMingButton(QiaoShi.YaoDingYi.Clear);
             }
-            if (shi.Follow && (shi.ZiJiaYao != yao || shi.ZiJiaYao == Chang.YaoDingYi.Wu))
+            if (shi.Follow && (shi.ZiJiaYao != yao || shi.ZiJiaYao == QiaoShi.YaoDingYi.Wu))
             {
                 TextMeshProUGUI text = go.GetComponentInChildren<TextMeshProUGUI>();
                 text.color = Color.gray;
@@ -2833,39 +2821,39 @@ namespace Maqiao
         }
 
         // 自家腰クリック
-        private void OnClickZiJiaYao(int jia, QiaoShi shi, Chang.YaoDingYi yao, int mingWei, int ShouPaiWei, bool isFollow)
+        private void OnClickZiJiaYao(int jia, QiaoShi shi, QiaoShi.YaoDingYi yao, int mingWei, int ShouPaiWei, bool isFollow)
         {
             ClearGameObject(ref goLeft);
             ClearGameObject(ref goRight);
             ClearGameObject(ref goSelect);
 
-            if (yao == Chang.YaoDingYi.Wu)
+            if (yao == QiaoShi.YaoDingYi.Wu)
             {
                 DrawZiJiaYao(shi, 0, 0, false, false);
                 DrawShouPai(jia, yao, -1, true, false);
                 DrawDaiPai(jia, -1);
                 if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
                 {
-                    DrawSelectDaPai(jia, shi, shi.ShouPaiWei - 1);
+                    DrawSelectDaPai(jia, shi, shi.ShouPai.Count - 1);
                 }
             }
-            else if (yao == Chang.YaoDingYi.LiZhi)
+            else if (yao == QiaoShi.YaoDingYi.LiZhi)
             {
-                DrawZiJiaYao(shi, (mingWei + 1) % shi.LiZhiKeNengShu, ShouPaiWei, false, true);
+                DrawZiJiaYao(shi, (mingWei + 1) % shi.LiZhiPaiWei.Count, ShouPaiWei, false, true);
                 DrawShouPai(jia, yao, mingWei, true, isFollow);
                 DrawDaiPai(jia, shi.LiZhiPaiWei[mingWei]);
             }
-            else if (yao == Chang.YaoDingYi.AnGang && shi.AnGangKeNengShu > 1)
+            else if (yao == QiaoShi.YaoDingYi.AnGang && shi.AnGangPaiWei.Count > 1)
             {
-                DrawZiJiaYao(shi, (mingWei + 1) % shi.AnGangKeNengShu, ShouPaiWei, false, true);
+                DrawZiJiaYao(shi, (mingWei + 1) % shi.AnGangPaiWei.Count, ShouPaiWei, false, true);
                 DrawShouPai(jia, yao, mingWei, true, isFollow);
             }
-            else if (yao == Chang.YaoDingYi.JiaGang && shi.JiaGangKeNengShu > 1)
+            else if (yao == QiaoShi.YaoDingYi.JiaGang && shi.JiaGangPaiWei.Count > 1)
             {
-                DrawZiJiaYao(shi, (mingWei + 1) % shi.JiaGangKeNengShu, ShouPaiWei, false, true);
+                DrawZiJiaYao(shi, (mingWei + 1) % shi.JiaGangPaiWei.Count, ShouPaiWei, false, true);
                 DrawShouPai(jia, yao, mingWei, true, isFollow);
             }
-            else if (yao == Chang.YaoDingYi.Select)
+            else if (yao == QiaoShi.YaoDingYi.Select)
             {
                 DrawZiJiaYao(shi, mingWei, ShouPaiWei, true, false);
                 DrawShouPai(jia, yao, ShouPaiWei, true, isFollow);
@@ -2899,25 +2887,25 @@ namespace Maqiao
             int index = 0;
             if (shi.HeLe)
             {
-                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), Chang.YaoDingYi.RongHe, mingWei);
+                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), QiaoShi.YaoDingYi.RongHe, mingWei);
                 x += width;
                 index++;
             }
-            if (shi.ChiKeNengShu > 0)
+            if (shi.ChiPaiWei.Count > 0)
             {
-                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), Chang.YaoDingYi.Chi, isFollow && shi.TaJiaYao == Chang.YaoDingYi.Chi ? shi.TaJiaXuanZe : mingWei);
+                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), QiaoShi.YaoDingYi.Chi, isFollow && shi.TaJiaYao == QiaoShi.YaoDingYi.Chi ? shi.TaJiaXuanZe : mingWei);
                 x += width;
                 index++;
             }
-            if (shi.BingKeNengShu > 0)
+            if (shi.BingPaiWei.Count > 0)
             {
-                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), Chang.YaoDingYi.Bing, isFollow && shi.TaJiaYao == Chang.YaoDingYi.Bing ? shi.TaJiaXuanZe : mingWei);
+                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), QiaoShi.YaoDingYi.Bing, isFollow && shi.TaJiaYao == QiaoShi.YaoDingYi.Bing ? shi.TaJiaXuanZe : mingWei);
                 x += width;
                 index++;
             }
-            if (shi.DaMingGangKeNengShu > 0)
+            if (shi.DaMingGangPaiWei.Count > 0)
             {
-                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), Chang.YaoDingYi.DaMingGang, mingWei);
+                DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(x, y), QiaoShi.YaoDingYi.DaMingGang, mingWei);
                 index++;
             }
             if (index > 0)
@@ -2925,13 +2913,13 @@ namespace Maqiao
                 isQuXiao = true;
                 if (sheDing.mingQuXiao)
                 {
-                    DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(paiWidth * 7.5f, y), Chang.YaoDingYi.Wu, mingWei);
+                    DrawOnClickTaJiaYao(ref goYao[index], jia, shi, new Vector2(paiWidth * 7.5f, y), QiaoShi.YaoDingYi.Wu, mingWei);
                 }
             }
         }
 
         // 【描画】他家腰
-        private void DrawOnClickTaJiaYao(ref Button go, int jia, QiaoShi shi, Vector2 xy, Chang.YaoDingYi yao, int mingWei)
+        private void DrawOnClickTaJiaYao(ref Button go, int jia, QiaoShi shi, Vector2 xy, QiaoShi.YaoDingYi yao, int mingWei)
         {
             go = Instantiate(goButton, goButton.transform.parent);
             go.onClick.AddListener(delegate {
@@ -2947,16 +2935,16 @@ namespace Maqiao
         }
 
         // 他家腰クリック
-        private void OnClickTaJiaYao(int jia, QiaoShi shi, Chang.YaoDingYi yao, int mingWei)
+        private void OnClickTaJiaYao(int jia, QiaoShi shi, QiaoShi.YaoDingYi yao, int mingWei)
         {
-            if (yao == Chang.YaoDingYi.Bing && shi.BingKeNengShu > 1)
+            if (yao == QiaoShi.YaoDingYi.Bing && shi.BingPaiWei.Count > 1)
             {
-                DrawTaJiaYao(jia, shi, (mingWei + 1) % shi.BingKeNengShu, false);
+                DrawTaJiaYao(jia, shi, (mingWei + 1) % shi.BingPaiWei.Count, false);
                 DrawShouPai(jia, yao, mingWei);
             }
-            else if (yao == Chang.YaoDingYi.Chi && shi.ChiKeNengShu > 1)
+            else if (yao == QiaoShi.YaoDingYi.Chi && shi.ChiPaiWei.Count > 1)
             {
-                DrawTaJiaYao(jia, shi, (mingWei + 1) % shi.ChiKeNengShu, false);
+                DrawTaJiaYao(jia, shi, (mingWei + 1) % shi.ChiPaiWei.Count, false);
                 DrawShouPai(jia, yao, mingWei);
             }
             else
@@ -2969,13 +2957,13 @@ namespace Maqiao
         }
 
         // 【描画】手牌
-        private void DrawShouPai(int jia, Chang.YaoDingYi yao, int mingWei)
+        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei)
         {
             DrawShouPai(jia, yao, mingWei, false, false);
         }
-        private void DrawShouPai(int jia, Chang.YaoDingYi yao, int mingWei, bool isPlayerZiMo, bool isFollow)
+        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei, bool isPlayerZiMo, bool isFollow)
         {
-            QiaoShi shi = Chang.QiaoShi[jia];
+            QiaoShi shi = Chang.QiaoShis[jia];
             ClearGameObject(ref shi.goShouPai);
             for (int i = 0; i < shi.goFuLuPai.Length; i++)
             {
@@ -3008,11 +2996,11 @@ namespace Maqiao
 
             // 手牌
             float margin = pw / 4;
-            for (int i = 0; i < shi.ShouPaiWei; i++)
+            foreach ((int sp, int i) in shi.ShouPai.Select((v, i) => (v, i)))
             {
-                int p = shi.ShouPai[i];
+                int p = sp;
                 shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
-                if (shi.PlayOrder != 0 && yao != Chang.YaoDingYi.TingPai && yao != Chang.YaoDingYi.HeLe && yao != Chang.YaoDingYi.JiuZhongJiuPai && yao != Chang.YaoDingYi.CuHe && p != 0xff)
+                if (shi.PlayOrder != 0 && yao != QiaoShi.YaoDingYi.TingPai && yao != QiaoShi.YaoDingYi.HeLe && yao != QiaoShi.YaoDingYi.JiuZhongJiuPai && yao != QiaoShi.YaoDingYi.CuHe && p != 0xff)
                 {
                     if (!shouPaiOpen)
                     {
@@ -3030,7 +3018,7 @@ namespace Maqiao
                     }
 
                     int wei = i;
-                    if (yao == Chang.YaoDingYi.LiZhi)
+                    if (yao == QiaoShi.YaoDingYi.LiZhi)
                     {
                         if (shi.LiZhiPaiWei[mingWei] == i)
                         {
@@ -3038,7 +3026,7 @@ namespace Maqiao
                             yy = y + margin;
                         }
                     }
-                    if (yao == Chang.YaoDingYi.AnGang)
+                    if (yao == QiaoShi.YaoDingYi.AnGang)
                     {
                         if (shi.AnGangPaiWei[mingWei][0] == i || shi.AnGangPaiWei[mingWei][1] == i || shi.AnGangPaiWei[mingWei][2] == i || shi.AnGangPaiWei[mingWei][3] == i)
                         {
@@ -3046,7 +3034,7 @@ namespace Maqiao
                             yy = y + margin;
                         }
                     }
-                    if (yao == Chang.YaoDingYi.JiaGang)
+                    if (yao == QiaoShi.YaoDingYi.JiaGang)
                     {
                         if (shi.JiaGangPaiWei[mingWei][0] == i)
                         {
@@ -3054,7 +3042,7 @@ namespace Maqiao
                             yy = y + margin;
                         }
                     }
-                    if (yao == Chang.YaoDingYi.Bing)
+                    if (yao == QiaoShi.YaoDingYi.Bing)
                     {
                         if (shi.BingPaiWei[mingWei][0] == i || shi.BingPaiWei[mingWei][1] == i)
                         {
@@ -3062,7 +3050,7 @@ namespace Maqiao
                             yy = y + margin;
                         }
                     }
-                    if (yao == Chang.YaoDingYi.Chi)
+                    if (yao == QiaoShi.YaoDingYi.Chi)
                     {
                         if (shi.ChiPaiWei[mingWei][0] == i || shi.ChiPaiWei[mingWei][1] == i)
                         {
@@ -3070,31 +3058,31 @@ namespace Maqiao
                             yy = y + margin;
                         }
                     }
-                    if (yao == Chang.YaoDingYi.Wu && mingWei >= -1)
+                    if (yao == QiaoShi.YaoDingYi.Wu && mingWei >= -1)
                     {
                         if (isFollow && shi.ZiJiaXuanZe == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, Chang.YaoDingYi.DaPai, wei); });
+                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
                             yy = y + margin;
                         }
-                        else if (!shi.LiZhi || shi.ShouPaiWei - 1 == i)
+                        else if (!shi.LiZhi || shi.ShouPai.Count - 1 == i)
                         {
                             shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, wei); });
                         }
                     }
-                    if (yao == Chang.YaoDingYi.Select)
+                    if (yao == QiaoShi.YaoDingYi.Select)
                     {
                         if (mingWei == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, Chang.YaoDingYi.DaPai, wei); });
+                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
                             yy = y + margin;
                         }
                         else
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, Chang.YaoDingYi.Wu, wei); });
+                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.Wu, wei); });
                         }
                     }
-                    if (isPlayerZiMo && shi.ShouPaiWei - 1 == i && !(shi.TaJiaYao == Chang.YaoDingYi.Bing || shi.TaJiaYao == Chang.YaoDingYi.Chi))
+                    if (isPlayerZiMo && shi.ShouPai.Count - 1 == i && !(shi.TaJiaYao == QiaoShi.YaoDingYi.Bing || shi.TaJiaYao == QiaoShi.YaoDingYi.Chi))
                     {
                         x += pw / 5;
                     }
@@ -3105,7 +3093,7 @@ namespace Maqiao
                 }
                 if (p != 0xff)
                 {
-                    if (p == 0x00 && !shi.Player && yao != Chang.YaoDingYi.BuTing)
+                    if (p == 0x00 && !shi.Player && yao != QiaoShi.YaoDingYi.BuTing)
                     {
                         DrawJiXiePai(ref shi.goShouPai[i], Cal(x, yy, shi.PlayOrder), 90 * GetDrawOrder(shi.PlayOrder));
                     }
@@ -3142,30 +3130,28 @@ namespace Maqiao
                     y = -Screen.safeArea.height / 2 + ph / 2;
                 }
             }
-            for (int i = 0; i < shi.FuLuPaiWei; i++)
+            foreach (((List<int> pais, _, QiaoShi.YaoDingYi fYao), int i) in shi.FuLuPai.Select((v, i) => (v, i)))
             {
-                int fuLuJia = shi.FuLuJia[i];
-                Chang.YaoDingYi fuLuZhong = shi.FuLuZhong[i];
-                for (int j = shi.FuLuPai[i].Length - 1; j >= 0; j--)
+                for (int j = pais.Count - 1; j >= 0; j--)
                 {
-                    int p = shi.FuLuPai[i][j];
+                    int p = pais[j];
                     if (p == 0xff)
                     {
                         continue;
                     }
-                    if (fuLuZhong == Chang.YaoDingYi.JiaGang && j == 3)
+                    if (fYao == QiaoShi.YaoDingYi.JiaGang && j == 3)
                     {
                         continue;
                     }
-                    bool isMingPai = shi.MingPaiPanDing(fuLuZhong, fuLuJia, j);
-                    if (fuLuZhong == Chang.YaoDingYi.AnGang && (j == 0 || j == 3))
+                    bool isMingPai = shi.MingPaiPanDing(fYao, jia, j);
+                    if (fYao == QiaoShi.YaoDingYi.AnGang && (j == 0 || j == 3))
                     {
                         p = 0x00;
                     }
                     shi.goFuLuPai[i][j] = Instantiate(goPai, goPai.transform.parent);
                     shi.goFuLuPai[i][j].transform.SetSiblingIndex(2);
                     shi.goFuLuPai[i][j].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.PlayOrder));
-                    if (fuLuZhong == Chang.YaoDingYi.JiaGang && isMingPai)
+                    if (fYao == QiaoShi.YaoDingYi.JiaGang && isMingPai)
                     {
                         shi.goFuLuPai[i][3] = Instantiate(goPai, goPai.transform.parent);
                         shi.goFuLuPai[i][3].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.PlayOrder));
@@ -3174,7 +3160,7 @@ namespace Maqiao
                     {
                         x -= (paiHeight / 2);
                         DrawPai(ref shi.goFuLuPai[i][j], p, Cal(x, y - (paiHeight - paiWidth) / 2, shi.PlayOrder), 90);
-                        if (fuLuZhong == Chang.YaoDingYi.JiaGang)
+                        if (fYao == QiaoShi.YaoDingYi.JiaGang)
                         {
                             DrawPai(ref shi.goFuLuPai[i][3], p, Cal(x, y - (paiHeight - paiWidth) / 2 + paiWidth, shi.PlayOrder), 90);
                         }
@@ -3197,13 +3183,13 @@ namespace Maqiao
             ClearGameObject(ref goRight);
             ClearGameObject(ref goSelect);
 
-            DrawShouPai(jia, Chang.YaoDingYi.Select, xuanZe, true, true);
+            DrawShouPai(jia, QiaoShi.YaoDingYi.Select, xuanZe, true, true);
 
             goLeft = Instantiate(goButton, goButton.transform.parent);
             int leftWei = xuanZe - 1;
             if (leftWei < 0)
             {
-                leftWei = shi.ShouPaiWei - 1;
+                leftWei = shi.ShouPai.Count - 1;
             }
             goLeft.onClick.AddListener(delegate {
                 DrawSelectDaPai(jia, shi, leftWei);
@@ -3212,7 +3198,7 @@ namespace Maqiao
 
             goRight = Instantiate(goButton, goButton.transform.parent);
             int rightWei = xuanZe + 1;
-            if (rightWei > shi.ShouPaiWei - 1)
+            if (rightWei > shi.ShouPai.Count - 1)
             {
                 rightWei = 0;
             }
@@ -3223,7 +3209,7 @@ namespace Maqiao
 
             goSelect = Instantiate(goButton, goButton.transform.parent);
             goSelect.onClick.AddListener(delegate {
-                shi.ZiJiaYao = Chang.YaoDingYi.Wu;
+                shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 shi.ZiJiaXuanZe = xuanZe;
                 keyPress = true;
             });
@@ -3262,28 +3248,28 @@ namespace Maqiao
         }
 
         // 牌クリック
-        private void OnClickShouPai(int jia, QiaoShi shi, Chang.YaoDingYi yao, int xuanZe)
+        private void OnClickShouPai(int jia, QiaoShi shi, QiaoShi.YaoDingYi yao, int xuanZe)
         {
-            if (yao == Chang.YaoDingYi.LiZhi || yao == Chang.YaoDingYi.AnGang || yao == Chang.YaoDingYi.JiaGang)
+            if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.AnGang || yao == QiaoShi.YaoDingYi.JiaGang)
             {
                 shi.ZiJiaYao = yao;
                 shi.ZiJiaXuanZe = xuanZe;
             }
-            if (yao == Chang.YaoDingYi.Bing || yao == Chang.YaoDingYi.Chi)
+            if (yao == QiaoShi.YaoDingYi.Bing || yao == QiaoShi.YaoDingYi.Chi)
             {
                 shi.TaJiaYao = yao;
                 shi.TaJiaXuanZe = xuanZe;
             }
-            if (yao == Chang.YaoDingYi.Wu)
+            if (yao == QiaoShi.YaoDingYi.Wu)
             {
                 if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.TAP_1)
                 {
-                    shi.ZiJiaYao = Chang.YaoDingYi.Wu;
+                    shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                     shi.ZiJiaXuanZe = xuanZe;
                 }
                 else
                 {
-                    DrawShouPai(jia, Chang.YaoDingYi.Select, xuanZe, true, true);
+                    DrawShouPai(jia, QiaoShi.YaoDingYi.Select, xuanZe, true, true);
                     DrawDaiPai(jia, xuanZe);
                     if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
                     {
@@ -3292,11 +3278,11 @@ namespace Maqiao
                     return;
                 }
             }
-            if (yao == Chang.YaoDingYi.DaPai)
+            if (yao == QiaoShi.YaoDingYi.DaPai)
             {
-                shi.ZiJiaYao = Chang.YaoDingYi.Wu;
+                shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 shi.ZiJiaXuanZe = xuanZe;
-                DrawShouPai(jia, Chang.YaoDingYi.Clear, 0, false, false);
+                DrawShouPai(jia, QiaoShi.YaoDingYi.Clear, 0, false, false);
             }
             keyPress = true;
         }
@@ -3304,7 +3290,7 @@ namespace Maqiao
         // 【描画】待牌
         private void DrawDaiPai(int jia, int xuanZe)
         {
-            QiaoShi shi = Chang.QiaoShi[jia];
+            QiaoShi shi = Chang.QiaoShis[jia];
             // 待牌
             if (!shi.Player)
             {
@@ -3333,9 +3319,9 @@ namespace Maqiao
                     shi.DaiPaiJiSuan(xuanZe);
                     shi.GongKaiPaiShuJiSuan();
                 }
-                for (int i = 0; i < shi.DaiPaiShu; i++)
+                foreach ((int dp, int i) in shi.DaiPai.Select((v, i) => (v, i)))
                 {
-                    int p = shi.DaiPai[i] & QiaoShi.QIAO_PAI;
+                    int p = dp & QiaoShi.QIAO_PAI;
                     if (p == 0xff)
                     {
                         ClearGameObject(ref shi.goDaiPai[i]);
@@ -3357,7 +3343,7 @@ namespace Maqiao
                 {
                     x = paiWidth * 13f;
                 }
-                if (shi.DaiPaiShu == 0)
+                if (shi.DaiPai.Count == 0)
                 {
                     if (xuanZe != -2)
                     {
@@ -3378,12 +3364,12 @@ namespace Maqiao
         }
         private void DrawShePai(int jia, bool ming)
         {
-            QiaoShi shi = Chang.QiaoShi[jia];
+            QiaoShi shi = Chang.QiaoShis[jia];
 
             ClearGameObject(ref shi.goShePai);
             int shePaiEnter = 6;
             float shePaiLeft = 2.5f;
-            if (Chang.MianZi == 2)
+            if (Chang.QiaoShis.Count == 2)
             {
                 shePaiLeft = 8.5f;
                 shePaiEnter = 18;
@@ -3395,39 +3381,41 @@ namespace Maqiao
             bool isDrawLizhi = !shi.LiZhi;
             float dark = 0.8f;
             int playOrder = shi.PlayOrder;
-            if (Chang.MianZi == 2 && playOrder == 1)
+            if (Chang.QiaoShis.Count == 2 && playOrder == 1)
             {
                 playOrder = 2;
             }
-            for (int i = 0; i < shi.ShePaiWei; i++)
+            int index = 0;
+            foreach ((int pai, QiaoShi.YaoDingYi yao, bool ziMoQie) in shi.ShePai)
             {
-                int p = shi.ShePai[i] & 0xff;
-                if (shi.ShePaiYao[i] == Chang.YaoDingYi.Wu || shi.ShePaiYao[i] == Chang.YaoDingYi.LiZhi)
+                if (yao == QiaoShi.YaoDingYi.Wu || yao == QiaoShi.YaoDingYi.LiZhi)
                 {
                     shu++;
 
-                    shi.goShePai[i] = Instantiate(goPai, goPai.transform.parent);
-                    shi.goShePai[i].transform.SetSiblingIndex(3);
-                    if (shi.ShePaiYao[i] == Chang.YaoDingYi.LiZhi || (!isDrawLizhi && shi.LiZhiWei < i))
+                    shi.goShePai[index] = Instantiate(goPai, goPai.transform.parent);
+                    shi.goShePai[index].transform.SetSiblingIndex(3);
+                    if (yao == QiaoShi.YaoDingYi.LiZhi || (!isDrawLizhi && shi.LiZhiWei < index))
                     {
                         x += (paiHeight - paiWidth) / 2;
-                        shi.goShePai[i].transform.Rotate(0, 0, 90);
+                        shi.goShePai[index].transform.Rotate(0, 0, 90);
                         isDrawLizhi = true;
-                        DrawPai(ref shi.goShePai[i], p, Cal(x, y, playOrder), 90 * GetDrawOrder(playOrder));
+                        Button b = shi.goShePai[index];
+                        DrawPai(ref b, pai, Cal(x, y, playOrder), 90 * GetDrawOrder(playOrder));
                         x += (paiHeight - paiWidth) / 2;
                     }
                     else
                     {
-                        if (ming && i == shi.ShePaiWei - 1)
+                        if (ming && index == shi.ShePai.Count - 1)
                         {
-                            shi.goShePai[i].GetComponentInChildren<TextMeshProUGUI>().text = "▼";
-                            shi.goShePai[i].GetComponentInChildren<TextMeshProUGUI>().color = Color.red;
+                            shi.goShePai[index].GetComponentInChildren<TextMeshProUGUI>().text = "▼";
+                            shi.goShePai[index].GetComponentInChildren<TextMeshProUGUI>().color = Color.red;
                         }
-                        DrawPai(ref shi.goShePai[i], p, Cal(x, y, playOrder), 90 * GetDrawOrder(playOrder));
+                        Button b = shi.goShePai[index];
+                        DrawPai(ref b, pai, Cal(x, y, playOrder), 90 * GetDrawOrder(playOrder));
                     }
-                    if (sheDing.ziMoQieBiaoShi && shi.ShePaiZiMoQie[i])
+                    if (sheDing.ziMoQieBiaoShi && ziMoQie)
                     {
-                        Image img = shi.goShePai[i].GetComponentInChildren<Image>();
+                        Image img = shi.goShePai[index].GetComponentInChildren<Image>();
                         Color c = img.color;
                         img.color = new Color(c.r * dark, c.g * dark, c.b * dark, c.a);
                     }
@@ -3441,13 +3429,14 @@ namespace Maqiao
                         x += paiWidth;
                     }
                 }
+                index++;
             }
         }
 
         // 【描画】声
         private void DrawShang(int jia, string text)
         {
-            QiaoShi shi = Chang.QiaoShi[jia];
+            QiaoShi shi = Chang.QiaoShis[jia];
             if (goSheng[jia] == null)
             {
                 goSheng[jia] = Instantiate(goSpeech, goSpeech.transform.parent);
@@ -3468,100 +3457,100 @@ namespace Maqiao
         // 【描画】自摸
         private void DrawZiMo(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.ZiMo));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.ZiMo));
         }
 
         // 【描画】九種九牌
         private void DrawJiuZhongJiuPai(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.JiuZhongJiuPai));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.JiuZhongJiuPai));
         }
 
         // 【描画】立直
         private void DrawLiZi(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.LiZhi));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.LiZhi));
         }
 
         // 【描画】暗槓
         private void DrawAnGang(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.AnGang));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.AnGang));
         }
 
         // 【描画】流し満貫
         private void DrawLiuManGuan(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.LiuManGuan));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.LiuManGuan));
         }
 
         // 【描画】四開槓
         private void DrawSiKaiGangPanDing(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.SiKaiGang));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.SiKaiGang));
         }
 
         // 【描画】加槓
         private void DrawJiaGang(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.JiaGang));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.JiaGang));
         }
 
         // 【描画】大明槓
         private void DrawDaMingGang(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.DaMingGang));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.DaMingGang));
         }
 
         // 【描画】石並
         private void DrawBing(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.Bing));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.Bing));
         }
 
         // 【描画】吃
         private void DrawChi(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.Chi));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.Chi));
         }
 
         // 【描画】四風子連打
         private void DrawSiFengZiLianDa(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.SiFengZiLianDa));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.SiFengZiLianDa));
         }
 
         // 【描画】四家立直
         private void DrawSiJiaLiZhi(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.SiJiaLiZhi));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.SiJiaLiZhi));
         }
 
         // 【描画】栄和
         private void DrawRongHe(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.RongHe));
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.RongHe));
         }
 
         // 【描画】聴牌
         private void DrawTingPai(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.TingPai));
-            DrawShouPai(jia, Chang.YaoDingYi.TingPai, -1);
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.TingPai));
+            DrawShouPai(jia, QiaoShi.YaoDingYi.TingPai, -1);
         }
 
         // 【描画】不聴
         private void DrawBuTing(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.BuTing));
-            DrawShouPai(jia, Chang.YaoDingYi.BuTing, -1);
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.BuTing));
+            DrawShouPai(jia, QiaoShi.YaoDingYi.BuTing, -1);
         }
 
         // 【描画】錯和
         private void DrawCuHe(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(Chang.YaoDingYi.CuHe) + " " + Chang.QiaoShi[Chang.CuHeFan].CuHeSheng);
-            DrawShouPai(jia, Chang.YaoDingYi.CuHe, 0);
+            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.CuHe) + " " + Chang.QiaoShis[Chang.CuHeFan].CuHeSheng);
+            DrawShouPai(jia, QiaoShi.YaoDingYi.CuHe, 0);
         }
 
         // 【ゲーム】対局終了
@@ -3583,14 +3572,14 @@ namespace Maqiao
             isYiBiaoShiCoroutine = true;
             isBackDuiJuZhongLe = false;
 
-            if (Chang.RongHeShu > 0)
+            if (Chang.RongHeFan.Count > 0)
             {
-                for (int i = 0; i < Chang.RongHeShu; i++)
+                foreach (int fan in Chang.RongHeFan)
                 {
                     // 描画
                     ClearScreen();
                     DrawBackDuiJuZhongLe();
-                    DrawYi(Chang.RongHeFan[i]);
+                    DrawYi(fan);
 
                     yield return Pause(ForwardMode.FAST_FORWARD);
                 }
@@ -3635,7 +3624,7 @@ namespace Maqiao
             {
                 DrawXuanShangPai();
 
-                QiaoShi shi = Chang.QiaoShi[jia];
+                QiaoShi shi = Chang.QiaoShis[jia];
 
                 // 名前
                 x = 0f;
@@ -3643,56 +3632,55 @@ namespace Maqiao
                 DrawText(ref goMingQian[jia], shi.MingQian, new Vector2(x, y), 0, 30);
 
                 // 手牌
-                int tp = shi.ShouPai[shi.ShouPaiWei - 1];
-                shi.ShouPai[shi.ShouPaiWei - 1] = 0xff;
-                QiaoShi.Sort(shi.ShouPai);
-                shi.ShouPai[shi.ShouPaiWei - 1] = tp;
+                if (!shi.LiPaiDongZuo)
+                {
+                    int tp = shi.ShouPai[^1];
+                    shi.ShouPai[^1] = 0xff;
+                    shi.Sort();
+                    shi.ShouPai[^1] = tp;
+                }
 
                 float pw = paiWidth * PLAYER_PAI_SCALE;
                 x = -(pw * 6.5f);
                 y -= paiHeight * 1.5f;
                 float ph = paiHeight * PLAYER_PAI_SCALE;
-                for (int i = 0; i < shi.ShouPaiWei; i++)
+                foreach ((int sp, int i) in shi.ShouPai.Select((v, i) => (v, i)))
                 {
-                    int p = shi.ShouPai[i];
                     shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
                     shi.goShouPai[i].transform.localScale *= PLAYER_PAI_SCALE;
-                    if (p != 0xff)
+                    if (sp != 0xff)
                     {
-                        DrawPai(ref shi.goShouPai[i], p, new Vector2(x, y), 0);
+                        DrawPai(ref shi.goShouPai[i], sp, new Vector2(x, y), 0);
                     }
                     x += pw;
-                    if (p == 0xff)
+                    if (sp == 0xff)
                     {
                         ClearGameObject(ref shi.goShouPai[i]);
                     }
                 }
 
                 x = paiWidth * 9f;
-                y -= ph;
-                for (int i = 0; i < shi.FuLuPaiWei; i++)
+                y -= ph * 1.1f;
+                foreach (((List<int> pais, int ji, QiaoShi.YaoDingYi zhong), int i) in shi.FuLuPai.Select((v, i) => (v, i)))
                 {
-                    int fuLuJia = shi.FuLuJia[i];
-                    Chang.YaoDingYi fuLuZhong = shi.FuLuZhong[i];
-
-                    for (int j = shi.FuLuPai[i].Length - 1; j >= 0; j--)
+                    for (int j = pais.Count - 1; j >= 0; j--)
                     {
-                        int p = shi.FuLuPai[i][j];
+                        int p = pais[j];
                         if (p == 0xff)
                         {
                             continue;
                         }
-                        if (fuLuZhong == Chang.YaoDingYi.JiaGang && j == 3)
+                        if (zhong == QiaoShi.YaoDingYi.JiaGang && j == 3)
                         {
                             continue;
                         }
-                        bool isMingPai = shi.MingPaiPanDing(fuLuZhong, fuLuJia, j);
-                        if (fuLuZhong == Chang.YaoDingYi.AnGang && (j == 0 || j == 3))
+                        bool isMingPai = shi.MingPaiPanDing(zhong, ji, j);
+                        if (zhong == QiaoShi.YaoDingYi.AnGang && (j == 0 || j == 3))
                         {
                             p = 0x00;
                         }
                         shi.goFuLuPai[i][j] = Instantiate(goPai, goPai.transform.parent);
-                        if (fuLuZhong == Chang.YaoDingYi.JiaGang && isMingPai)
+                        if (zhong == QiaoShi.YaoDingYi.JiaGang && isMingPai)
                         {
                             shi.goFuLuPai[i][3] = Instantiate(goPai, goPai.transform.parent);
                         }
@@ -3700,9 +3688,9 @@ namespace Maqiao
                         {
                             x -= (paiHeight / 2);
                             DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y - (paiHeight - paiWidth) / 2), 90);
-                            if (fuLuZhong == Chang.YaoDingYi.JiaGang)
+                            if (zhong == QiaoShi.YaoDingYi.JiaGang)
                             {
-                                DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (paiHeight - paiWidth) / 2 + paiWidth), 90);
+                                DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (paiHeight - paiWidth) / 2 + pw), 90);
                             }
                             x -= (paiHeight / 2);
                         }
@@ -3724,30 +3712,28 @@ namespace Maqiao
                     }
                 }
                 string value = (shi.Fu > 0 ? shi.Fu + "符" : "") + (shi.YiMan ? "役満 " : shi.FanShuJi + "飜 ") + hele + " " + shi.HeLeDian + "点";
-                y -= paiHeight * 1.5f;
+                y -= paiHeight * 1.1f;
                 DrawText(ref goFu, value, new Vector2(0, y), 0, 30);
-                y -= paiHeight * 0.5f;
-                string[] yi = new string[shi.YiShu];
-                for (int i = 0; i < shi.YiShu; i++)
+                int index = 0;
+                foreach ((int yi, int fanShu) in shi.YiFan)
                 {
-                    yi[i] = (shi.YiMan ? QiaoShi.YiManMing[shi.Yi[i]] : QiaoShi.YiMing[shi.Yi[i]]);
                     // 記録 役数・役満数
                     if (shi.YiMan)
                     {
-                        shi.JiLu.yiManShu[shi.Yi[i]]++;
+                        shi.JiLu.yiManShu[yi]++;
                     }
                     else
                     {
-                        shi.JiLu.yiShu[shi.Yi[i]]++;
+                        shi.JiLu.yiShu[yi]++;
                     }
-                }
-                for (int i = 0; i < shi.YiShu; i++)
-                {
+
                     y -= paiHeight;
-                    goYi[i] = Instantiate(goText, goText.transform.parent);
-                    DrawText(ref goYi[i], yi[i], new Vector2(0, y), 0, 25, TextAlignmentOptions.Left, 7);
-                    goFanShu[i] = Instantiate(goText, goText.transform.parent);
-                    DrawText(ref goFanShu[i], shi.FanShu[i].ToString(), new Vector2(paiWidth * 3.3f, y), 0, 25, TextAlignmentOptions.Right, 2);
+                    goYi[index] = Instantiate(goText, goText.transform.parent);
+                    string ming = (shi.YiMan ? QiaoShi.YiManMing[yi] : QiaoShi.YiMing[yi]);
+                    DrawText(ref goYi[index], ming, new Vector2(0, y), 0, 25, TextAlignmentOptions.Left, 7);
+                    goFanShu[index] = Instantiate(goText, goText.transform.parent);
+                    DrawText(ref goFanShu[index], fanShu.ToString(), new Vector2(paiWidth * 3.3f, y), 0, 25, TextAlignmentOptions.Right, 2);
+                    index++;
                 }
             }
         }
@@ -3761,15 +3747,15 @@ namespace Maqiao
             ClearScreen();
             DrawJuFrame();
             DrawMingQian();
-            Chang.DianJiSuan(Chang.QiaoShi);
+            Chang.DianJiSuan();
 
             float x = 0;
             float y = -(paiHeight * 4);
             int max = 0;
-            for (int i = 0; i < Chang.MianZi; i++)
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                int jia = (Chang.Qin + i) % Chang.MianZi;
-                QiaoShi shi = Chang.QiaoShi[jia];
+                int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
                 // 受取
                 string shouQuGongTuo = (shi.ShouQuGongTuo > 0 ? "+" : "") + (shi.ShouQuGongTuo == 0 ? "" : shi.ShouQuGongTuo.ToString());
                 string shouQu = (shi.ShouQu - shi.ShouQuGongTuo > 0 ? "+" : "") + (shi.ShouQu - shi.ShouQuGongTuo == 0 ? "" : (shi.ShouQu - shi.ShouQuGongTuo).ToString());
@@ -3793,10 +3779,10 @@ namespace Maqiao
             }
             for (int shu = 0; shu <= max; shu += 100)
             {
-                for (int i = 0; i < Chang.MianZi; i++)
+                for (int i = 0; i < Chang.QiaoShis.Count; i++)
                 {
-                    int jia = (Chang.Qin + i) % Chang.MianZi;
-                    QiaoShi shi = Chang.QiaoShi[jia];
+                    int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                    QiaoShi shi = Chang.QiaoShis[jia];
                     if (shi.ShouQu > 0)
                     {
                         if (shi.ShouQu - shu >= 0)
@@ -3821,17 +3807,16 @@ namespace Maqiao
                     yield return new WaitForSeconds(0);
                 }
             }
-            for (int i = 0; i < Chang.MianZi; i++)
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                int jia = (Chang.Qin + i) % Chang.MianZi;
-                QiaoShi shi = Chang.QiaoShi[jia];
+                int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
                 DrawText(ref goDianBang[jia], (shi.DianBang).ToString(), Cal(x, y, shi.PlayOrder), 90 * GetDrawOrder(shi.PlayOrder), 30);
             }
 
             // 記録の書込
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 // 記録 対局数
                 shi.JiLu.duiJuShu++;
                 File.WriteAllText(Application.persistentDataPath + "/" + shi.MingQian + ".json", JsonUtility.ToJson(shi.JiLu));
@@ -3849,17 +3834,17 @@ namespace Maqiao
             }
 
             bool isQinTop = false;
-            if (Chang.ChangFeng == 0x32 && Chang.Ju == Chang.MianZi)
+            if (Chang.ChangFeng == 0x32 && Chang.Ju == Chang.QiaoShis.Count)
             {
-                QiaoShi qinShi = Chang.QiaoShi[Chang.Qin];
-                if (qinShi.ZiJiaYao == Chang.YaoDingYi.ZiMo || qinShi.TaJiaYao == Chang.YaoDingYi.RongHe)
+                QiaoShi qinShi = Chang.QiaoShis[Chang.Qin];
+                if (qinShi.ZiJiaYao == QiaoShi.YaoDingYi.ZiMo || qinShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
                 {
                     // 親の和了
                     int maxDian = 0;
-                    for (int i = 0; i < Chang.MianZi; i++)
+                    for (int i = 0; i < Chang.QiaoShis.Count; i++)
                     {
-                        int jia = (Chang.Qin + i) % Chang.MianZi;
-                        QiaoShi shi = Chang.QiaoShi[jia];
+                        int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
+                        QiaoShi shi = Chang.QiaoShis[jia];
                         if (maxDian < shi.DianBang)
                         {
                             maxDian = shi.DianBang;
@@ -3874,7 +3859,7 @@ namespace Maqiao
             }
 
             // 点表示
-            if (Chang.ChangFeng > 0x32 || (GuiZe.xiang && Chang.XiangPanDing(Chang.QiaoShi)) || isQinTop)
+            if (Chang.ChangFeng > 0x32 || (GuiZe.xiang && Chang.XiangPanDing()) || isQinTop)
             {
                 eventStatus = Event.ZHUANG_ZHONG_LE;
             }
@@ -3902,10 +3887,10 @@ namespace Maqiao
 
             // 記録の書込
             List<(int dian, QiaoShi shi)> shunWei = new();
-            for (int i = Chang.QiaJia; i < Chang.QiaJia + Chang.MianZi; i++)
+            for (int i = Chang.QiaJia; i < Chang.QiaJia + Chang.QiaoShis.Count; i++)
             {
-                int jia = i % Chang.MianZi;
-                QiaoShi shi = Chang.QiaoShi[jia];
+                int jia = i % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
                 shunWei.Add((shi.DianBang, shi));
             }
             shunWei.Sort((x, y) => y.dian.CompareTo(x.dian));
@@ -3948,10 +3933,10 @@ namespace Maqiao
             int geHe = 0;
             int maxDian = 0;
             int top = 0;
-            for (int i = Chang.QiaJia; i < Chang.QiaJia + Chang.MianZi; i++)
+            for (int i = Chang.QiaJia; i < Chang.QiaJia + Chang.QiaoShis.Count; i++)
             {
-                int jia = i % Chang.MianZi;
-                QiaoShi shi = Chang.QiaoShi[jia];
+                int jia = i % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
 
                 if (maxDian < shi.DianBang)
                 {
@@ -3963,7 +3948,7 @@ namespace Maqiao
                 geHe += deDian;
                 shi.JiJiDianJiSuan(deDian);
             }
-            Chang.QiaoShi[top].JiJiDianJiSuan(Chang.QiaoShi[top].JiJiDian - geHe);
+            Chang.QiaoShis[top].JiJiDianJiSuan(Chang.QiaoShis[top].JiJiDian - geHe);
         }
 
         // 【描画】荘終了
@@ -3973,9 +3958,8 @@ namespace Maqiao
             int maxMingQian = 0;
             int maxDianBang = 0;
             int maxDeDian = 0;
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 if (maxMingQian < shi.MingQian.Length)
                 {
                     maxMingQian = shi.MingQian.Length;
@@ -3995,9 +3979,8 @@ namespace Maqiao
                 }
             }
 
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((i, v) => (i, v)))
             {
-                QiaoShi shi = Chang.QiaoShi[i];
                 string dianBang = shi.DianBang.ToString();
                 for (int j = dianBang.Length; j < maxDianBang; j++)
                 {
@@ -4137,11 +4120,11 @@ namespace Maqiao
 
         private int GetDrawOrder(int order)
         {
-            if (Chang.MianZi == 3 && order == 2)
+            if (Chang.QiaoShis.Count == 3 && order == 2)
             {
                 return 3;
             }
-            if (Chang.MianZi == 2 && order == 1)
+            if (Chang.QiaoShis.Count == 2 && order == 1)
             {
                 return 2;
             }
@@ -4175,22 +4158,21 @@ namespace Maqiao
             ClearGameObject(ref Pai.goXuanShangPai);
             ClearGameObject(ref Pai.goLiXuanShangPai);
 
-            for (int i = 0; i < Chang.MianZi; i++)
+            foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                QiaoShi qs = Chang.QiaoShi[i];
-                if (qs == null)
+                if (shi == null)
                 {
                     continue;
                 }
-                ClearGameObject(ref qs.goShouPai);
-                for (int j = 0; j < qs.goFuLuPai.Length; j++)
+                ClearGameObject(ref shi.goShouPai);
+                for (int j = 0; j < shi.goFuLuPai.Length; j++)
                 {
-                    ClearGameObject(ref qs.goFuLuPai[j]);
+                    ClearGameObject(ref shi.goFuLuPai[j]);
                 }
-                ClearGameObject(ref qs.goShePai);
-                ClearGameObject(ref qs.goDaiPai);
-                ClearGameObject(ref qs.goCanPaiShu);
-                ClearGameObject(ref qs.goXiangTingShu);
+                ClearGameObject(ref shi.goShePai);
+                ClearGameObject(ref shi.goDaiPai);
+                ClearGameObject(ref shi.goCanPaiShu);
+                ClearGameObject(ref shi.goXiangTingShu);
             }
             ClearGameObject(ref goZiMoShiLine);
 
@@ -4241,6 +4223,14 @@ namespace Maqiao
         }
 
         // テキストクリア
+        private void ClearGameObject(ref List<TextMeshProUGUI> go)
+        {
+            for (int i = 0; i < go.Count; i++)
+            {
+                TextMeshProUGUI t = go[i];
+                ClearGameObject(ref t);
+            }
+        }
         private void ClearGameObject(ref TextMeshProUGUI[] go)
         {
             for (int i = 0; i < go.Length; i++)
@@ -4250,6 +4240,14 @@ namespace Maqiao
         }
 
         // ボタンクリア
+        private void ClearGameObject(ref List<Button> go)
+        {
+            for (int i = 0; i < go.Count; i++)
+            {
+                Button b = go[i];
+                ClearGameObject(ref b);
+            }
+        }
         private void ClearGameObject(ref Button[] go)
         {
             for (int i = 0; i < go.Length; i++)
