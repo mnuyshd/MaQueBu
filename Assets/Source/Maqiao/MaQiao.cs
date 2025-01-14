@@ -3130,7 +3130,7 @@ namespace Maqiao
                     y = -Screen.safeArea.height / 2 + ph / 2;
                 }
             }
-            foreach (((List<int> pais, _, QiaoShi.YaoDingYi fYao), int i) in shi.FuLuPai.Select((v, i) => (v, i)))
+            foreach (((List<int> pais, int ji, QiaoShi.YaoDingYi fYao), int i) in shi.FuLuPai.Select((v, i) => (v, i)))
             {
                 for (int j = pais.Count - 1; j >= 0; j--)
                 {
@@ -3143,7 +3143,7 @@ namespace Maqiao
                     {
                         continue;
                     }
-                    bool isMingPai = shi.MingPaiPanDing(fYao, jia, j);
+                    bool isMingPai = shi.MingPaiPanDing(fYao, ji, j);
                     if (fYao == QiaoShi.YaoDingYi.AnGang && (j == 0 || j == 3))
                     {
                         p = 0x00;
@@ -3690,7 +3690,7 @@ namespace Maqiao
                             DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y - (paiHeight - paiWidth) / 2), 90);
                             if (zhong == QiaoShi.YaoDingYi.JiaGang)
                             {
-                                DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (paiHeight - paiWidth) / 2 + pw), 90);
+                                DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (paiHeight - paiWidth) / 2 + paiWidth), 90);
                             }
                             x -= (paiHeight / 2);
                         }
