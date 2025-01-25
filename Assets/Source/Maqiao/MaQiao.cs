@@ -2351,14 +2351,13 @@ namespace Maqiao
                 yield return new WaitForSeconds(waitTime / 2);
                 // 打牌
                 ziJiaShi.DaPai(dp);
-                DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -2, false, false);
                 Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(Chang.ZiJiaYao);
                 DrawShePai(Chang.ZiMoFan);
+                yield return new WaitForSeconds(waitTime / 2);
                 if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi)
                 {
                     DrawLiZi(Chang.ZiMoFan);
                 }
-                yield return new WaitForSeconds(waitTime / 2);
                 ziJiaShi.LiPai();
                 DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -2);
                 // 四風子連打処理
