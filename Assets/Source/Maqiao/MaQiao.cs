@@ -3716,16 +3716,6 @@ namespace Maqiao
                 int index = 0;
                 foreach ((int yi, int fanShu) in shi.YiFan)
                 {
-                    // 記録 役数・役満数
-                    if (shi.YiMan)
-                    {
-                        shi.JiLu.yiManShu[yi]++;
-                    }
-                    else
-                    {
-                        shi.JiLu.yiShu[yi]++;
-                    }
-
                     y -= paiHeight;
                     goYi[index] = Instantiate(goText, goText.transform.parent);
                     string ming = (shi.YiMan ? QiaoShi.YiManMing[yi] : QiaoShi.YiMing[yi]);
@@ -3747,6 +3737,44 @@ namespace Maqiao
             DrawJuFrame();
             DrawMingQian();
             Chang.DianJiSuan();
+
+            // 記録 役数・役満数
+            if (Chang.RongHeFan.Count > 0)
+            {
+                foreach (int fan in Chang.RongHeFan)
+                {
+                    QiaoShi shi = Chang.QiaoShis[fan];
+                    foreach ((int yi, _) in shi.YiFan)
+                    {
+                        if (shi.YiMan)
+                        {
+                            shi.JiLu.yiManShu[yi]++;
+                        }
+                        else
+                        {
+                            shi.JiLu.yiShu[yi]++;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (Chang.HeleFan >= 0)
+                {
+                    QiaoShi shi = Chang.QiaoShis[Chang.HeleFan];
+                    foreach ((int yi, _) in shi.YiFan)
+                    {
+                        if (shi.YiMan)
+                        {
+                            shi.JiLu.yiManShu[yi]++;
+                        }
+                        else
+                        {
+                            shi.JiLu.yiShu[yi]++;
+                        }
+                    }
+                }
+            }
 
             float x = 0;
             float y = -(paiHeight * 4);
