@@ -59,6 +59,8 @@ namespace Maqiao
             LIAN_ZHUANG
         }
 
+        // フレームレート
+        private static readonly int FRAME_RATE = 60;
         // 待ち時間(デフォルト)
         private static readonly float WAIT_TIME = 0.3f;
         // プレイヤー牌倍率
@@ -250,7 +252,7 @@ namespace Maqiao
 
         void Start()
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = FRAME_RATE;
 
             orientation = Screen.orientation;
             if (orientation == ScreenOrientation.PortraitUpsideDown)
@@ -451,6 +453,7 @@ namespace Maqiao
                 {
                     forwardMode = ForwardMode.FAST_FORWARD;
                 }
+                Application.targetFrameRate = 0;
                 waitTime = 0;
                 if (keyPress == false)
                 {
@@ -468,6 +471,7 @@ namespace Maqiao
             goReproduction = goSettingPanel.transform.Find("Reproduction").GetComponent<Button>();
             goReproduction.onClick.AddListener(delegate {
                 forwardMode = ForwardMode.NORMAL;
+                Application.targetFrameRate = FRAME_RATE;
                 waitTime = WAIT_TIME;
                 goSettingPanel.SetActive(false);
             });
