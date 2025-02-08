@@ -350,14 +350,14 @@ namespace Sikao
         {
             get { return shouPai; }
         }
-        internal Button[] goShouPai = new Button[14];
+        internal Button[] goShouPai;
         // 副露牌(牌、家、腰)
         private List<(List<int> pais, int jia, YaoDingYi yao)> fuLuPai;
         internal List<(List<int> pais, int jia, YaoDingYi yao)> FuLuPai
         {
             get { return fuLuPai; }
         }
-        internal Button[][] goFuLuPai = new Button[4][];
+        internal Button[][] goFuLuPai;
         // 包則番
         private int baoZeFan;
         internal int BaoZeFan
@@ -555,6 +555,8 @@ namespace Sikao
         // コンストラクタ
         internal QiaoShi()
         {
+            goShouPai = new Button[14];
+            goFuLuPai = new Button[4][];
             for (int i = 0; i < goFuLuPai.Length; i++)
             {
                 goFuLuPai[i] = new Button[4];
@@ -729,9 +731,7 @@ namespace Sikao
                 {
                     if ((shouPai[i] & QIAO_PAI) > (shouPai[j] & QIAO_PAI))
                     {
-                        int tmp = shouPai[i];
-                        shouPai[i] = shouPai[j];
-                        shouPai[j] = tmp;
+                        (shouPai[i], shouPai[j]) = (shouPai[j], shouPai[i]);
                     }
                 }
             }
@@ -755,9 +755,8 @@ namespace Sikao
         {
             Chang.ShePai = p;
             shePaiShu[p & QIAO_PAI]++;
-            for (int i = 0; i < Chang.QiaoShis.Count; i++)
+            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
             {
-                QiaoShi shi = Chang.QiaoShis[i];
                 if (i != Chang.ZiMoFan && shi.LiZhi)
                 {
                     shi.liZhiShePaiShu[Chang.ShePai & QIAO_PAI]++;
