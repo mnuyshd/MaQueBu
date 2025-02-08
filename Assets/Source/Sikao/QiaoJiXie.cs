@@ -27,8 +27,6 @@ namespace Sikao
             RAN,
             // 逃げ
             TAO,
-            // 国士無双
-            GUO_SHI_WU_SHUANG,
         }
 
         // 脳
@@ -41,7 +39,6 @@ namespace Sikao
             { XingGe.LI_ZHI, 50 },
             { XingGe.MING, 50 },
             { XingGe.RAN, 50 },
-            { XingGe.GUO_SHI_WU_SHUANG, 50 },
             { XingGe.TAO, 50 },
         };
 
@@ -89,7 +86,7 @@ namespace Sikao
             if (JiuZhongJiuPai)
             {
                 int dian = DianCha() / 1000;
-                if (nao[XingGe.GUO_SHI_WU_SHUANG] + dian < 50)
+                if (nao[XingGe.YI_PAI] + dian < 50)
                 {
                     // 九種九牌
                     ZiJiaYao = YaoDingYi.JiuZhongJiuPai;
@@ -617,11 +614,6 @@ namespace Sikao
                 if ((16 - gao <= nao[XingGe.RAN] / 10) && ((p & SE_PAI) == se || (p & ZI_PAI) == ZI_PAI))
                 {
                     shouPaiDian[i] += nao[XingGe.RAN] / 5;
-                }
-                // 国士無双
-                if (YaoJiuPaiJiSuan() >= 9 && nao[XingGe.GUO_SHI_WU_SHUANG] >= 70)
-                {
-                    shouPaiDian[i] += nao[XingGe.GUO_SHI_WU_SHUANG];
                 }
                 // 字牌
                 if ((p & ZI_PAI) == ZI_PAI)

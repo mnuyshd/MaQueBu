@@ -14,7 +14,6 @@ namespace Sikao.Shi
                 { XingGe.LI_ZHI, 50 },
                 { XingGe.MING, 80 },
                 { XingGe.RAN, 10 },
-                { XingGe.GUO_SHI_WU_SHUANG, 30 },
                 { XingGe.TAO, 40 },
             };
         }
