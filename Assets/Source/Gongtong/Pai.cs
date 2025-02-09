@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.UI;
 
 using Sikao;
@@ -120,12 +119,14 @@ namespace Gongtong
                 }
             }
             // 赤牌
-            foreach ((int cp, int i) in ChiPaiDingYi.Select((v, i) => (v, i)))
+            for (int i = 0; i < ChiPaiDingYi.Length; i++)
             {
+                int cp = ChiPaiDingYi[i];
                 for (int j = 0; j < GuiZe.chiPaiShu[i]; j++)
                 {
-                    foreach ((int p, int k) in shanPai.Select((v, i) => (v, i)))
+                    for (int k = 0; k < shanPai.Count; k++)
                     {
+                        int p = shanPai[k];
                         if (cp == p)
                         {
                             shanPai[k] += QiaoShi.CHI_PAI;
@@ -167,12 +168,15 @@ namespace Gongtong
         {
             List<int> shanPaiC = new(shanPai);
 
-            foreach ((List<int> pais, int i) in jiRuPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < jiRuPai.Count; i++)
             {
-                foreach ((int pai, int j) in pais.Select((v, i) => (v, i)))
+                List<int> pais = jiRuPai[i];
+                for (int j = 0; j < pais.Count; j++)
                 {
-                    foreach ((int sp, int k) in shanPaiC.Select((v, i) => (v, i)))
+                    int pai = pais[j];
+                    for (int k = 0; k < shanPaiC.Count; k++)
                     {
+                        int sp = shanPaiC[k];
                         if (pai == sp)
                         {
                             int wei;

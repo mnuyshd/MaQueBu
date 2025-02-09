@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -1158,8 +1157,9 @@ namespace Maqiao
             DrawMingQian();
 
             bool isHeLe = false;
-            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
+                QiaoShi shi = Chang.QiaoShis[i];
                 if (shi.Player)
                 {
                     continue;
@@ -1178,8 +1178,9 @@ namespace Maqiao
                 }
                 DrawShouPai(i, yao, xuanZe, shi.Player, shi.Follow);
             }
-            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
+                QiaoShi shi = Chang.QiaoShis[i];
                 if (!shi.Player)
                 {
                     continue;
@@ -1225,7 +1226,7 @@ namespace Maqiao
                 }
             }
 
-            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
                 DrawDaiPai(i, -2);
                 DrawShePai(i);
@@ -1273,8 +1274,9 @@ namespace Maqiao
                     }
                     if (isQuXiao && !sheDing.mingQuXiao)
                     {
-                        foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+                        for (int i = 0; i < Chang.QiaoShis.Count; i++)
                         {
+                            QiaoShi shi = Chang.QiaoShis[i];
                             if (shi.Player && !shi.JiJia)
                             {
                                 OnClickTaJiaYao(i, shi, QiaoShi.YaoDingYi.Wu, 0);
@@ -1829,8 +1831,9 @@ namespace Maqiao
             }
 
             int order = 0;
-            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
+                QiaoShi shi = Chang.QiaoShis[i];
                 shi.PlayOrder = i;
                 if (shi.Player)
                 {
@@ -2051,20 +2054,20 @@ namespace Maqiao
                     yield return new WaitForSeconds(waitTime / 3);
                 }
             }
-            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
                 // 理牌
                 Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].LiPai();
                 DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
-            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
+                    Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
                 DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
-            foreach ((_, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
                 Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].LiPai();
                 DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
@@ -2768,8 +2771,9 @@ namespace Maqiao
                 int wei = mingWei;
                 if (isFollow && shi.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi)
                 {
-                    foreach ((int w, int i) in shi.LiZhiPaiWei.Select((v, i) => (v, i)))
+                    for (int i = 0; i < shi.LiZhiPaiWei.Count; i++)
                     {
+                        int w = shi.LiZhiPaiWei[i];
                         if (w == shi.ZiJiaXuanZe)
                         {
                             wei = i;
@@ -2999,9 +3003,9 @@ namespace Maqiao
 
             // 手牌
             float margin = pw / 4;
-            foreach ((int sp, int i) in shi.ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < shi.ShouPai.Count; i++)
             {
-                int p = sp;
+                int p = shi.ShouPai[i];
                 shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
                 if (shi.PlayOrder != 0 && yao != QiaoShi.YaoDingYi.TingPai && yao != QiaoShi.YaoDingYi.HeLe && yao != QiaoShi.YaoDingYi.JiuZhongJiuPai && yao != QiaoShi.YaoDingYi.CuHe && p != 0xff)
                 {
@@ -3133,8 +3137,9 @@ namespace Maqiao
                     y = -Screen.safeArea.height / 2 + ph / 2;
                 }
             }
-            foreach (((List<int> pais, int ji, QiaoShi.YaoDingYi fYao), int i) in shi.FuLuPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < shi.FuLuPai.Count; i++)
             {
+                (List<int> pais, int ji, QiaoShi.YaoDingYi fYao) = shi.FuLuPai[i];
                 for (int j = pais.Count - 1; j >= 0; j--)
                 {
                     int p = pais[j];
@@ -3322,9 +3327,9 @@ namespace Maqiao
                     shi.DaiPaiJiSuan(xuanZe);
                     shi.GongKaiPaiShuJiSuan();
                 }
-                foreach ((int dp, int i) in shi.DaiPai.Select((v, i) => (v, i)))
+                for (int i = 0; i < shi.DaiPai.Count; i++)
                 {
-                    int p = dp & QiaoShi.QIAO_PAI;
+                    int p = shi.DaiPai[i] & QiaoShi.QIAO_PAI;
                     if (p == 0xff)
                     {
                         ClearGameObject(ref shi.goDaiPai[i]);
@@ -3647,8 +3652,9 @@ namespace Maqiao
                 x = -(pw * 6.5f);
                 y -= paiHeight * 1.5f;
                 float ph = paiHeight * PLAYER_PAI_SCALE;
-                foreach ((int sp, int i) in shi.ShouPai.Select((v, i) => (v, i)))
+                for (int i = 0; i < shi.ShouPai.Count; i++)
                 {
+                    int sp = shi.ShouPai[i];
                     shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
                     shi.goShouPai[i].transform.localScale *= PLAYER_PAI_SCALE;
                     if (sp != 0xff)
@@ -3664,8 +3670,9 @@ namespace Maqiao
 
                 x = paiWidth * 9f;
                 y -= ph * 1.1f;
-                foreach (((List<int> pais, int ji, QiaoShi.YaoDingYi zhong), int i) in shi.FuLuPai.Select((v, i) => (v, i)))
+                for (int i = 0; i < shi.FuLuPai.Count; i++)
                 {
+                    (List<int> pais, int ji, QiaoShi.YaoDingYi zhong) = shi.FuLuPai[i];
                     for (int j = pais.Count - 1; j >= 0; j--)
                     {
                         int p = pais[j];
@@ -4010,8 +4017,9 @@ namespace Maqiao
                 }
             }
 
-            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((i, v) => (i, v)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
+                QiaoShi shi = Chang.QiaoShis[i];
                 string dianBang = shi.DianBang.ToString();
                 for (int j = dianBang.Length; j < maxDianBang; j++)
                 {

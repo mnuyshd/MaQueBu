@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.UI;
 using TMPro;
 
@@ -755,8 +754,9 @@ namespace Sikao
         {
             Chang.ShePai = p;
             shePaiShu[p & QIAO_PAI]++;
-            foreach ((QiaoShi shi, int i) in Chang.QiaoShis.Select((v, i) => (v, i)))
+            for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
+                QiaoShi shi = Chang.QiaoShis[i];
                 if (i != Chang.ZiMoFan && shi.LiZhi)
                 {
                     shi.liZhiShePaiShu[Chang.ShePai & QIAO_PAI]++;
@@ -843,8 +843,9 @@ namespace Sikao
         // 加槓
         internal void JiaGang(int wei)
         {
-            foreach (((List<int> pais, int jia, YaoDingYi yao), int i) in fuLuPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < fuLuPai.Count; i++)
             {
+                (List<int> pais, int jia, YaoDingYi yao) = fuLuPai[i];
                 if (yao == YaoDingYi.Bing)
                 {
                     if ((pais[0] & QIAO_PAI) == (shouPai[jiaGangPaiWei[wei][0]] & QIAO_PAI))
@@ -1790,9 +1791,9 @@ namespace Sikao
                 if (shouPaiShu[p] >= 4)
                 {
                     List<int> anGang = new();
-                    foreach ((int sp, int j) in shouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < shouPai.Count; j++)
                     {
-                        if (p == (sp & QIAO_PAI))
+                        if (p == (shouPai[j] & QIAO_PAI))
                         {
                             anGang.Add(j);
                         }
@@ -1816,7 +1817,7 @@ namespace Sikao
             DaiPaiJiSuan(shouPai.Count - 1);
 
             bool heLe = true;
-            foreach ((_, int i) in anGangPaiWei.Select((v, i) => (v, i)))
+            for (int i = 0; i < anGangPaiWei.Count; i++)
             {
                 List<int> shouPaiC = new(shouPai);
                 List<(List<int>, int, YaoDingYi)> fuLuPaiC = new(fuLuPai);
@@ -1853,9 +1854,9 @@ namespace Sikao
                 {
                     continue;
                 }
-                foreach ((int sp, int j) in shouPai.Select((v, i) => (v, i)))
+                for (int j = 0; j < shouPai.Count; j++)
                 {
-                    if ((pais[0] & QIAO_PAI) == (sp & QIAO_PAI))
+                    if ((pais[0] & QIAO_PAI) == (shouPai[j] & QIAO_PAI))
                     {
                         jiaGangPaiWei.Add(new List<int>() { j });
                     }
@@ -2851,15 +2852,17 @@ namespace Sikao
             {
                 // 重複
                 bool chongFu = false;
-                foreach ((List<int> pais1, int i) in shunZi.Select((v, i) => (v, i)))
+                for (int i = 0; i < shunZi.Count; i++)
                 {
+                    List<int> pais1 = shunZi[i];
                     int shu = 0;
-                    foreach ((List<int> pais2, int j) in shunZi.Select((v, i) => (v, i)))
+                    for (int j = 0; j < shunZi.Count; j++)
                     {
                         if (i == j)
                         {
                             continue;
                         }
+                        List<int> pais2 = shunZi[j];
                         if (pais1[0] == pais2[0])
                         {
                             shu++;
@@ -2919,15 +2922,17 @@ namespace Sikao
             {
                 return;
             }
-            foreach ((List<int> pais1, int i) in shunZi.Select((v, i) => (v, i)))
+            for (int i = 0; i < shunZi.Count; i++)
             {
+                List<int> pais1 = shunZi[i];
                 bool[] se = new bool[3];
-                foreach ((List<int> pais2, int j) in shunZi.Select((v, i) => (v, i)))
-                    {
+                for (int j = 0; j < shunZi.Count; j++)
+                {
                     if (i == j)
                     {
                         continue;
                     }
+                    List<int> pais2 = shunZi[j];
                     if ((pais1[0] & SHU_PAI) == (pais2[0] & SHU_PAI)
                         && (pais1[1] & SHU_PAI) == (pais2[1] & SHU_PAI)
                         && (pais1[2] & SHU_PAI) == (pais2[2] & SHU_PAI))
@@ -3519,8 +3524,9 @@ namespace Sikao
                     gongKaiPaiShu[p]++;
                 }
                 // 副露牌
-                foreach (((List<int> pais, int jia, YaoDingYi yao), int i) in shi.fuLuPai.Select((v, i) => (v, i)))
+                for (int i = 0; i < shi.fuLuPai.Count; i++)
                 {
+                    (List<int> pais, int jia, YaoDingYi yao) = shi.fuLuPai[i];
                     int wei = 0;
                     foreach (int fp in pais)
                     {

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using Gongtong;
 
@@ -51,8 +50,9 @@ namespace Sikao
             // 公開牌数計算
             GongKaiPaiShuJiSuan();
             // 有効度計算
-            foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
+                int sp = ShouPai[i];
                 int dian = 0;
                 dian += XuanShangPaiPanDing(sp) * (nao[XingGe.XUAN_SHANG] / 10);
                 int p = sp & QIAO_PAI;
@@ -119,9 +119,9 @@ namespace Sikao
                 }
                 if (shi.LiZhi)
                 {
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         int s = p & SHU_PAI;
                         if (shi.ShePaiShu[p] + shi.LiZhiShePaiShu[p] > 0)
                         {
@@ -247,14 +247,14 @@ namespace Sikao
             XiangTingShuJiSuan(ShouPai.Count - 1);
             if (LiZhiZheShu() >= 1)
             {
-                foreach ((_, int i) in ShouPai.Select((v, i) => (v, i)))
+                for (int i = 0; i < ShouPai.Count; i++)
                 {
                     YouXiaoPaiShu[i] += shouPaiAnQuan[i] * XiangTingShu;
                 }
             }
             int maxYouXiaoPai = -99;
             int minDian = 99;
-            foreach ((_, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
                 if (maxYouXiaoPai < YouXiaoPaiShu[i] || (maxYouXiaoPai == YouXiaoPaiShu[i] && minDian >= shouPaiYouXiao[i]))
                 {
@@ -359,9 +359,9 @@ namespace Sikao
                 return wei;
             }
             int p = ShouPai[wei] & QIAO_PAI;
-            foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
-                if (p == sp)
+                if (p == ShouPai[i])
                 {
                     return i;
                 }

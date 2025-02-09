@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Gongtong;
 
@@ -101,8 +100,9 @@ namespace Sikao
                 // 暗槓判定
                 int liDian = 999;
                 wei = -1;
-                foreach ((List<int> weis, int i) in AnGangPaiWei.Select((v, i) => (v, i)))
+                for (int i = 0; i < AnGangPaiWei.Count; i++)
                 {
+                    List<int> weis = AnGangPaiWei[i];
                     int dian = 999;
                     foreach (int w in weis)
                     {
@@ -131,8 +131,9 @@ namespace Sikao
                 // 加槓判定
                 liDian = 999;
                 wei = -1;
-                foreach ((List<int> weis, int i) in JiaGangPaiWei.Select((v, i) => (v, i)))
+                for (int i = 0; i < JiaGangPaiWei.Count; i++)
                 {
+                    List<int> weis = JiaGangPaiWei[i];
                     int dian = 0;
                     foreach (int w in weis)
                     {
@@ -213,8 +214,9 @@ namespace Sikao
                 // 当牌の多い待ちを選択
                 wei = -1;
                 int gao = 0;
-                foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+                for (int i = 0; i < ShouPai.Count; i++)
                 {
+                    int sp = ShouPai[i];
                     DaiPaiJiSuan(i);
                     bool shiTi = false;
                     foreach (int stp in ShiTiPai)
@@ -257,8 +259,9 @@ namespace Sikao
             wei = ShouPai.Count - 1;
             int diDian = 999;
             int gaoShu = 0;
-            foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
+                int sp = ShouPai[i];
                 if (diDian > shouPaiDian[i])
                 {
                     diDian = shouPaiDian[i];
@@ -316,10 +319,10 @@ namespace Sikao
             // 大明槓判定
             int gaoDian = 0;
             int wei = -1;
-            foreach ((List<int> weis, int i) in DaMingGangPaiWei.Select((v, i) => (v, i)))
+            for (int i = 0; i < DaMingGangPaiWei.Count; i++)
             {
                 int dian = 0;
-                foreach (int w in weis)
+                foreach (int w in DaMingGangPaiWei[i])
                 {
                     dian += shouPaiDian[w];
                 }
@@ -352,10 +355,10 @@ namespace Sikao
             // 石並判定
             gaoDian = 0;
             wei = -1;
-            foreach ((List<int> weis, int i) in BingPaiWei.Select((v, i) => (v, i)))
+            for (int i = 0; i < BingPaiWei.Count; i++)
             {
                 int dian = 0;
-                foreach (int w in weis)
+                foreach (int w in BingPaiWei[i])
                 {
                     dian += shouPaiDian[w];
                 }
@@ -412,10 +415,10 @@ namespace Sikao
             // 吃判定
             int diDian = 999;
             wei = -1;
-            foreach ((List<int> weis, int i) in ChiPaiWei.Select((v, i) => (v, i)))
+            for (int i = 0; i < ChiPaiWei.Count; i++)
             {
                 int dian = 0;
-                foreach (int w in weis)
+                foreach (int w in ChiPaiWei[i])
                 {
                     dian += shouPaiDian[w];
                 }
@@ -491,9 +494,9 @@ namespace Sikao
                 return wei;
             }
             int p = ShouPai[wei] & QIAO_PAI;
-            foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
-                if (p == sp)
+                if (p == ShouPai[i])
                 {
                     return i;
                 }
@@ -537,9 +540,9 @@ namespace Sikao
                 }
                 if (shi.LiZhi)
                 {
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         int s = p & SHU_PAI;
                         if (shi.ShePaiShu[p] + shi.LiZhiShePaiShu[p] > 0)
                         {
@@ -594,8 +597,9 @@ namespace Sikao
                 }
             }
 
-            foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
+                int sp = ShouPai[i];
                 int p = sp & QIAO_PAI;
                 foreach (int stp in ShiTiPai)
                 {
@@ -631,9 +635,9 @@ namespace Sikao
                 if (ShouPaiShu[i] >= 3)
                 {
                     int k = 3;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
@@ -649,9 +653,9 @@ namespace Sikao
                 if (ShouPaiShu[i] >= 2)
                 {
                     int k = 2;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.KE_ZI] / 5;
@@ -674,13 +678,13 @@ namespace Sikao
                     int s0 = m;
                     int s1 = m;
                     int s2 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI];
@@ -718,13 +722,13 @@ namespace Sikao
                     int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 1]);
                     int s0 = m;
                     int s1 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
@@ -750,13 +754,13 @@ namespace Sikao
                     int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 2]);
                     int s0 = m;
                     int s2 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
@@ -783,13 +787,13 @@ namespace Sikao
                     int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 1]);
                     int s0 = m;
                     int s1 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
@@ -820,13 +824,13 @@ namespace Sikao
                     int s0 = m;
                     int s1 = m;
                     int s2 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI];
@@ -864,13 +868,13 @@ namespace Sikao
                     int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 1]);
                     int s0 = m;
                     int s1 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
@@ -896,13 +900,13 @@ namespace Sikao
                     int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 2]);
                     int s0 = m;
                     int s2 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
@@ -929,13 +933,13 @@ namespace Sikao
                     int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 1]);
                     int s0 = m;
                     int s1 = m;
-                    foreach ((int sp, int j) in ShouPai.Select((v, i) => (v, i)))
+                    for (int j = 0; j < ShouPai.Count; j++)
                     {
                         if (shouPaiDianShu[j] <= 0)
                         {
                             continue;
                         }
-                        int p = sp & QIAO_PAI;
+                        int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
@@ -958,9 +962,9 @@ namespace Sikao
             ShouPaiShuJiSuan();
             Init(shouPaiDianShu, 1);
             // 嵌張・辺張
-            foreach ((int sp, int i) in ShouPai.Select((v, i) => (v, i)))
+            for (int i = 0; i < ShouPai.Count; i++)
             {
-                int p = sp & QIAO_PAI;
+                int p = ShouPai[i] & QIAO_PAI;
                 int s = p & SHU_PAI;
                 if ((p & ZI_PAI) == ZI_PAI)
                 {
