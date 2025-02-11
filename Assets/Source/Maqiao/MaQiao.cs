@@ -8,12 +8,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using TMPro;
 
-using Gongtong;
-using Sikao;
-using Sikao.Shi;
+using Assets.Source.Gongtong;
+using Assets.Source.Sikao;
+using Assets.Source.Sikao.Shi;
 using Unity.VisualScripting;
 
-namespace Maqiao
+namespace Assets.Source.Maqiao
 {
     // 麻雀
     internal class MaQiao : MonoBehaviour

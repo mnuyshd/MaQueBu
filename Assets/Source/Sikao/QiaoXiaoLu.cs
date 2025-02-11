@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-using Gongtong;
+using Assets.Source.Gongtong;
 
-namespace Sikao
+namespace Assets.Source.Sikao
 {
     // 効率雀士
     internal class QiaoXiaoLu : QiaoShi

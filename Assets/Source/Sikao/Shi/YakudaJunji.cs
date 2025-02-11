@@ -1,4 +1,4 @@
-namespace Sikao.Shi
+namespace Assets.Source.Sikao.Shi
 {
     internal class YakudaJunji : QiaoJiXie
     {

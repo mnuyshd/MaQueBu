@@ -1,4 +1,4 @@
-namespace Maqiao
+namespace Assets.Source.Maqiao
 {
     // 設定
     public class SheDing
