@@ -504,18 +504,6 @@ namespace Assets.Source.Sikao
             return wei;
         }
 
-        // 最小
-        private int ZuiXiao(int n1, int n2)
-        {
-            return Math.Min(n1, n2);
-        }
-        // 最小
-        private int ZuiXiao(int n1, int n2, int n3)
-        {
-            int m = ZuiXiao(n1, n2);
-            return Math.Min(m, n3);
-        }
-
         // 手牌点数計算
         private void ShouPaiDianShuJiSuan()
         {
@@ -674,7 +662,7 @@ namespace Assets.Source.Sikao
             {
                 if (ShouPaiShu[i] >= 1 && ShouPaiShu[i + 1] >= 1 && ShouPaiShu[i + 2] >= 1)
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 1], ShouPaiShu[i + 2]);
+                    int m = Math.Min(Math.Min(ShouPaiShu[i], ShouPaiShu[i + 1]), ShouPaiShu[i + 2]);
                     int s0 = m;
                     int s1 = m;
                     int s2 = m;
@@ -719,7 +707,7 @@ namespace Assets.Source.Sikao
                 }
                 if (ShouPaiShu[i] >= 1 && ShouPaiShu[i + 1] >= 1)
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 1]);
+                    int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i + 1]);
                     int s0 = m;
                     int s1 = m;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -751,7 +739,7 @@ namespace Assets.Source.Sikao
             {
                 if (ShouPaiShu[i] >= 1 && ShouPaiShu[i + 2] >= 1)
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 2]);
+                    int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i + 2]);
                     int s0 = m;
                     int s2 = m;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -784,7 +772,7 @@ namespace Assets.Source.Sikao
                 int s = i & SHU_PAI;
                 if ((s == 1 || s == 7) && (ShouPaiShu[i] >= 1 && ShouPaiShu[i + 1] >= 1))
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i + 1]);
+                    int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i + 1]);
                     int s0 = m;
                     int s1 = m;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -820,7 +808,7 @@ namespace Assets.Source.Sikao
             {
                 if (ShouPaiShu[i] >= 1 && ShouPaiShu[i - 1] >= 1 && ShouPaiShu[i - 2] >= 1)
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 1], ShouPaiShu[i - 2]);
+                    int m = Math.Min(Math.Min(ShouPaiShu[i], ShouPaiShu[i - 1]), ShouPaiShu[i - 2]);
                     int s0 = m;
                     int s1 = m;
                     int s2 = m;
@@ -865,7 +853,7 @@ namespace Assets.Source.Sikao
                 }
                 if (ShouPaiShu[i] >= 1 && ShouPaiShu[i - 1] >= 1)
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 1]);
+                    int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i - 1]);
                     int s0 = m;
                     int s1 = m;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -897,7 +885,7 @@ namespace Assets.Source.Sikao
             {
                 if (ShouPaiShu[i] >= 1 && ShouPaiShu[i - 2] >= 1)
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 2]);
+                    int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i - 2]);
                     int s0 = m;
                     int s2 = m;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -930,7 +918,7 @@ namespace Assets.Source.Sikao
                 int s = i & SHU_PAI;
                 if ((s == 2 || s == 9) && (ShouPaiShu[i] >= 1 && ShouPaiShu[i - 1] >= 1))
                 {
-                    int m = ZuiXiao(ShouPaiShu[i], ShouPaiShu[i - 1]);
+                    int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i - 1]);
                     int s0 = m;
                     int s1 = m;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -981,6 +969,34 @@ namespace Assets.Source.Sikao
                 if ((s == 8 && ShouPaiShu[p + 1] > 0) || (s == 2 && ShouPaiShu[p - 1] > 0))
                 {
                     shouPaiDian[i] += 1;
+                }
+            }
+
+            // 手牌数計算
+            ShouPaiShuJiSuan();
+            Init(shouPaiDianShu, 1);
+            // 孤立牌への加減点
+            for (int i = 0; i < ShouPai.Count; i++)
+            {
+                int p = ShouPai[i] & QIAO_PAI;
+                if (p >= ZI_PAI || shouPaiDian[i] > 0)
+                {
+                    continue;
+                }
+                int s = p & SHU_PAI;
+                int dian = nao[XingGe.SHUN_ZI] / 25 * (5 - Math.Abs(s - 5));
+                if (s <= 2 && ShouPaiShu[p] > 0 && ShouPaiShu[p + 1] == 0 && ShouPaiShu[p + 2] == 0 && ShouPaiShu[p + 3] > 0)
+                {
+                    shouPaiDian[i] -= dian;
+                }
+                if (s >= 8 && ShouPaiShu[p] > 0 && ShouPaiShu[p - 1] == 0 && ShouPaiShu[p - 2] == 0 && ShouPaiShu[p - 3] > 0)
+                {
+                    shouPaiDian[i] -= dian;
+                }
+                // 数牌
+                if (s >= 2 && s <= 8)
+                {
+                    shouPaiDian[i] += dian;
                 }
             }
         }
