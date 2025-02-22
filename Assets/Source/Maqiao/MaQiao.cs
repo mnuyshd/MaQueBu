@@ -163,6 +163,7 @@ namespace Assets.Source.Maqiao
         private TextMeshProUGUI[] goShouQuGongTuo;
         private TextMeshProUGUI[] goMingQian;
         private Button[] goQiaoShi;
+        private Button goRandom;
         private Button[] goYao;
         private Image[] goLizhiBang;
         private Image goDianBang100;
@@ -1467,21 +1468,21 @@ namespace Assets.Source.Maqiao
         private void DrawTitle()
         {
             float x = 0;
-            float y = paiHeight * 3.5f;
+            float y = paiHeight * 4f;
             string value;
             switch (eventStatus)
             {
                 case Event.QIAO_SHI_XUAN_ZE:
-                    value = "相手雀士";
+                    value = "面子";
                     break;
                 case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                    value = "フォロー雀士";
+                    value = "フォロー";
                     break;
                 default:
                     value = "";
                     break;
             }
-            DrawText(ref goJu, value, new Vector2(x, y), 0, 20);
+            DrawText(ref goJu, value, new Vector2(x, y), 0, 25);
         }
 
         // 【描画】局、残牌、供託、点
@@ -1699,7 +1700,7 @@ namespace Assets.Source.Maqiao
             }
 
             float x = 0;
-            float y = paiHeight * 2f;
+            float y = paiHeight * 2.5f;
             int index = 0;
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
@@ -1718,6 +1719,18 @@ namespace Assets.Source.Maqiao
                 }
                 index++;
             }
+
+            y -= paiHeight * 1.5f;
+            DrawButton(ref goRandom, "ランダム", new Vector2(0, y));
+            goRandom.onClick.AddListener(delegate
+            {
+                RandomQiaoShiXuanZe();
+                index = 0;
+                foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
+                {
+                    SetQiaoShiColor(kvp.Key, index++);
+                }
+            });
         }
 
         // ランダム雀士自動選択
@@ -1762,6 +1775,9 @@ namespace Assets.Source.Maqiao
             if (!selected)
             {
                 int selectedCount = 0;
+                string firstMing = "";
+                int firstPos = 0;
+                bool isFirst = true;
                 string lastMing = "";
                 int lastPos = 0;
                 int index = 0;
@@ -1770,13 +1786,26 @@ namespace Assets.Source.Maqiao
                     if (kvp.Value)
                     {
                         selectedCount++;
+                        if (isFirst)
+                        {
+                            firstMing = kvp.Key;
+                            firstPos = index;
+                            isFirst = false;
+                        }
                         lastMing = kvp.Key;
                         lastPos = index;
                     }
                     if (selectedCount > 2)
                     {
-                        qiaoShiMingQian[lastMing] = false;
-                        SetQiaoShiColor(lastMing, lastPos);
+                        string changeMing = lastMing;
+                        int changePos = lastPos;
+                        if (pos > lastPos)
+                        {
+                            changeMing = firstMing;
+                            changePos = firstPos;
+                        }
+                        qiaoShiMingQian[changeMing] = false;
+                        SetQiaoShiColor(changeMing, changePos);
                         break;
                     }
                     index++;
@@ -1797,7 +1826,7 @@ namespace Assets.Source.Maqiao
         private void DrawFollowQiaoShiXuanZe()
         {
             float x = 0;
-            float y = paiHeight * 2f;
+            float y = paiHeight * 2.5f;
             int i = 0;
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
@@ -4226,6 +4255,7 @@ namespace Assets.Source.Maqiao
             ClearGameObject(ref goSai2);
 
             ClearGameObject(ref goQiaoShi);
+            ClearGameObject(ref goRandom);
 
             ClearGameObject(ref goLeft);
             ClearGameObject(ref goRight);
