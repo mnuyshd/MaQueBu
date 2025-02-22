@@ -255,7 +255,7 @@ namespace Assets.Source.Sikao
         internal int TaJiaXuanZe
         {
             get { return taJiaXuanZe; }
-            set { taJiaXuanZe= value; }
+            set { taJiaXuanZe = value; }
         }
 
         // プレイヤー

@@ -138,7 +138,7 @@ namespace Assets.Source.Sikao
                             else
                             {
                                 // 数牌
-                                if ((s == 1 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 9 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p -3] > 0)))
+                                if ((s == 1 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 9 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
                                 {
                                     shouPaiAnQuan[j] += 9;
                                 }

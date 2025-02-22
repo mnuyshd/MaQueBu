@@ -106,7 +106,8 @@ namespace Assets.Source.Gongtong
         }
 
         // 洗牌
-        internal static void XiPai() {
+        internal static void XiPai()
+        {
             qiaoPai = Chang.QiaoShis.Count == 3 ? Pai3DingYi : Pai4DingYi;
             shanPai = new();
             // 山牌

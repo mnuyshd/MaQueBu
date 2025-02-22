@@ -296,7 +296,8 @@ namespace Assets.Source.Maqiao
             goLine = GameObject.Find("Line").GetComponent<Image>();
             // スクリーン
             goScreen = GameObject.Find("Screen").GetComponent<Button>();
-            goScreen.onClick.AddListener(delegate {
+            goScreen.onClick.AddListener(delegate
+            {
                 OnClickScreen();
             });
             goScreen.transform.SetSiblingIndex(10);
@@ -427,14 +428,16 @@ namespace Assets.Source.Maqiao
             EventTrigger etSettingPanel = goSettingPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eSettingPanel = new();
             eSettingPanel.eventID = EventTriggerType.PointerClick;
-            eSettingPanel.callback.AddListener((eventData) => {
+            eSettingPanel.callback.AddListener((eventData) =>
+            {
                 goSettingPanel.SetActive(false);
             });
             etSettingPanel.triggers.Add(eSettingPanel);
             goSettingPanel.SetActive(false);
             // 設定ボタン
             goSetting = GameObject.Find("Setting").GetComponent<Button>();
-            goSetting.onClick.AddListener(delegate {
+            goSetting.onClick.AddListener(delegate
+            {
                 goSettingPanel.SetActive(true);
             });
             RectTransform rtSetting = goSetting.GetComponent<RectTransform>();
@@ -446,7 +449,8 @@ namespace Assets.Source.Maqiao
 
             // 早送り
             goFast = goSettingPanel.transform.Find("Fast").GetComponent<Button>();
-            goFast.onClick.AddListener(delegate {
+            goFast.onClick.AddListener(delegate
+            {
                 forwardMode = (ForwardMode)(((int)forwardMode + 1) % Enum.GetValues(typeof(ForwardMode)).Length);
                 if (forwardMode == ForwardMode.NORMAL)
                 {
@@ -468,7 +472,8 @@ namespace Assets.Source.Maqiao
             rtFast.anchoredPosition = new Vector2(-paiWidth, -(rtFast.sizeDelta.y * scale.x));
             // 再生
             goReproduction = goSettingPanel.transform.Find("Reproduction").GetComponent<Button>();
-            goReproduction.onClick.AddListener(delegate {
+            goReproduction.onClick.AddListener(delegate
+            {
                 forwardMode = ForwardMode.NORMAL;
                 Application.targetFrameRate = FRAME_RATE;
                 waitTime = WAIT_TIME;
@@ -482,7 +487,8 @@ namespace Assets.Source.Maqiao
             rtReproduction.anchoredPosition = new Vector2(-(rtReproduction.sizeDelta.x * scale.x + (paiWidth * 1.5f)), -(rtReproduction.sizeDelta.y * scale.x));
             // リスタート
             goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
-            goRestart.onClick.AddListener(delegate {
+            goRestart.onClick.AddListener(delegate
+            {
                 SceneManager.LoadScene("GameScene");
             });
             RectTransform rtRestart = goRestart.GetComponent<RectTransform>();
@@ -493,7 +499,8 @@ namespace Assets.Source.Maqiao
             rtRestart.anchoredPosition = new Vector2(paiWidth, -(rtRestart.sizeDelta.y * scale.x));
             // 相手牌オープン
             goShouPaiOpen = Instantiate(goPai, goSettingPanel.transform);
-            goShouPaiOpen.onClick.AddListener(delegate {
+            goShouPaiOpen.onClick.AddListener(delegate
+            {
                 shouPaiOpen = !shouPaiOpen;
                 SwitchShouPaiOpenImage();
                 switch (eventStatus)
@@ -519,7 +526,8 @@ namespace Assets.Source.Maqiao
             EventTrigger etResetPanel = goSettingDialogPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eResetPanel = new();
             eResetPanel.eventID = EventTriggerType.PointerClick;
-            eResetPanel.callback.AddListener((eventData) => {
+            eResetPanel.callback.AddListener((eventData) =>
+            {
                 goSettingDialogPanel.SetActive(false);
             });
             etResetPanel.triggers.Add(eResetPanel);
@@ -529,12 +537,14 @@ namespace Assets.Source.Maqiao
             DrawText(ref message, "全ての設定をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goSettingDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
-            goYes.onClick.AddListener(delegate {
+            goYes.onClick.AddListener(delegate
+            {
                 ResetSheDing();
                 goSettingDialogPanel.SetActive(false);
             });
             Button goNo = Instantiate(goButton, goSettingDialogPanel.transform);
-            goNo.onClick.AddListener(delegate {
+            goNo.onClick.AddListener(delegate
+            {
                 goSettingDialogPanel.SetActive(false);
             });
             DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
@@ -552,7 +562,8 @@ namespace Assets.Source.Maqiao
             string[] labelDaPaiFangFa = new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" };
             ClearGameObject(ref goDaPaiFangFa);
             goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
-            goDaPaiFangFa.onClick.AddListener(delegate {
+            goDaPaiFangFa.onClick.AddListener(delegate
+            {
                 sheDing.daPaiFangFa = (SheDing.DaPaiFangFa)((int)(sheDing.daPaiFangFa + 1) % Enum.GetValues(typeof(SheDing.DaPaiFangFa)).Length);
                 goDaPaiFangFa.GetComponentInChildren<TextMeshProUGUI>().text = labelDaPaiFangFa[(int)sheDing.daPaiFangFa];
                 WriteSheDing();
@@ -562,7 +573,8 @@ namespace Assets.Source.Maqiao
             string[] labelLiZhiAuto = new string[] { "立直後自動打牌", "立直後手動打牌" };
             ClearGameObject(ref goLiZhiAuto);
             goLiZhiAuto = Instantiate(goButton, goSettingPanel.transform);
-            goLiZhiAuto.onClick.AddListener(delegate {
+            goLiZhiAuto.onClick.AddListener(delegate
+            {
                 sheDing.liZhiAuto = !sheDing.liZhiAuto;
                 goLiZhiAuto.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1];
                 WriteSheDing();
@@ -573,7 +585,8 @@ namespace Assets.Source.Maqiao
             string[] labelXuanShangYin = new string[] { "ドラマーク有", "ドラマーク無" };
             ClearGameObject(ref goXuanShangYin);
             goXuanShangYin = Instantiate(goButton, goSettingPanel.transform);
-            goXuanShangYin.onClick.AddListener(delegate {
+            goXuanShangYin.onClick.AddListener(delegate
+            {
                 sheDing.xuanShangYin = !sheDing.xuanShangYin;
                 goXuanShangYin.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1];
                 WriteSheDing();
@@ -583,7 +596,8 @@ namespace Assets.Source.Maqiao
             string[] labelZiMoQieBiaoShi = new string[] { "ツモ切表示有", "ツモ切表示無" };
             ClearGameObject(ref goZiMoQieBiaoShi);
             goZiMoQieBiaoShi = Instantiate(goButton, goSettingPanel.transform);
-            goZiMoQieBiaoShi.onClick.AddListener(delegate {
+            goZiMoQieBiaoShi.onClick.AddListener(delegate
+            {
                 sheDing.ziMoQieBiaoShi = !sheDing.ziMoQieBiaoShi;
                 goZiMoQieBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1];
                 WriteSheDing();
@@ -594,7 +608,8 @@ namespace Assets.Source.Maqiao
             string[] labelDaiPaiBiaoShi = new string[] { "待牌表示有", "待牌表示無" };
             ClearGameObject(ref goDaiPaiBiaoShi);
             goDaiPaiBiaoShi = Instantiate(goButton, goSettingPanel.transform);
-            goDaiPaiBiaoShi.onClick.AddListener(delegate {
+            goDaiPaiBiaoShi.onClick.AddListener(delegate
+            {
                 sheDing.daiPaiBiaoShi = !sheDing.daiPaiBiaoShi;
                 goDaiPaiBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1];
                 WriteSheDing();
@@ -604,7 +619,8 @@ namespace Assets.Source.Maqiao
             string[] labelXiangTingShuBiaoShi = new string[] { "向聴数表示有", "向聴数表示無" };
             ClearGameObject(ref goXiangTingShuBiaoShi);
             goXiangTingShuBiaoShi = Instantiate(goButton, goSettingPanel.transform);
-            goXiangTingShuBiaoShi.onClick.AddListener(delegate {
+            goXiangTingShuBiaoShi.onClick.AddListener(delegate
+            {
                 sheDing.xiangTingShuBiaoShi = !sheDing.xiangTingShuBiaoShi;
                 goXiangTingShuBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1];
                 WriteSheDing();
@@ -615,7 +631,8 @@ namespace Assets.Source.Maqiao
             string[] labelMingQuXiao = new string[] { "鳴パスはボタン", "鳴パスはタップ" };
             ClearGameObject(ref goMingquXiao);
             goMingquXiao = Instantiate(goButton, goSettingPanel.transform);
-            goMingquXiao.onClick.AddListener(delegate {
+            goMingquXiao.onClick.AddListener(delegate
+            {
                 sheDing.mingQuXiao = !sheDing.mingQuXiao;
                 goMingquXiao.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1];
                 WriteSheDing();
@@ -625,7 +642,8 @@ namespace Assets.Source.Maqiao
             // リセット
             goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
             Button goOptionReset = Instantiate(goButton, goSettingPanel.transform);
-            goOptionReset.onClick.AddListener(delegate {
+            goOptionReset.onClick.AddListener(delegate
+            {
                 goSettingDialogPanel.SetActive(true);
             });
             DrawButton(ref goOptionReset, "リセット", new Vector2(0, y));
@@ -667,7 +685,8 @@ namespace Assets.Source.Maqiao
             EventTrigger etScore = goScorePanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eScore = new();
             eScore.eventID = EventTriggerType.PointerClick;
-            eScore.callback.AddListener((eventData) => {
+            eScore.callback.AddListener((eventData) =>
+            {
                 goScorePanel.SetActive(false);
             });
             etScore.triggers.Add(eScore);
@@ -675,7 +694,8 @@ namespace Assets.Source.Maqiao
 
             // 得点ボタン
             goScore = GameObject.Find("Score").GetComponent<Button>();
-            goScore.onClick.AddListener(delegate {
+            goScore.onClick.AddListener(delegate
+            {
                 goScorePanel.SetActive(true);
             });
 
@@ -692,7 +712,8 @@ namespace Assets.Source.Maqiao
             float y = paiHeight * 4;
 
             goScoreQiaoShi[qiaoShiMingQian.Count] = Instantiate(goButton, goScorePanel.transform);
-            goScoreQiaoShi[qiaoShiMingQian.Count].onClick.AddListener(delegate {
+            goScoreQiaoShi[qiaoShiMingQian.Count].onClick.AddListener(delegate
+            {
                 OnClickScoreQiaoShi(PLAYER_NAME);
             });
             DrawButton(ref goScoreQiaoShi[qiaoShiMingQian.Count], PLAYER_NAME, new Vector2(x, y));
@@ -704,7 +725,8 @@ namespace Assets.Source.Maqiao
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
                 goScoreQiaoShi[i] = Instantiate(goButton, goScorePanel.transform);
-                goScoreQiaoShi[i].onClick.AddListener(delegate {
+                goScoreQiaoShi[i].onClick.AddListener(delegate
+                {
                     OnClickScoreQiaoShi(kvp.Key);
                 });
                 DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
@@ -718,7 +740,8 @@ namespace Assets.Source.Maqiao
 
             goScoreDialogPanel = GameObject.Find("ScoreDialogPanel");
             Button goScoreReset = Instantiate(goButton, goScorePanel.transform);
-            goScoreReset.onClick.AddListener(delegate {
+            goScoreReset.onClick.AddListener(delegate
+            {
                 goScoreDialogPanel.SetActive(true);
             });
             DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight * 1.5f));
@@ -726,7 +749,8 @@ namespace Assets.Source.Maqiao
             EventTrigger etResetPanel = goScoreDialogPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eResetPanel = new();
             eResetPanel.eventID = EventTriggerType.PointerClick;
-            eResetPanel.callback.AddListener((eventData) => {
+            eResetPanel.callback.AddListener((eventData) =>
+            {
                 goScoreDialogPanel.SetActive(false);
             });
             etResetPanel.triggers.Add(eResetPanel);
@@ -736,12 +760,14 @@ namespace Assets.Source.Maqiao
             DrawText(ref message, "全員の得点をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goScoreDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
-            goYes.onClick.AddListener(delegate {
+            goYes.onClick.AddListener(delegate
+            {
                 ResetJiLu();
                 goScoreDialogPanel.SetActive(false);
             });
             Button goNo = Instantiate(goButton, goScoreDialogPanel.transform);
-            goNo.onClick.AddListener(delegate {
+            goNo.onClick.AddListener(delegate
+            {
                 goScoreDialogPanel.SetActive(false);
             });
             DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
@@ -786,7 +812,8 @@ namespace Assets.Source.Maqiao
 
             // データ画面の上の戻るボタン
             Button goDataBack = Instantiate(goBack, goDataBackCanvas.transform, false);
-            goDataBack.onClick.AddListener(delegate {
+            goDataBack.onClick.AddListener(delegate
+            {
                 goDataScrollView.SetActive(false);
                 goDataBackCanvas.SetActive(false);
             });
@@ -928,7 +955,8 @@ namespace Assets.Source.Maqiao
 
             // ルールボタン
             goGuiZe = GameObject.Find("GuiZe").GetComponent<Button>();
-            goGuiZe.onClick.AddListener(delegate {
+            goGuiZe.onClick.AddListener(delegate
+            {
                 goGuiZeScrollView.SetActive(true);
             });
 
@@ -1678,7 +1706,8 @@ namespace Assets.Source.Maqiao
                 x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
                 int pos = index;
                 DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
-                goQiaoShi[index].onClick.AddListener(delegate {
+                goQiaoShi[index].onClick.AddListener(delegate
+                {
                     OnClickQiaoShi(kvp.Key, pos);
                 });
 
@@ -1775,7 +1804,8 @@ namespace Assets.Source.Maqiao
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
                 DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
-                goQiaoShi[i].onClick.AddListener(delegate {
+                goQiaoShi[i].onClick.AddListener(delegate
+                {
                     OnClickFollowQiaoShi(kvp.Key);
                 });
 
@@ -2063,7 +2093,7 @@ namespace Assets.Source.Maqiao
             yield return new WaitForSeconds(waitTime / 3);
             for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                    Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
+                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
                 DrawShouPai((Chang.Qin + i) % Chang.QiaoShis.Count, QiaoShi.YaoDingYi.Wu, -1);
             }
             yield return new WaitForSeconds(waitTime / 3);
@@ -2811,7 +2841,8 @@ namespace Assets.Source.Maqiao
         private void DrawOnClickZiJiaYao(ref Button go, QiaoShi shi, Vector2 xy, QiaoShi.YaoDingYi yao, int mingWei, int ShouPaiWei, bool isFollow)
         {
             go = Instantiate(goButton, goButton.transform.parent);
-            go.onClick.AddListener(delegate {
+            go.onClick.AddListener(delegate
+            {
                 OnClickZiJiaYao(Chang.ZiMoFan, shi, yao, mingWei, ShouPaiWei, isFollow);
             });
             string value = shi.YaoMingButton(yao);
@@ -2929,7 +2960,8 @@ namespace Assets.Source.Maqiao
         private void DrawOnClickTaJiaYao(ref Button go, int jia, QiaoShi shi, Vector2 xy, QiaoShi.YaoDingYi yao, int mingWei)
         {
             go = Instantiate(goButton, goButton.transform.parent);
-            go.onClick.AddListener(delegate {
+            go.onClick.AddListener(delegate
+            {
                 OnClickTaJiaYao(jia, shi, yao, mingWei);
             });
             string value = shi.YaoMingButton(yao);
@@ -3199,7 +3231,8 @@ namespace Assets.Source.Maqiao
             {
                 leftWei = shi.ShouPai.Count - 1;
             }
-            goLeft.onClick.AddListener(delegate {
+            goLeft.onClick.AddListener(delegate
+            {
                 DrawSelectDaPai(jia, shi, leftWei);
                 DrawDaiPai(jia, leftWei);
             });
@@ -3210,13 +3243,15 @@ namespace Assets.Source.Maqiao
             {
                 rightWei = 0;
             }
-            goRight.onClick.AddListener(delegate {
+            goRight.onClick.AddListener(delegate
+            {
                 DrawSelectDaPai(jia, shi, rightWei);
                 DrawDaiPai(jia, rightWei);
             });
 
             goSelect = Instantiate(goButton, goButton.transform.parent);
-            goSelect.onClick.AddListener(delegate {
+            goSelect.onClick.AddListener(delegate
+            {
                 shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 shi.ZiJiaXuanZe = xuanZe;
                 keyPress = true;
@@ -3453,7 +3488,8 @@ namespace Assets.Source.Maqiao
             goText.text = text;
             goText.fontSize = 23;
             goSheng[jia].transform.SetAsLastSibling();
-            goSheng[jia].onClick.AddListener(delegate {
+            goSheng[jia].onClick.AddListener(delegate
+            {
                 ClearGameObject(ref goSheng[jia]);
             });
             goSheng[jia].transform.rotation = Quaternion.Euler(0, 0, 90 * GetDrawOrder(shi.PlayOrder));
@@ -3611,7 +3647,8 @@ namespace Assets.Source.Maqiao
         {
             // 戻るボタン
             goBackDuiJuZhongLe = Instantiate(goBack, goBack.transform.parent);
-            goBackDuiJuZhongLe.onClick.AddListener(delegate {
+            goBackDuiJuZhongLe.onClick.AddListener(delegate
+            {
                 isBackDuiJuZhongLe = true;
                 keyPress = true;
             });
