@@ -3,6 +3,23 @@ namespace Assets.Source.Maqiao
     // 記録
     public class JiLu
     {
+        // 脳 懸賞
+        public int naoXuanShang = -1;
+        // 脳 役牌
+        public int naoYiPai = -1;
+        // 脳 順子
+        public int naoShunZi = -1;
+        // 脳 刻子
+        public int naoKeZi = -1;
+        // 脳 立直
+        public int naoLiZhi = -1;
+        // 脳 鳴き
+        public int naoMing = -1;
+        // 脳 染め
+        public int naoRan = -1;
+        // 脳 逃げ
+        public int naoTao = -1;
+
         // 半荘数
         public int banZhuangShu = 0;
         // 対局数

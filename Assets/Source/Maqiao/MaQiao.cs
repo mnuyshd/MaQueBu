@@ -139,6 +139,7 @@ namespace Assets.Source.Maqiao
         private Button goShouPaiOpen;
         private Image goBenChang;
         private Image goGongTou;
+        private Slider goSlider;
         private GameObject[] goQiJias;
         private GameObject[] goSais;
         private GameObject[] goPais;
@@ -202,6 +203,22 @@ namespace Assets.Source.Maqiao
         private GameObject goGuiZeBackCanvas;
 
         private TextMeshProUGUI goJiJuMingQian;
+        private Slider goJiLuNaoXuanShang;
+        private TextMeshProUGUI goJiLuNaoXuanShangValue;
+        private Slider goJiLuNaoYiPai;
+        private TextMeshProUGUI goJiLuNaoYiPaiValue;
+        private Slider goJiLuNaoShunZi;
+        private TextMeshProUGUI goJiLuNaoShunZiValue;
+        private Slider goJiLuNaoKeZi;
+        private TextMeshProUGUI goJiLuNaoKeZiValue;
+        private Slider goJiLuNaoLiZhi;
+        private TextMeshProUGUI goJiLuNaoLiZhiValue;
+        private Slider goJiLuNaoMing;
+        private TextMeshProUGUI goJiLuNaoMingValue;
+        private Slider goJiLuNaoRan;
+        private TextMeshProUGUI goJiLuNaoRanValue;
+        private Slider goJiLuNaoTao;
+        private TextMeshProUGUI goJiLuNaoTaoValue;
         private TextMeshProUGUI goJiLuBanZhuangShu;
         private TextMeshProUGUI goJiLuDuiJuShu;
         private TextMeshProUGUI goJiLuJiJiDian;
@@ -235,7 +252,22 @@ namespace Assets.Source.Maqiao
         // 雀士取得
         private QiaoShi GetQiaoShi(string mingQian)
         {
-            return mingQian switch
+            return GetQiaoShi(mingQian, false);
+        }
+        private QiaoShi GetQiaoShi(string mingQian, bool isNew)
+        {
+            if (!isNew)
+            {
+                foreach (QiaoShi shi in Chang.QiaoShis)
+                {
+                    if (shi.MingQian == mingQian)
+                    {
+                        return shi;
+                    }
+                }
+            }
+
+            QiaoShi newShi = mingQian switch
             {
                 "効率雀士" => new QiaoXiaoLu(mingQian),
                 "機械雀士" => new QiaoJiXie(mingQian),
@@ -248,6 +280,8 @@ namespace Assets.Source.Maqiao
                 MenzenJunko.MING_QIAN => new MenzenJunko(),
                 _ => new QiaoJiXie(mingQian),
             };
+            newShi.JiLu = new JiLu();
+            return newShi;
         }
 
         void Start()
@@ -302,6 +336,8 @@ namespace Assets.Source.Maqiao
                 OnClickScreen();
             });
             goScreen.transform.SetSiblingIndex(10);
+            // スライダー
+            goSlider = GameObject.Find("Slider").GetComponent<Slider>();
             // ボタン
             goButton = GameObject.Find("Button").GetComponent<Button>();
             goPai = GameObject.Find("Pai").GetComponent<Button>();
@@ -362,6 +398,9 @@ namespace Assets.Source.Maqiao
 
             RectTransform rtLine = goLine.GetComponent<RectTransform>();
             rtLine.localScale *= scale.x;
+
+            RectTransform rtSlider = goSlider.GetComponent<RectTransform>();
+            rtSlider.localScale *= scale.x;
 
             // ボタンのスケールとサイズを設定
             rtButton.localScale *= scale.x;
@@ -427,8 +466,10 @@ namespace Assets.Source.Maqiao
             // 設定パネル
             goSettingPanel = GameObject.Find("SettingPanel");
             EventTrigger etSettingPanel = goSettingPanel.AddComponent<EventTrigger>();
-            EventTrigger.Entry eSettingPanel = new();
-            eSettingPanel.eventID = EventTriggerType.PointerClick;
+            EventTrigger.Entry eSettingPanel = new()
+            {
+                eventID = EventTriggerType.PointerClick
+            };
             eSettingPanel.callback.AddListener((eventData) =>
             {
                 goSettingPanel.SetActive(false);
@@ -748,8 +789,10 @@ namespace Assets.Source.Maqiao
             DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight * 1.5f));
 
             EventTrigger etResetPanel = goScoreDialogPanel.AddComponent<EventTrigger>();
-            EventTrigger.Entry eResetPanel = new();
-            eResetPanel.eventID = EventTriggerType.PointerClick;
+            EventTrigger.Entry eResetPanel = new()
+            {
+                eventID = EventTriggerType.PointerClick
+            };
             eResetPanel.callback.AddListener((eventData) =>
             {
                 goScoreDialogPanel.SetActive(false);
@@ -793,10 +836,7 @@ namespace Assets.Source.Maqiao
 
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                if (shi != null)
-                {
-                    shi.JiLu = new JiLu();
-                }
+                Nao2JiLu(GetQiaoShi(shi.MingQian, true));
             }
         }
 
@@ -825,12 +865,29 @@ namespace Assets.Source.Maqiao
             rtBack.pivot = new Vector2(0, 1);
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
 
-            float y = paiHeight * 30f;
+            float y = paiHeight * 35f;
             goJiJuMingQian = Instantiate(goText, goDataContent.transform);
             DrawText(ref goJiJuMingQian, "", new Vector2(0, y), 0, 25);
 
             float x = -(paiWidth * 2f);
             y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoXuanShang, ref goJiLuNaoXuanShangValue, "懸賞", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoYiPai, ref goJiLuNaoYiPaiValue, "役牌", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoShunZi, ref goJiLuNaoShunZiValue, "順子", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoKeZi, ref goJiLuNaoKeZiValue, "刻子", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoLiZhi, ref goJiLuNaoLiZhiValue, "立直", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoMing, ref goJiLuNaoMingValue, "鳴き", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoRan, ref goJiLuNaoRanValue, "染め", y);
+            y -= paiHeight;
+            DrawDataSlider(ref goJiLuNaoTao, ref goJiLuNaoTaoValue, "逃げ", y);
+
+            y -= paiHeight * 2;
             DrawData(ref goJiLuJiJiDian, "集計点", y);
             y -= paiHeight;
             DrawData(ref goJiLuBanZhuangShu, "半荘数", y);
@@ -877,7 +934,7 @@ namespace Assets.Source.Maqiao
 
             RectTransform rtDataContent = goDataContent.GetComponent<RectTransform>();
             Vector2 size = rtDataContent.sizeDelta;
-            size.y = paiHeight * 65f;
+            size.y = paiHeight * 73f;
             rtDataContent.sizeDelta = size;
             ScrollRect scrollRect = goDataScrollView.GetComponent<ScrollRect>();
             scrollRect.verticalNormalizedPosition = 1f;
@@ -900,50 +957,156 @@ namespace Assets.Source.Maqiao
             goShu = Instantiate(goText, goDataContent.transform);
             DrawText(ref goShu, "", new Vector2(paiWidth * 5.5f, y), 0, 25, TextAlignmentOptions.Right, 0);
         }
+        private void DrawDataSlider(ref Slider goShu, ref TextMeshProUGUI goValue, string ming, float y)
+        {
+            TextMeshProUGUI text = Instantiate(goText, goDataContent.transform);
+            TextMeshProUGUI value = Instantiate(goText, goDataContent.transform);
+            DrawDataSlider(ref text, ref goShu, ref goValue, ming, y);
+        }
+        private void DrawDataSlider(ref TextMeshProUGUI goMing, ref Slider goShu, ref TextMeshProUGUI goValue, string ming, float y)
+        {
+            if (goMing == null)
+            {
+                goMing = Instantiate(goText, goDataContent.transform);
+            }
+            DrawText(ref goMing, ming, new Vector2(-paiWidth * 2f, y), 0, 25, TextAlignmentOptions.Left, 7);
+
+            goShu = Instantiate(goSlider, goDataContent.transform);
+            RectTransform rt = goShu.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(paiWidth * 1.5f, y);
+
+            if (goValue == null)
+            {
+                goValue = Instantiate(goText, goDataContent.transform);
+            }
+            DrawText(ref goValue, goShu.value.ToString(), new Vector2(paiWidth * 5.5f, y), 0, 25, TextAlignmentOptions.Right, 3);
+        }
 
         // 得点パネル 雀士名クリック
         private void OnClickScoreQiaoShi(string mingQian)
         {
             QiaoShi shi = GetQiaoShi(mingQian);
-            JiLu jiLu = new();
-            string filePath = Application.persistentDataPath + "/" + shi.MingQian + ".json";
+            string filePath = Application.persistentDataPath + "/" + mingQian + ".json";
             if (File.Exists(filePath))
             {
-                jiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
+                shi.JiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
+            }
+            else
+            {
+                Nao2JiLu(shi);
             }
 
             goJiJuMingQian.text = mingQian;
-            goJiLuJiJiDian.text = jiLu.jiJiDian + "点";
-            goJiLuBanZhuangShu.text = jiLu.banZhuangShu + "回";
-            goJiLuDuiJuShu.text = jiLu.duiJuShu + "回";
-            goJiLuShunWei1Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei1 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei2Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei2 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei3Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei3 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei4Shuai.text = jiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)jiLu.shunWei4 / jiLu.banZhuangShu * 100) + "％";
-            goJiLuHeLeShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeShu / jiLu.duiJuShu * 100) + "％";
-            goJiLuFangChongShuai.text = jiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongShu / jiLu.duiJuShu * 100) + "％";
-            goJiLuTingPaiShuai.text = jiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)jiLu.tingPaiShu / jiLu.liuJuShu * 100) + "％";
-            goJiLuPingJunHeLeDian.text = jiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)jiLu.heLeDian / jiLu.heLeShu) + "点";
-            goJiLuPingJunFangChongDian.text = jiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)jiLu.fangChongDian / jiLu.fangChongShu) + "点";
+
+            goJiLuNaoXuanShang.onValueChanged.RemoveAllListeners();
+            goJiLuNaoXuanShang.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoXuanShangValue.text = ((int)value).ToString();
+                shi.JiLu.naoXuanShang = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoYiPai.onValueChanged.RemoveAllListeners();
+            goJiLuNaoYiPai.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoYiPaiValue.text = ((int)value).ToString();
+                shi.JiLu.naoYiPai = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoShunZi.onValueChanged.RemoveAllListeners();
+            goJiLuNaoShunZi.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoShunZiValue.text = ((int)value).ToString();
+                shi.JiLu.naoShunZi = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoKeZi.onValueChanged.RemoveAllListeners();
+            goJiLuNaoKeZi.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoKeZiValue.text = ((int)value).ToString();
+                shi.JiLu.naoKeZi = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoLiZhi.onValueChanged.RemoveAllListeners();
+            goJiLuNaoLiZhi.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoLiZhiValue.text = ((int)value).ToString();
+                shi.JiLu.naoLiZhi = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoMing.onValueChanged.RemoveAllListeners();
+            goJiLuNaoMing.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoMingValue.text = ((int)value).ToString();
+                shi.JiLu.naoMing = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoRan.onValueChanged.RemoveAllListeners();
+            goJiLuNaoRan.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoRanValue.text = ((int)value).ToString();
+                shi.JiLu.naoRan = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoTao.onValueChanged.RemoveAllListeners();
+            goJiLuNaoTao.onValueChanged.AddListener(delegate (float value)
+            {
+                goJiLuNaoTaoValue.text = ((int)value).ToString();
+                shi.JiLu.naoTao = (int)value;
+                WriteJiLu(shi.MingQian, shi.JiLu);
+            });
+            goJiLuNaoXuanShang.value = shi.JiLu.naoXuanShang;
+            goJiLuNaoYiPai.value = shi.JiLu.naoYiPai;
+            goJiLuNaoShunZi.value = shi.JiLu.naoShunZi;
+            goJiLuNaoKeZi.value = shi.JiLu.naoKeZi;
+            goJiLuNaoLiZhi.value = shi.JiLu.naoLiZhi;
+            goJiLuNaoMing.value = shi.JiLu.naoMing;
+            goJiLuNaoRan.value = shi.JiLu.naoRan;
+            goJiLuNaoTao.value = shi.JiLu.naoTao;
+
+            goJiLuJiJiDian.text = shi.JiLu.jiJiDian + "点";
+            goJiLuBanZhuangShu.text = shi.JiLu.banZhuangShu + "回";
+            goJiLuDuiJuShu.text = shi.JiLu.duiJuShu + "回";
+            goJiLuShunWei1Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei1 / shi.JiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei2Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei2 / shi.JiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei3Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei3 / shi.JiLu.banZhuangShu * 100) + "％";
+            goJiLuShunWei4Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei4 / shi.JiLu.banZhuangShu * 100) + "％";
+            goJiLuHeLeShuai.text = shi.JiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.heLeShu / shi.JiLu.duiJuShu * 100) + "％";
+            goJiLuFangChongShuai.text = shi.JiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongShu / shi.JiLu.duiJuShu * 100) + "％";
+            goJiLuTingPaiShuai.text = shi.JiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.tingPaiShu / shi.JiLu.liuJuShu * 100) + "％";
+            goJiLuPingJunHeLeDian.text = shi.JiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.heLeDian / shi.JiLu.heLeShu) + "点";
+            goJiLuPingJunFangChongDian.text = shi.JiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongDian / shi.JiLu.fangChongShu) + "点";
             for (int i = 0; i < goYiShu.Length; i++)
             {
                 if (QiaoShi.YiMing[i] == "ドラ")
                 {
                     continue;
                 }
-                goYiShu[i].text = jiLu.yiShu[i] + "回";
-                goYiMing[i].color = jiLu.yiShu[i] == 0 ? Color.gray : Color.black;
-                goYiShu[i].color = jiLu.yiShu[i] == 0 ? Color.gray : Color.black;
+                goYiShu[i].text = shi.JiLu.yiShu[i] + "回";
+                goYiMing[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
+                goYiShu[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
             }
             for (int i = 0; i < goYiManShu.Length; i++)
             {
-                goYiManShu[i].text = jiLu.yiManShu[i] + "回";
-                goYiManMing[i].color = jiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
-                goYiManShu[i].color = jiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
+                goYiManShu[i].text = shi.JiLu.yiManShu[i] + "回";
+                goYiManMing[i].color = shi.JiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
+                goYiManShu[i].color = shi.JiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
             }
 
             goDataScrollView.SetActive(true);
             goDataBackCanvas.SetActive(true);
+        }
+
+        private void WriteJiLu(string ming, JiLu jiLu)
+        {
+            File.WriteAllText(Application.persistentDataPath + "/" + ming + ".json", JsonUtility.ToJson(jiLu));
+
+            foreach (QiaoShi shi in Chang.QiaoShis)
+            {
+                if (shi.MingQian == ming)
+                {
+                    JiLu2Nao(shi);
+                }
+            }
         }
 
         // 【描画】ルール画面
@@ -1881,9 +2044,7 @@ namespace Assets.Source.Maqiao
                 {
                     if (fengPai[j] == i)
                     {
-                        QiaoShi shi = Chang.QiaoShis[idx];
-                        Chang.QiaoShis[idx] = Chang.QiaoShis[j];
-                        Chang.QiaoShis[j] = shi;
+                        (Chang.QiaoShis[j], Chang.QiaoShis[idx]) = (Chang.QiaoShis[idx], Chang.QiaoShis[j]);
                     }
                 }
                 idx++;
@@ -1917,16 +2078,68 @@ namespace Assets.Source.Maqiao
                 if (File.Exists(filePath))
                 {
                     shi.JiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
+                    JiLu2Nao(shi);
                 }
                 else
                 {
                     shi.JiLu = new JiLu();
+                    Nao2JiLu(shi);
                 }
             }
 
             ClearGameObject(ref goButton);
 
             eventStatus = Event.QIN_JUE;
+        }
+
+        // 記録を脳へ反映
+        private void JiLu2Nao(QiaoShi shi)
+        {
+            if (shi is QiaoJiXie qjx)
+            {
+                qjx.Nao[QiaoJiXie.XingGe.XUAN_SHANG] = shi.JiLu.naoXuanShang;
+                qjx.Nao[QiaoJiXie.XingGe.YI_PAI] = shi.JiLu.naoYiPai;
+                qjx.Nao[QiaoJiXie.XingGe.SHUN_ZI] = shi.JiLu.naoShunZi;
+                qjx.Nao[QiaoJiXie.XingGe.KE_ZI] = shi.JiLu.naoKeZi;
+                qjx.Nao[QiaoJiXie.XingGe.LI_ZHI] = shi.JiLu.naoLiZhi;
+                qjx.Nao[QiaoJiXie.XingGe.MING] = shi.JiLu.naoMing;
+                qjx.Nao[QiaoJiXie.XingGe.RAN] = shi.JiLu.naoRan;
+                qjx.Nao[QiaoJiXie.XingGe.TAO] = shi.JiLu.naoTao;
+            }
+            else if (shi is QiaoXiaoLu qxl)
+            {
+                qxl.Nao[QiaoXiaoLu.XingGe.XUAN_SHANG] = shi.JiLu.naoXuanShang;
+                qxl.Nao[QiaoXiaoLu.XingGe.YI_PAI] = shi.JiLu.naoYiPai;
+                qxl.Nao[QiaoXiaoLu.XingGe.LI_ZHI] = shi.JiLu.naoLiZhi;
+                qxl.Nao[QiaoXiaoLu.XingGe.MING] = shi.JiLu.naoMing;
+                qxl.Nao[QiaoXiaoLu.XingGe.TAO] = shi.JiLu.naoTao;
+            }
+        }
+
+        // 脳を記録へ反映
+        private void Nao2JiLu(QiaoShi shi)
+        {
+            if (shi is QiaoJiXie qjx)
+            {
+                shi.JiLu.naoXuanShang = qjx.Nao[QiaoJiXie.XingGe.XUAN_SHANG];
+                shi.JiLu.naoYiPai = qjx.Nao[QiaoJiXie.XingGe.YI_PAI];
+                shi.JiLu.naoShunZi = qjx.Nao[QiaoJiXie.XingGe.SHUN_ZI];
+                shi.JiLu.naoKeZi = qjx.Nao[QiaoJiXie.XingGe.KE_ZI];
+                shi.JiLu.naoLiZhi = qjx.Nao[QiaoJiXie.XingGe.LI_ZHI];
+                shi.JiLu.naoMing = qjx.Nao[QiaoJiXie.XingGe.MING];
+                shi.JiLu.naoRan = qjx.Nao[QiaoJiXie.XingGe.RAN];
+                shi.JiLu.naoTao = qjx.Nao[QiaoJiXie.XingGe.TAO];
+            }
+            else if (shi is QiaoXiaoLu qxl)
+            {
+                shi.JiLu.naoXuanShang = qxl.Nao[QiaoXiaoLu.XingGe.XUAN_SHANG];
+                shi.JiLu.naoYiPai = qxl.Nao[QiaoXiaoLu.XingGe.YI_PAI];
+                shi.JiLu.naoLiZhi = qxl.Nao[QiaoXiaoLu.XingGe.LI_ZHI];
+                shi.JiLu.naoMing = qxl.Nao[QiaoXiaoLu.XingGe.MING];
+                shi.JiLu.naoTao = qxl.Nao[QiaoXiaoLu.XingGe.TAO];
+            }
+
+            File.WriteAllText(Application.persistentDataPath + "/" + shi.MingQian + ".json", JsonUtility.ToJson(shi.JiLu));
         }
 
         // 【ゲーム】親決

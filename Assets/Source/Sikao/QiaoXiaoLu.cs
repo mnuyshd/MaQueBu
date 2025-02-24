@@ -7,7 +7,7 @@ namespace Assets.Source.Sikao
     // 効率雀士
     internal class QiaoXiaoLu : QiaoShi
     {
-        protected enum XingGe
+        internal enum XingGe
         {
             // 懸賞
             XUAN_SHANG,
@@ -30,6 +30,10 @@ namespace Assets.Source.Sikao
             { XingGe.MING, 50 },
             { XingGe.TAO, 50 },
         };
+        internal Dictionary<XingGe, int> Nao
+        {
+            get { return nao; }
+        }
 
         // 手牌有効度
         private readonly int[] shouPaiYouXiao;
