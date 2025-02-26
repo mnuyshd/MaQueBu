@@ -250,10 +250,6 @@ namespace Assets.Source.Maqiao
             { MenzenJunko.MING_QIAN, false },
         };
         // 雀士取得
-        private QiaoShi GetQiaoShi(string mingQian)
-        {
-            return GetQiaoShi(mingQian, false);
-        }
         private QiaoShi GetQiaoShi(string mingQian, bool isNew)
         {
             if (!isNew)
@@ -531,6 +527,8 @@ namespace Assets.Source.Maqiao
             goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
             goRestart.onClick.AddListener(delegate
             {
+                Application.targetFrameRate = FRAME_RATE;
+                waitTime = WAIT_TIME;
                 SceneManager.LoadScene("GameScene");
             });
             RectTransform rtRestart = goRestart.GetComponent<RectTransform>();
@@ -985,7 +983,7 @@ namespace Assets.Source.Maqiao
         // 得点パネル 雀士名クリック
         private void OnClickScoreQiaoShi(string mingQian)
         {
-            QiaoShi shi = GetQiaoShi(mingQian);
+            QiaoShi shi = GetQiaoShi(mingQian, false);
             string filePath = Application.persistentDataPath + "/" + mingQian + ".json";
             if (File.Exists(filePath))
             {
@@ -1594,7 +1592,7 @@ namespace Assets.Source.Maqiao
             {
                 if (kvp.Value)
                 {
-                    Chang.QiaoShis.Add(GetQiaoShi(kvp.Key));
+                    Chang.QiaoShis.Add(GetQiaoShi(kvp.Key, true));
                 }
             }
 
@@ -2012,7 +2010,7 @@ namespace Assets.Source.Maqiao
         // 名前クリック
         private void OnClickFollowQiaoShi(string mingQian)
         {
-            Chang.QiaoShis.Insert(0, GetQiaoShi(mingQian));
+            Chang.QiaoShis.Insert(0, GetQiaoShi(mingQian, true));
             Chang.QiaoShis[0].MingQian = PLAYER_NAME;
             Chang.QiaoShis[0].Follow = true;
             Chang.QiaoShis[0].Player = true;
