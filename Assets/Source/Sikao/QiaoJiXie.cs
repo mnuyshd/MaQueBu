@@ -612,7 +612,7 @@ namespace Assets.Source.Sikao
                 }
 
                 // 懸賞牌
-                shouPaiDian[i] += (nao[XingGe.XUAN_SHANG] / 6 / ShouPaiShu[p] * XuanShangPaiPanDing(sp));
+                shouPaiDian[i] += (nao[XingGe.XUAN_SHANG] / 4 * ShouPaiShu[p] * XuanShangPaiPanDing(sp));
                 // 役牌・風牌
                 shouPaiDian[i] += (nao[XingGe.YI_PAI] / 8 * YiPaiPanDing(p));
                 // 染め
@@ -641,7 +641,7 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] * 2 * nao[XingGe.XUAN_SHANG] / 25;
+                            shouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
                             ShouPaiShu[i]--;
                             k--;
                         }
@@ -659,7 +659,7 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 5 * nao[XingGe.XUAN_SHANG] / 25;
+                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 5;
                             ShouPaiShu[i]--;
                             k--;
                         }
@@ -714,7 +714,7 @@ namespace Assets.Source.Sikao
             for (int i = 0x01; i <= 0x27; i++)
             {
                 int s = i & SHU_PAI;
-                if (s == 1 || s == 9)
+                if (s == 1 || s >= 8)
                 {
                     continue;
                 }
@@ -860,7 +860,7 @@ namespace Assets.Source.Sikao
             for (int i = 0x29; i >= 0x03; i--)
             {
                 int s = i & SHU_PAI;
-                if (s == 1 || s == 9)
+                if (s <= 2 || s == 9)
                 {
                     continue;
                 }
@@ -956,32 +956,6 @@ namespace Assets.Source.Sikao
                             ShouPaiShu[p]--;
                         }
                     }
-                }
-            }
-
-            // 手牌数計算
-            ShouPaiShuJiSuan();
-            Init(shouPaiDianShu, 1);
-            // 嵌張・辺張
-            for (int i = 0; i < ShouPai.Count; i++)
-            {
-                int p = ShouPai[i] & QIAO_PAI;
-                int s = p & SHU_PAI;
-                if ((p & ZI_PAI) == ZI_PAI)
-                {
-                    continue;
-                }
-                if (s <= 7 && ShouPaiShu[p + 2] > 0)
-                {
-                    shouPaiDian[i] += 2;
-                }
-                if (s >= 3 && ShouPaiShu[p - 2] > 0)
-                {
-                    shouPaiDian[i] += 2;
-                }
-                if ((s == 8 && ShouPaiShu[p + 1] > 0) || (s == 2 && ShouPaiShu[p - 1] > 0))
-                {
-                    shouPaiDian[i] += 1;
                 }
             }
 
