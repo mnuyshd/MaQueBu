@@ -2093,6 +2093,10 @@ namespace Assets.Source.Maqiao
         // 記録を脳へ反映
         private void JiLu2Nao(QiaoShi shi)
         {
+            if (shi.Player && shi.Follow)
+            {
+                return;
+            }
             if (shi is QiaoJiXie qjx)
             {
                 qjx.Nao[QiaoJiXie.XingGe.XUAN_SHANG] = shi.JiLu.naoXuanShang;

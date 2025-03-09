@@ -167,6 +167,15 @@ namespace Assets.Source.Sikao
 
             // 手牌点数計算
             ShouPaiDianShuJiSuan();
+            // if (Player)
+            // {
+            //     string m = "";
+            //     for (int i = 0; i < ShouPai.Count; i++)
+            //     {
+            //         m += "0x" + ShouPai[i].ToString("x02") + "=" + shouPaiDian[i] + " ";
+            //     }
+            //     UnityEngine.Debug.Log(m);
+            // }
 
             if (LiZhiPaiWei.Count > 0)
             {
@@ -632,7 +641,7 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
+                            shouPaiDian[j] += nao[XingGe.KE_ZI] * 2 * nao[XingGe.XUAN_SHANG] / 25;
                             ShouPaiShu[i]--;
                             k--;
                         }
@@ -650,7 +659,7 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 5;
+                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 5 * nao[XingGe.XUAN_SHANG] / 25;
                             ShouPaiShu[i]--;
                             k--;
                         }
