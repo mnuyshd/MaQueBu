@@ -177,81 +177,53 @@ namespace Assets.Source.Sikao
             //     UnityEngine.Debug.Log(m);
             // }
 
-            if (LiZhiPaiWei.Count > 0)
+            // 予想点 x 残牌数 が高い牌を選択
+            int maxYuXiangDian = 0;
+            wei = -1;
+            GongKaiPaiShuJiSuan();
+            foreach ((List<int> _, int w, int[] yuXiangDian) in HeLePai)
             {
-                // 当牌の多い待ちを選択
-                wei = 0;
-                int maxDaiPaiShu = 0;
-                int minShouPaiDian = 999;
-                foreach (int w in LiZhiPaiWei)
+                int dian = 0;
+                for (int i = 0; i < yuXiangDian.Length; i++)
                 {
-                    DaiPaiJiSuan(wei);
-                    GongKaiPaiShuJiSuan();
-                    int geHeDaiPaiShu = 0;
-                    foreach (int dp in DaiPai)
+                    if (yuXiangDian[i] > 0)
                     {
-                        int p = dp & QIAO_PAI;
-                        if (p == 0xff)
+                        foreach (int stp in ShiTiPai)
                         {
-                            break;
+                            if (i == stp)
+                            {
+                                continue;
+                            }
                         }
-                        else
-                        {
-                            geHeDaiPaiShu += Pai.CanShu(GongKaiPaiShu[p]);
-                        }
-                    }
-                    if (maxDaiPaiShu < geHeDaiPaiShu || (maxDaiPaiShu == geHeDaiPaiShu && minShouPaiDian > shouPaiDian[wei]))
-                    {
-                        maxDaiPaiShu = geHeDaiPaiShu;
-                        minShouPaiDian = shouPaiDian[wei];
-                        wei = w;
+                        dian += yuXiangDian[i] * Pai.CanShu(GongKaiPaiShu[i]);
                     }
                 }
-                int dian = maxDaiPaiShu * 10;
-                // 点差
-                dian += DianCha() / 1000;
-                dian += Pai.CanShanPaiShu() / 5;
-                if (dian > 100 - nao[XingGe.LI_ZHI])
+                if (maxYuXiangDian < dian)
+                {
+                    maxYuXiangDian = dian;
+                    wei = w;
+                }
+            }
+            if (wei >= 0)
+            {
+                ZiJiaYao = YaoDingYi.Wu;
+                if (LiZhiPaiWei.Count > 0)
+                {
+                    // 点差
+                    int dian = DianCha() / 1000;
+                    dian += Pai.CanShanPaiShu();
+                    if (nao[XingGe.LI_ZHI] + dian >= 100)
+                    {
+                        ZiJiaYao = YaoDingYi.LiZhi;
+                    }
+
+                }
+                if (LiZhiPaiWei.Count > 0 && nao[XingGe.LI_ZHI] / 10 * Pai.CanShanPaiShu() >= 25)
                 {
                     ZiJiaYao = YaoDingYi.LiZhi;
                 }
-                else
-                {
-                    ZiJiaYao = YaoDingYi.Wu;
-                }
                 ZiJiaXuanZe = PaiXuanZe(wei);
                 return;
-            }
-            else
-            {
-                // 当牌の多い待ちを選択
-                wei = -1;
-                int gao = 0;
-                for (int i = 0; i < ShouPai.Count; i++)
-                {
-                    int sp = ShouPai[i];
-                    DaiPaiJiSuan(i);
-                    bool shiTi = false;
-                    foreach (int stp in ShiTiPai)
-                    {
-                        if (sp == stp)
-                        {
-                            shiTi = true;
-                            break;
-                        }
-                    }
-                    if (DaiPai.Count > gao && !shiTi)
-                    {
-                        gao = DaiPai.Count;
-                        wei = i;
-                    }
-                }
-                if (wei >= 0)
-                {
-                    ZiJiaYao = YaoDingYi.Wu;
-                    ZiJiaXuanZe = PaiXuanZe(wei);
-                    return;
-                }
             }
 
             if (AnGangPaiWei.Count > 0 && shouPaiDian[ShouPai.Count - 1] < nao[XingGe.SHUN_ZI])

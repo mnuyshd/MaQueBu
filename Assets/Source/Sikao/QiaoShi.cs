@@ -3750,6 +3750,11 @@ namespace Assets.Source.Sikao
                         cuHeSheng = "誤栄和";
                         return true;
                     }
+                    if (ZhenTingPanDing())
+                    {
+                        cuHeSheng = "振聴";
+                        return true;
+                    }
                     break;
 
                 default:
