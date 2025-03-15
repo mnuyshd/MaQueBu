@@ -162,10 +162,8 @@ namespace Assets.Source.Sikao
                 return;
             }
 
-            // 予想点 x 残牌数 が高い牌を選択
+            // 和了牌点(予想点 x 残牌数)
             Init(shouPaiDian, 0);
-            int maxYuXiangDian = 0;
-            wei = -1;
             GongKaiPaiShuJiSuan();
             foreach ((List<int> _, int w, int[] yuXiangDian) in HeLePai)
             {
@@ -184,33 +182,7 @@ namespace Assets.Source.Sikao
                         dian += yuXiangDian[i] * Pai.CanShu(GongKaiPaiShu[i]);
                     }
                 }
-                shouPaiDian[w] += dian / 1000;
-                if (maxYuXiangDian < dian)
-                {
-                    maxYuXiangDian = dian;
-                    wei = w;
-                }
-            }
-            if (wei >= 0)
-            {
-                ZiJiaYao = YaoDingYi.Wu;
-                if (LiZhiPaiWei.Count > 0)
-                {
-                    // 点差
-                    int dian = DianCha() / 1000;
-                    dian += Pai.CanShanPaiShu();
-                    if (nao[XingGe.LI_ZHI] + dian >= 100)
-                    {
-                        ZiJiaYao = YaoDingYi.LiZhi;
-                    }
-
-                }
-                if (LiZhiPaiWei.Count > 0 && nao[XingGe.LI_ZHI] / 10 * Pai.CanShanPaiShu() >= 25)
-                {
-                    ZiJiaYao = YaoDingYi.LiZhi;
-                }
-                ZiJiaXuanZe = PaiXuanZe(wei);
-                return;
+                shouPaiDian[w] -= dian / nao[XingGe.TAO] == 0 ? 1 : nao[XingGe.TAO];
             }
 
             // 手牌点数計算
@@ -252,6 +224,25 @@ namespace Assets.Source.Sikao
                         gaoShu = s;
                         wei = i;
                     }
+                }
+            }
+
+            foreach (int w in LiZhiPaiWei)
+            {
+                if (wei == w) {
+                    // 点差
+                    int dian = DianCha() / 1000;
+                    dian += Pai.CanShanPaiShu();
+                    if (nao[XingGe.LI_ZHI] + dian >= 100)
+                    {
+                        ZiJiaYao = YaoDingYi.LiZhi;
+                    }
+                    if (nao[XingGe.LI_ZHI] / 10 * Pai.CanShanPaiShu() >= 25)
+                    {
+                        ZiJiaYao = YaoDingYi.LiZhi;
+                    }
+                    ZiJiaXuanZe = PaiXuanZe(wei);
+                    return;
                 }
             }
 
@@ -482,8 +473,6 @@ namespace Assets.Source.Sikao
         // 手牌点数計算
         private void ShouPaiDianShuJiSuan()
         {
-            Init(shouPaiDian, 0);
-
             // シャンテン数計算
             XiangTingShuJiSuan();
             // 手牌数計算
