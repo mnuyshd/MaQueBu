@@ -30,5 +30,7 @@ namespace Assets.Source.Maqiao
         public bool xiangTingShuBiaoShi = true;
         // 鳴パスはボタン
         public bool mingQuXiao = true;
+        // デバッグ表示無し
+        public bool debugDisplay = false;
     }
 }

@@ -185,6 +185,7 @@ namespace Assets.Source.Maqiao
         private Button goDaiPaiBiaoShi;
         private Button goXiangTingShuBiaoShi;
         private Button goMingquXiao;
+        private Button goDebugDisplay;
         private Button goSetting;
         private Button goScore;
         private Button goGuiZe;
@@ -678,6 +679,17 @@ namespace Assets.Source.Maqiao
                 WriteSheDing();
             });
             DrawButton(ref goMingquXiao, sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1], new Vector2(-x, y), len);
+            // デバッグ表示
+            string[] labelDebugDisplay = new string[] { "デバッグ表示有", "デバッグ表示無" };
+            ClearGameObject(ref goDebugDisplay);
+            goDebugDisplay = Instantiate(goButton, goSettingPanel.transform);
+            goDebugDisplay.onClick.AddListener(delegate
+            {
+                sheDing.debugDisplay = !sheDing.debugDisplay;
+                goDebugDisplay.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.debugDisplay ? labelDebugDisplay[0] : labelDebugDisplay[1];
+                WriteSheDing();
+            });
+            DrawButton(ref goDebugDisplay, sheDing.debugDisplay ? labelDebugDisplay[0] : labelDebugDisplay[1], new Vector2(x, y), len);
             y -= offset;
             // リセット
             goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
@@ -3372,6 +3384,15 @@ namespace Assets.Source.Maqiao
                     if (sheDing.xuanShangYin)
                     {
                         shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = (shi.XuanShangPaiPanDing(shi.ShouPai[i]) > 0) ? "▼" : "";
+                    }
+                    if (sheDing.debugDisplay && isPlayerZiMo && mingWei != -2)
+                    {
+                        TextMeshProUGUI paiText = shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>();
+                        paiText.text = shi.ShouPaiDian[i].ToString();
+                        paiText.fontSize = 12;
+                        paiText.fontStyle = FontStyles.Bold;
+                        RectTransform rtPaiText = paiText.GetComponent<RectTransform>();
+                        rtPaiText.anchoredPosition += new Vector2(0, 10);
                     }
                 }
                 if (p != 0xff)

@@ -462,6 +462,10 @@ namespace Assets.Source.Sikao
         private bool wLiZhi;
         // 一発
         private bool yiFa;
+        internal bool YiFa
+        {
+            get { return yiFa; }
+        }
         // 一巡目
         private bool yiXunMu;
         // 副露順
@@ -550,6 +554,12 @@ namespace Assets.Source.Sikao
         {
             get { return shiTiPai; }
         }
+        // 手牌点数
+        protected int[] shouPaiDian;
+        internal int[] ShouPaiDian
+        {
+            get { return shouPaiDian; }
+        }
 
         // コンストラクタ
         internal QiaoShi()
@@ -560,6 +570,7 @@ namespace Assets.Source.Sikao
             {
                 goFuLuPai[i] = new Button[4];
             }
+            shouPaiDian = new int[14];
         }
 
         // コンストラクタ

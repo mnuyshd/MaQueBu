@@ -45,14 +45,11 @@ namespace Assets.Source.Sikao
             get { return nao; }
         }
 
-        // 手牌点数
-        private readonly int[] shouPaiDian;
         private readonly int[] shouPaiDianShu;
 
         // コンストラクタ
         internal QiaoJiXie(string mingQian) : base(mingQian)
         {
-            shouPaiDian = new int[14];
             shouPaiDianShu = new int[14];
         }
 
@@ -165,19 +162,8 @@ namespace Assets.Source.Sikao
                 return;
             }
 
-            // 手牌点数計算
-            ShouPaiDianShuJiSuan();
-            // if (Player)
-            // {
-            //     string m = "";
-            //     for (int i = 0; i < ShouPai.Count; i++)
-            //     {
-            //         m += "0x" + ShouPai[i].ToString("x02") + "=" + shouPaiDian[i] + " ";
-            //     }
-            //     UnityEngine.Debug.Log(m);
-            // }
-
             // 予想点 x 残牌数 が高い牌を選択
+            Init(shouPaiDian, 0);
             int maxYuXiangDian = 0;
             wei = -1;
             GongKaiPaiShuJiSuan();
@@ -198,6 +184,7 @@ namespace Assets.Source.Sikao
                         dian += yuXiangDian[i] * Pai.CanShu(GongKaiPaiShu[i]);
                     }
                 }
+                shouPaiDian[w] += dian / 1000;
                 if (maxYuXiangDian < dian)
                 {
                     maxYuXiangDian = dian;
@@ -225,6 +212,9 @@ namespace Assets.Source.Sikao
                 ZiJiaXuanZe = PaiXuanZe(wei);
                 return;
             }
+
+            // 手牌点数計算
+            ShouPaiDianShuJiSuan();
 
             if (AnGangPaiWei.Count > 0 && shouPaiDian[ShouPai.Count - 1] < nao[XingGe.SHUN_ZI])
             {
@@ -504,15 +494,22 @@ namespace Assets.Source.Sikao
             (int se, int gao) = SeSuan();
 
             // 安全度
-            float taoDian = nao[XingGe.TAO] / 50;
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
                 if (shi.Player)
                 {
                     continue;
                 }
-                if (shi.LiZhi)
+                if (shi.LiZhi || shi.FuLuPai.Count >= 3)
                 {
+                    // 得点掛率
+                    float taoDian = nao[XingGe.TAO] / 50;
+                    // 一発警戒
+                    taoDian *= (shi.YiFa ? nao[XingGe.TAO] / 25 : 1);
+                    // 親警戒
+                    taoDian *= (shi.Feng == Chang.Qin ? nao[XingGe.TAO] / 25 : 1);
+                    // シャンテン数分 降り気味
+                    taoDian *= (XiangTingShu > 0 ? XiangTingShu : 1) * nao[XingGe.TAO] / 50;
                     for (int j = 0; j < ShouPai.Count; j++)
                     {
                         int p = ShouPai[j] & QIAO_PAI;
@@ -595,7 +592,7 @@ namespace Assets.Source.Sikao
                 // 字牌
                 if ((p & ZI_PAI) == ZI_PAI)
                 {
-                    shouPaiDian[i] -= (int)(taoDian * GongKaiPaiShu[p]);
+                    shouPaiDian[i] -= (int)(nao[XingGe.YI_PAI] / 10 * (GongKaiPaiShu[p] - ShouPaiShu[p]));
                 }
             }
 
