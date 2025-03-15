@@ -3387,12 +3387,7 @@ namespace Assets.Source.Maqiao
                     }
                     if (sheDing.debugDisplay && isPlayerZiMo && mingWei != -2)
                     {
-                        TextMeshProUGUI paiText = shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>();
-                        paiText.text = shi.ShouPaiDian[i].ToString();
-                        paiText.fontSize = 12;
-                        paiText.fontStyle = FontStyles.Bold;
-                        RectTransform rtPaiText = paiText.GetComponent<RectTransform>();
-                        rtPaiText.anchoredPosition += new Vector2(0, 10);
+                        shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = shi.ShouPaiDian[i].ToString();
                     }
                 }
                 if (p != 0xff)

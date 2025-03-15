@@ -1392,6 +1392,23 @@ namespace Assets.Source.Sikao
         }
 
         // 向聴数計算
+        internal void XiangTingShuJiSuan()
+        {
+            int minXiangTing = 99;
+            for (int i = 0; i < ShouPai.Count; i++)
+            {
+                XiangTingShuJiSuan(i, FuLuPai.Count);
+                if (minXiangTing > xiangTingShu)
+                {
+                    minXiangTing = xiangTingShu;
+                }
+            }
+            xiangTingShu = minXiangTing;
+
+            // 手牌数計算(向聴数計算で手牌の一番右を切った状態で手牌数を計算して終わるので、再度 手牌数を計算しておく)
+            ShouPaiShuJiSuan();
+
+        }
         internal void XiangTingShuJiSuan(int wei)
         {
             XiangTingShuJiSuan(wei, 0);

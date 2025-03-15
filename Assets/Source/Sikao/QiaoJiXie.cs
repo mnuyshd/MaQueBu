@@ -484,6 +484,8 @@ namespace Assets.Source.Sikao
         {
             Init(shouPaiDian, 0);
 
+            // シャンテン数計算
+            XiangTingShuJiSuan();
             // 手牌数計算
             ShouPaiShuJiSuan();
             // 副露牌数計算
@@ -500,14 +502,14 @@ namespace Assets.Source.Sikao
                 {
                     continue;
                 }
-                if (shi.LiZhi || shi.FuLuPai.Count >= 3)
+                if (shi.LiZhi || shi.FuLuPai.Count >= 3 || (Pai.CanShanPaiShu() <= XiangTingShu * 4))
                 {
                     // 得点掛率
                     float taoDian = nao[XingGe.TAO] / 50;
                     // 一発警戒
-                    taoDian *= (shi.YiFa ? nao[XingGe.TAO] / 25 : 1);
+                    taoDian *= shi.YiFa ? nao[XingGe.TAO] / 25 : 1;
                     // 親警戒
-                    taoDian *= (shi.Feng == Chang.Qin ? nao[XingGe.TAO] / 25 : 1);
+                    taoDian *= shi.Feng == Chang.Qin ? nao[XingGe.TAO] / 25 : 1;
                     // シャンテン数分 降り気味
                     taoDian *= (XiangTingShu > 0 ? XiangTingShu : 1) * nao[XingGe.TAO] / 50;
                     for (int j = 0; j < ShouPai.Count; j++)
@@ -557,7 +559,7 @@ namespace Assets.Source.Sikao
                                 {
                                     shouPaiDian[j] -= (int)(GongKaiPaiShu[p + 1] * GongKaiPaiShu[p + 2] * taoDian);
                                 }
-                                else if (s >= 7 && (GongKaiPaiShu[p - 1] >= 2 && GongKaiPaiShu[p - 2] >= 2))
+                                else if (s >= 7 && GongKaiPaiShu[p - 1] >= 2 && GongKaiPaiShu[p - 2] >= 2)
                                 {
                                     shouPaiDian[j] -= (int)(GongKaiPaiShu[p - 1] * GongKaiPaiShu[p - 2] * taoDian);
                                 }
@@ -581,9 +583,9 @@ namespace Assets.Source.Sikao
                 }
 
                 // 懸賞牌
-                shouPaiDian[i] += (nao[XingGe.XUAN_SHANG] / 4 * ShouPaiShu[p] * XuanShangPaiPanDing(sp));
+                shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 4 * ShouPaiShu[p] * XuanShangPaiPanDing(sp);
                 // 役牌・風牌
-                shouPaiDian[i] += (nao[XingGe.YI_PAI] / 8 * YiPaiPanDing(p));
+                shouPaiDian[i] += nao[XingGe.YI_PAI] / 15 * YiPaiPanDing(p);
                 // 染め
                 if ((16 - gao <= nao[XingGe.RAN] / 10) && ((p & SE_PAI) == se || (p & ZI_PAI) == ZI_PAI))
                 {
@@ -592,7 +594,7 @@ namespace Assets.Source.Sikao
                 // 字牌
                 if ((p & ZI_PAI) == ZI_PAI)
                 {
-                    shouPaiDian[i] -= (int)(nao[XingGe.YI_PAI] / 10 * (GongKaiPaiShu[p] - ShouPaiShu[p]));
+                    shouPaiDian[i] -= nao[XingGe.YI_PAI] / 10 * (GongKaiPaiShu[p] - ShouPaiShu[p]);
                 }
             }
 
@@ -628,7 +630,7 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 5;
+                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 3;
                             ShouPaiShu[i]--;
                             k--;
                         }
