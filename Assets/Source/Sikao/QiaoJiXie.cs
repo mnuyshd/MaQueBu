@@ -182,7 +182,7 @@ namespace Assets.Source.Sikao
                         dian += yuXiangDian[i] * Pai.CanShu(GongKaiPaiShu[i]);
                     }
                 }
-                shouPaiDian[w] -= dian / nao[XingGe.TAO] == 0 ? 1 : nao[XingGe.TAO];
+                shouPaiDian[w] -= dian / (nao[XingGe.TAO] == 0 ? 1 : nao[XingGe.TAO]);
             }
 
             // 手牌点数計算
@@ -204,24 +204,24 @@ namespace Assets.Source.Sikao
             }
 
             wei = ShouPai.Count - 1;
-            int diDian = 999;
-            int gaoShu = 0;
+            int minDian = 999;
+            int maxShu = 0;
             for (int i = 0; i < ShouPai.Count; i++)
             {
                 int sp = ShouPai[i];
-                if (diDian > shouPaiDian[i])
+                if (minDian > shouPaiDian[i])
                 {
-                    diDian = shouPaiDian[i];
-                    gaoShu = Math.Abs(5 - (sp & SHU_PAI));
+                    minDian = shouPaiDian[i];
+                    maxShu = Math.Abs(5 - (sp & SHU_PAI));
                     wei = i;
                 }
-                else if (diDian == shouPaiDian[i])
+                else if (minDian == shouPaiDian[i])
                 {
                     int p = sp & QIAO_PAI;
                     int s = Math.Abs(5 - (sp & SHU_PAI));
-                    if (p >= 0x30 || gaoShu < s)
+                    if (p >= 0x30 || maxShu < s)
                     {
-                        gaoShu = s;
+                        maxShu = s;
                         wei = i;
                     }
                 }
@@ -229,7 +229,8 @@ namespace Assets.Source.Sikao
 
             foreach (int w in LiZhiPaiWei)
             {
-                if (wei == w) {
+                if (wei == w)
+                {
                     // 点差
                     int dian = DianCha() / 1000;
                     dian += Pai.CanShanPaiShu();
@@ -282,19 +283,33 @@ namespace Assets.Source.Sikao
             // 手牌点数計算
             ShouPaiDianShuJiSuan();
 
+            // 危険度
+            int weiXian = 0;
+            foreach (QiaoShi shi in Chang.QiaoShis)
+            {
+                if (shi.Player)
+                {
+                    continue;
+                }
+                if (shi.LiZhi)
+                {
+                    weiXian += nao[XingGe.TAO];
+                }
+            }
+
             // 大明槓判定
-            int gaoDian = 0;
+            int maxDian = 0;
             int wei = -1;
             for (int i = 0; i < DaMingGangPaiWei.Count; i++)
             {
-                int dian = 0;
+                int dian = weiXian;
                 foreach (int w in DaMingGangPaiWei[i])
                 {
                     dian += shouPaiDian[w];
                 }
-                if (gaoDian < dian)
+                if (maxDian < dian)
                 {
-                    gaoDian = dian;
+                    maxDian = dian;
                     wei = i;
                 }
             }
@@ -302,14 +317,14 @@ namespace Assets.Source.Sikao
             {
                 if (TaJiaFuLuShu == 0)
                 {
-                    gaoDian += 100 - nao[XingGe.MING];
+                    maxDian += 100 - nao[XingGe.MING];
                 }
                 else
                 {
-                    gaoDian -= nao[XingGe.MING];
+                    maxDian -= nao[XingGe.MING];
                 }
-                gaoDian -= dianCha / 100;
-                if (gaoDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
+                maxDian -= dianCha / 100;
+                if (maxDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
                 {
                     // 大明槓
                     TaJiaYao = YaoDingYi.DaMingGang;
@@ -319,18 +334,18 @@ namespace Assets.Source.Sikao
             }
 
             // 石並判定
-            gaoDian = 0;
+            maxDian = 0;
             wei = -1;
             for (int i = 0; i < BingPaiWei.Count; i++)
             {
-                int dian = 0;
+                int dian = weiXian;
                 foreach (int w in BingPaiWei[i])
                 {
                     dian += shouPaiDian[w];
                 }
-                if (gaoDian < dian)
+                if (maxDian < dian)
                 {
-                    gaoDian = dian;
+                    maxDian = dian;
                     wei = i;
                 }
             }
@@ -340,36 +355,36 @@ namespace Assets.Source.Sikao
                 int yiPai = YiPaiPanDing(p);
                 if (yiPai > 0)
                 {
-                    gaoDian -= YiPaiPanDing(p) * 20;
+                    maxDian -= YiPaiPanDing(p) * 20;
                 }
                 else
                 {
                     if (TaJiaFuLuShu == 0)
                     {
-                        gaoDian += 100 - nao[XingGe.MING];
+                        maxDian += 100 - nao[XingGe.MING];
                     }
                     else
                     {
-                        gaoDian -= nao[XingGe.MING];
+                        maxDian -= nao[XingGe.MING];
                     }
                 }
                 if ((p & SE_PAI) != se && (p & ZI_PAI) != ZI_PAI)
                 {
-                    gaoDian += nao[XingGe.RAN];
+                    maxDian += nao[XingGe.RAN];
                 }
                 if (!ZiPaiPanDing(p))
                 {
                     int s = p & SHU_PAI;
                     if (s >= 2 && ShouPaiShu[p - 1] > 0)
                     {
-                        gaoDian += ShouPaiShu[p - 1] * (100 - nao[XingGe.MING]);
+                        maxDian += ShouPaiShu[p - 1] * (100 - nao[XingGe.MING]);
                     }
                     if (s <= 8 && ShouPaiShu[p + 1] > 0)
                     {
-                        gaoDian += ShouPaiShu[p + 1] * (100 - nao[XingGe.MING]);
+                        maxDian += ShouPaiShu[p + 1] * (100 - nao[XingGe.MING]);
                     }
                 }
-                if (gaoDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
+                if (maxDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
                 {
                     // 石並
                     TaJiaYao = YaoDingYi.Bing;
@@ -379,18 +394,18 @@ namespace Assets.Source.Sikao
             }
 
             // 吃判定
-            int diDian = 999;
+            int minDian = 999;
             wei = -1;
             for (int i = 0; i < ChiPaiWei.Count; i++)
             {
-                int dian = 0;
+                int dian = weiXian;
                 foreach (int w in ChiPaiWei[i])
                 {
                     dian += shouPaiDian[w];
                 }
-                if (diDian > dian)
+                if (minDian > dian)
                 {
-                    diDian = dian;
+                    minDian = dian;
                     wei = i;
                 }
             }
@@ -398,14 +413,14 @@ namespace Assets.Source.Sikao
             {
                 if (TaJiaFuLuShu == 0)
                 {
-                    diDian += 100 - nao[XingGe.MING];
+                    minDian += 100 - nao[XingGe.MING];
                 }
                 int p = ShouPai[ChiPaiWei[0][0]] & QIAO_PAI;
                 if (se != (p & SE_PAI))
                 {
-                    diDian += nao[XingGe.RAN];
+                    minDian += nao[XingGe.RAN];
                 }
-                if (diDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
+                if (minDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
                 {
                     // 吃
                     TaJiaYao = YaoDingYi.Chi;
@@ -419,7 +434,7 @@ namespace Assets.Source.Sikao
         }
 
         // 色計算
-        private (int se, int gao) SeSuan()
+        private (int se, int maxShu) SeSuan()
         {
             int[] shu = new int[4];
             Init(shu, 0);
@@ -438,18 +453,18 @@ namespace Assets.Source.Sikao
                 }
             }
             int se = 0x00;
-            int gao = shu[se];
-            if (gao < shu[1])
+            int max = shu[se];
+            if (max < shu[1])
             {
-                gao = shu[1];
+                max = shu[1];
                 se = 0x10;
             }
-            if (gao < shu[2])
+            if (max < shu[2])
             {
-                gao = shu[2];
+                max = shu[2];
                 se = 0x20;
             }
-            return (se, gao + shu[3]);
+            return (se, max + shu[3]);
         }
 
         // 牌選択(赤牌以外を優先)
@@ -482,7 +497,7 @@ namespace Assets.Source.Sikao
             // 公開牌数計算
             GongKaiPaiShuJiSuan();
             // 色
-            (int se, int gao) = SeSuan();
+            (int se, int maxShu) = SeSuan();
 
             // 安全度
             foreach (QiaoShi shi in Chang.QiaoShis)
@@ -576,7 +591,7 @@ namespace Assets.Source.Sikao
                 // 役牌・風牌
                 shouPaiDian[i] += nao[XingGe.YI_PAI] / 15 * YiPaiPanDing(p);
                 // 染め
-                if ((16 - gao <= nao[XingGe.RAN] / 10) && ((p & SE_PAI) == se || (p & ZI_PAI) == ZI_PAI))
+                if ((16 - maxShu <= nao[XingGe.RAN] / 10) && ((p & SE_PAI) == se || (p & ZI_PAI) == ZI_PAI))
                 {
                     shouPaiDian[i] += nao[XingGe.RAN] / 5;
                 }
