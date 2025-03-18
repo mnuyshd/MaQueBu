@@ -240,8 +240,8 @@ namespace Assets.Source.Maqiao
         // 雀士名前
         private readonly Dictionary<string, bool> qiaoShiMingQian = new()
         {
-            { "効率雀士", true },
             { "機械雀士", true },
+            { QiaoXiaoLu.MING_QIAN, true },
             { HikitaMamoru.MING_QIAN, true },
             { UchidaKou.MING_QIAN, false },
             { SomeyaMei.MING_QIAN, false },
@@ -266,8 +266,8 @@ namespace Assets.Source.Maqiao
 
             QiaoShi newShi = mingQian switch
             {
-                "効率雀士" => new QiaoXiaoLu(mingQian),
                 "機械雀士" => new QiaoJiXie(mingQian),
+                QiaoXiaoLu.MING_QIAN => new QiaoXiaoLu(),
                 HikitaMamoru.MING_QIAN => new HikitaMamoru(),
                 SomeyaMei.MING_QIAN => new SomeyaMei(),
                 UchidaKou.MING_QIAN => new UchidaKou(),
@@ -1511,7 +1511,6 @@ namespace Assets.Source.Maqiao
         private void OnClickScreenFollowNone()
         {
             Chang.QiaoShis.Insert(0, new QiaoJiXie(PLAYER_NAME));
-            //Chang.QiaoShi.Insert(0, new QiaoXiaoLu(PLAYER_NAME));
             Chang.QiaoShis[0].Follow = false;
             Chang.QiaoShis[0].Player = true;
             keyPress = true;

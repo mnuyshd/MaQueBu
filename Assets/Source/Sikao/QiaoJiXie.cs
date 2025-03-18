@@ -163,7 +163,6 @@ namespace Assets.Source.Sikao
             }
 
             // 和了牌点(予想点 x 残牌数)
-            Init(shouPaiDian, 0);
             GongKaiPaiShuJiSuan();
             foreach ((List<int> _, int w, int[] yuXiangDian) in HeLePai)
             {
@@ -296,6 +295,7 @@ namespace Assets.Source.Sikao
             ShouPaiDianShuJiSuan();
 
             // 危険度
+            XiangTingShuJiSuan();
             int weiXian = 0;
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
@@ -305,7 +305,7 @@ namespace Assets.Source.Sikao
                 }
                 if (shi.LiZhi)
                 {
-                    weiXian += nao[XingGe.TAO];
+                    weiXian += nao[XingGe.TAO] * (XiangTingShu == 0 ? 1 : XiangTingShu);
                 }
             }
 
@@ -608,11 +608,19 @@ namespace Assets.Source.Sikao
                 {
                     if (s >= 2)
                     {
-                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p - 1);
+                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 5 * XuanShangPaiPanDing(p - 1);
                     }
                     if (s <= 8)
                     {
-                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p + 1);
+                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 5 * XuanShangPaiPanDing(p + 1);
+                    }
+                    if (s >= 3)
+                    {
+                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p - 2);
+                    }
+                    if (s <= 7)
+                    {
+                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p + 2);
                     }
                 }
                 // 役牌・風牌

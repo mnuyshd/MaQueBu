@@ -1148,6 +1148,8 @@ namespace Assets.Source.Sikao
                 chiPaiWei = new();
             }
             jiuZhongJiuPai = false;
+
+            Init(shouPaiDian, 0);
         }
 
         // 字牌判定
