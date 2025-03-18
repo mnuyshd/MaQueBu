@@ -594,7 +594,7 @@ namespace Assets.Source.Sikao
                 int p = sp & QIAO_PAI;
                 foreach (int stp in ShiTiPai)
                 {
-                    if (sp == stp)
+                    if (p == stp)
                     {
                         // 食替牌
                         shouPaiDian[i] += 1000;

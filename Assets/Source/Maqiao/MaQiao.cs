@@ -1249,7 +1249,7 @@ namespace Assets.Source.Maqiao
                         break;
                     // 役表示
                     case Event.YI_BIAO_SHI:
-                        DrawXuanShangPai();
+                        DrawXuanShangPai(true);
                         OrientationSelectDaPai();
                         break;
                 }
@@ -1355,7 +1355,6 @@ namespace Assets.Source.Maqiao
             DrawJuFrame();
             DrawJuOption();
             DrawQiJia();
-            DrawXuanShangPai();
             DrawMingQian();
 
             bool isHeLe = false;
@@ -1657,7 +1656,7 @@ namespace Assets.Source.Maqiao
             DrawText(ref goJu, value, new Vector2(x, y), 0, 25);
         }
 
-        // 【描画】局、残牌、供託、点
+        // 【描画】局、残牌、供託、点、懸賞牌
         private void DrawJuFrame()
         {
             DrawJu();
@@ -1665,6 +1664,7 @@ namespace Assets.Source.Maqiao
             if (eventStatus != Event.DIAN_BIAO_SHI)
             {
                 DrawCanShanPaiShu();
+                DrawXuanShangPai(false);
             }
             DrawDianBang();
         }
@@ -1690,38 +1690,38 @@ namespace Assets.Source.Maqiao
             // 局
             ClearGameObject(ref goJu);
             goJu = Instantiate(goText, goJuFrame.transform.parent);
-            float x = 0;
+            float x = paiWidth * -0.8f;
             float y = paiHeight * 0.9f;
             string value = Pai.FengPaiMing[Chang.ChangFeng - 0x31] + (Chang.Ju + 1) + "局";
-            DrawText(ref goJu, value, new Vector2(x, y), 0, 18);
+            DrawText(ref goJu, value, new Vector2(x, y), 0, 17);
             goJu.rectTransform.SetSiblingIndex(1);
         }
 
         // 【描画】供託
         private void DrawGongTuo()
         {
-            float x = -paiWidth * 0.3f;
-            float y = paiHeight * 0.4f;
+            float x = paiWidth * 0.7f;
+            float y = paiHeight * 1.0f;
             ClearGameObject(ref goBenChang);
             goBenChang = Instantiate(goDianBang100, goDianBang100.transform.parent);
             RectTransform rt100 = goBenChang.GetComponent<RectTransform>();
-            rt100.sizeDelta = new Vector2(rt100.sizeDelta.x * 0.5f, rt100.sizeDelta.y);
+            rt100.sizeDelta = new Vector2(rt100.sizeDelta.x * 0.4f, rt100.sizeDelta.y);
             rt100.anchoredPosition = new Vector2(x, y);
             ClearGameObject(ref goBenChangText);
             goBenChangText = Instantiate(goText, goJuFrame.transform.parent);
             string valueBenChang = "x" + Chang.BenChang.ToString();
-            DrawText(ref goBenChangText, valueBenChang, new Vector2(x + paiWidth * 1.1f, y + paiHeight * 0.05f), 0, 14);
+            DrawText(ref goBenChangText, valueBenChang, new Vector2(x + paiWidth * 0.9f, y + paiHeight * 0.05f), 0, 12);
 
-            y -= paiHeight * 0.4f;
+            y -= paiHeight * 0.3f;
             ClearGameObject(ref goGongTou);
             goGongTou = Instantiate(goDianBang1000, goDianBang1000.transform.parent);
             RectTransform rt1000 = goGongTou.GetComponent<RectTransform>();
-            rt1000.sizeDelta = new Vector2(rt1000.sizeDelta.x * 0.5f, rt1000.sizeDelta.y);
+            rt1000.sizeDelta = new Vector2(rt1000.sizeDelta.x * 0.4f, rt1000.sizeDelta.y);
             rt1000.anchoredPosition = new Vector2(x, y);
             ClearGameObject(ref goGongTouText);
             goGongTouText = Instantiate(goText, goJuFrame.transform.parent);
             string valueGongTou = "x" + (Chang.GongTuo / 1000).ToString();
-            DrawText(ref goGongTouText, valueGongTou, new Vector2(x + paiWidth * 1.1f, y + paiHeight * 0.05f), 0, 14);
+            DrawText(ref goGongTouText, valueGongTou, new Vector2(x + paiWidth * 0.9f, y + paiHeight * 0.05f), 0, 12);
         }
 
         /**
@@ -1732,7 +1732,7 @@ namespace Assets.Source.Maqiao
             ClearGameObject(ref goCanShanPaiShu);
             goCanShanPaiShu = Instantiate(goFrame, goJuFrame.transform.parent);
             float alfa = Pai.CanShanPaiShu() < 100 ? 1f : 0f;
-            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, -(paiHeight * 0.6f)), 0, 20, new Color(0, 0.6f, 0), new Color(1f, 1f, 1f, alfa), 3);
+            DrawFrame(ref goCanShanPaiShu, Pai.CanShanPaiShu().ToString(), new Vector2(0, paiHeight * 0.2f), 0, 17, new Color(0, 0.6f, 0), new Color(1f, 1f, 1f, alfa), 3);
         }
 
         // 【描画】点数
@@ -1797,7 +1797,70 @@ namespace Assets.Source.Maqiao
                     goLizhiBang[jia] = Instantiate(goDianBang1000, goJuFrame.transform.parent);
                     goLizhiBang[jia].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.PlayOrder));
                     RectTransform rt = goLizhiBang[jia].GetComponent<RectTransform>();
-                    rt.anchoredPosition = Cal(x, y + paiHeight * 0.4f, shi.PlayOrder);
+                    rt.SetSiblingIndex(2);
+                    rt.anchoredPosition = Cal(x, y + paiHeight * 0.3f, shi.PlayOrder);
+                }
+            }
+        }
+
+        // 【描画】懸賞牌
+        private void DrawXuanShangPai(bool isYiBiaoShi)
+        {
+            ClearGameObject(ref Pai.goXuanShangPai);
+            ClearGameObject(ref Pai.goLiXuanShangPai);
+
+            float xuanShangScalse = 0.7f;
+            float X = -(paiWidth * 1.4f);
+            float Y = -(paiHeight * 0.6f);
+            if (isYiBiaoShi)
+            {
+                X = -(paiWidth * 2f);
+                Y = paiHeight * 8f;
+                if (orientation != ScreenOrientation.Portrait)
+                {
+                    X = -(paiWidth * 15f);
+                    Y = paiHeight * 2f;
+                }
+                xuanShangScalse = 1.0f;
+            }
+            float x = X;
+            float y = Y;
+            for (int i = 0; i <= 4; i++)
+            {
+                Pai.goXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
+                Pai.goXuanShangPai[i].transform.SetSiblingIndex(3);
+                RectTransform rt = Pai.goXuanShangPai[i].GetComponent<RectTransform>();
+                rt.localScale *= xuanShangScalse;
+                DrawPai(ref Pai.goXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.XuanShangPai[i] : 0x00, new Vector2(x, y), 0);
+                x += paiWidth * xuanShangScalse;
+            }
+
+            bool isLiXuanShangPai = false;
+            if (Chang.HeleFan >= 0 && Chang.QiaoShis[Chang.HeleFan].LiZhi)
+            {
+                isLiXuanShangPai = true;
+            }
+            foreach (int fan in Chang.RongHeFan)
+            {
+                QiaoShi shi = Chang.QiaoShis[fan];
+                if (shi.LiZhi)
+                {
+                    isLiXuanShangPai = true;
+                    break;
+                }
+            }
+            if (isLiXuanShangPai)
+            {
+                x = X;
+                y -= paiHeight * xuanShangScalse;
+                for (int i = 0; i <= 4; i++)
+                {
+                    Pai.goLiXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
+                    Pai.goLiXuanShangPai[i].transform.SetSiblingIndex(3);
+                    RectTransform rt = Pai.goLiXuanShangPai[i].GetComponent<RectTransform>();
+                    rt.localScale *= xuanShangScalse;
+                    DrawPai(ref Pai.goLiXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.LiXuanShangPai[i] : 0x00, new Vector2(x, y), 0);
+                    x += paiWidth * xuanShangScalse;
                 }
             }
         }
@@ -2323,7 +2386,6 @@ namespace Assets.Source.Maqiao
             DrawJuFrame();
             DrawJuOption();
             DrawQiJia();
-            DrawXuanShangPai();
             DrawMingQian();
 
             // 配牌
@@ -2401,57 +2463,6 @@ namespace Assets.Source.Maqiao
             isDuiJuCoroutine = false;
 
             eventStatus = Event.PEI_PAI;
-        }
-
-        // 【描画】懸賞牌
-        private void DrawXuanShangPai()
-        {
-            ClearGameObject(ref Pai.goXuanShangPai);
-            ClearGameObject(ref Pai.goLiXuanShangPai);
-
-            float X = -(paiWidth * 2f);
-            float Y = paiHeight * 8f;
-            if (orientation != ScreenOrientation.Portrait)
-            {
-                X = -(paiWidth * 15f);
-                Y = paiHeight * 2f;
-            }
-            float x = X;
-            float y = Y;
-            for (int i = 0; i <= 4; i++)
-            {
-                Pai.goXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
-                Pai.goXuanShangPai[i].transform.SetSiblingIndex(1);
-                DrawPai(ref Pai.goXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.XuanShangPai[i] : 0x00, new Vector2(x, y), 0);
-                x += paiWidth;
-            }
-
-            bool isLiXuanShangPai = false;
-            if (Chang.HeleFan >= 0 && Chang.QiaoShis[Chang.HeleFan].LiZhi)
-            {
-                isLiXuanShangPai = true;
-            }
-            foreach (int fan in Chang.RongHeFan)
-            {
-                QiaoShi shi = Chang.QiaoShis[fan];
-                if (shi.LiZhi)
-                {
-                    isLiXuanShangPai = true;
-                    break;
-                }
-            }
-            if (isLiXuanShangPai)
-            {
-                x = X;
-                y -= paiHeight;
-                for (int i = 0; i <= 4; i++)
-                {
-                    Pai.goLiXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
-                    Pai.goLiXuanShangPai[i].transform.SetSiblingIndex(0);
-                    DrawPai(ref Pai.goLiXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.LiXuanShangPai[i] : 0x00, new Vector2(x, y), 0);
-                    x += paiWidth;
-                }
-            }
         }
 
         // 【ゲーム】対局
@@ -2550,8 +2561,8 @@ namespace Assets.Source.Maqiao
                     // 描画
                     DrawZiMo(Chang.ZiMoFan);
                     DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.HeLe, -1);
-                    DrawXuanShangPai();
-                    tingPaiLianZhuang = (Chang.ZiMoFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG);
+                    DrawJuFrame();
+                    tingPaiLianZhuang = Chang.ZiMoFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                     yield return Pause(ForwardMode.FAST_FORWARD);
                     eventStatus = Event.YI_BIAO_SHI;
                     yield break;
@@ -2592,7 +2603,6 @@ namespace Assets.Source.Maqiao
                     DrawAnGang(Chang.ZiMoFan);
                     DrawJuFrame();
                     DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1);
-                    DrawXuanShangPai();
                     // 四開槓判定
                     if (Pai.SiKaiGangPanDing())
                     {
@@ -2673,7 +2683,7 @@ namespace Assets.Source.Maqiao
                     // 嶺上牌処理
                     Pai.LingShangPaiChuLi();
                     // 描画
-                    DrawXuanShangPai();
+                    DrawJuFrame();
                     // 四開槓判定
                     if (Pai.SiKaiGangPanDing())
                     {
@@ -2798,7 +2808,7 @@ namespace Assets.Source.Maqiao
                     Chang.QiaoShis[fan].HeLeChuLi();
                 }
                 Chang.HeleFan = Chang.MingFan;
-                DrawXuanShangPai();
+                DrawJuFrame();
                 tingPaiLianZhuang = (Chang.MingFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG);
                 yield return Pause(ForwardMode.FAST_FORWARD);
                 eventStatus = Event.YI_BIAO_SHI;
@@ -2848,7 +2858,6 @@ namespace Assets.Source.Maqiao
                     // 描画
                     DrawJuFrame();
                     DrawJiaGang(Chang.ZiMoFan);
-                    DrawXuanShangPai();
                     // 四開槓判定
                     if (Pai.SiKaiGangPanDing())
                     {
@@ -3926,7 +3935,7 @@ namespace Assets.Source.Maqiao
             float y = paiWidth * 2.5f + paiHeight * 7.5f;
             if (jia >= 0)
             {
-                DrawXuanShangPai();
+                DrawXuanShangPai(true);
 
                 QiaoShi shi = Chang.QiaoShis[jia];
 
