@@ -266,7 +266,6 @@ namespace Assets.Source.Maqiao
 
             QiaoShi newShi = mingQian switch
             {
-                "機械雀士" => new QiaoJiXie(mingQian),
                 QiaoXiaoLu.MING_QIAN => new QiaoXiaoLu(),
                 HikitaMamoru.MING_QIAN => new HikitaMamoru(),
                 SomeyaMei.MING_QIAN => new SomeyaMei(),

@@ -1641,6 +1641,11 @@ namespace Assets.Source.Sikao
             }
             // 切上
             fu = Chang.Ceil(fu, 10);
+            if (fu == 20)
+            {
+                // 食い平和形
+                fu = 30;
+            }
         }
 
         // 点計算
