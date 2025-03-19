@@ -96,7 +96,8 @@ namespace Assets.Source.Sikao
         // 役満名
         internal static readonly string[] YiManMing = new string[] {
             "天和", "人和", "地和", "国士無双", "国士無双十三面", "四暗刻", "四暗刻単騎", "四槓子", "四連刻", "大三元",
-            "小四喜", "大四喜", "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "小車輪", "大車輪", "十三不塔"
+            "小四喜", "大四喜", "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "小車輪", "大車輪", "大竹林",
+            "大数隣", "十三不塔"
         };
         // 役名
         internal static readonly string[] YiMing = new string[] {
@@ -150,8 +151,12 @@ namespace Assets.Source.Sikao
             XiaoCheLun = 17,
             // 大車輪(ローカル)
             DaCheLun = 18,
+            // 大竹林(ローカル)
+            DaZhuLin = 19,
+            // 大数隣(ローカル)
+            DaShuLin = 20,
             // 十三不塔(ローカル)
-            ShiSanBuTa = 19,
+            ShiSanBuTa = 21,
         }
 
         // 役
@@ -646,10 +651,13 @@ namespace Assets.Source.Sikao
             // 九種九牌判定
             JiuZhongJiuPaiPanDing();
 
-            // 十三不塔判定
-            if (ShiSanBuTaPanDing())
+            if (Chang.LocalYi)
             {
-                heLe = true;
+                // 十三不塔判定
+                if (ShiSanBuTaPanDing())
+                {
+                    heLe = true;
+                }
             }
 
             // 食替牌判定
@@ -2217,14 +2225,12 @@ namespace Assets.Source.Sikao
 
             // 天和
             TianHe();
-            // 人和・地和
-            RenHeDeHe();
+            // 地和
+            DeHe();
             // 国士無双・国士無双十三面
             GuoShiWuShuang();
             // 四暗刻・四暗刻単騎・四槓子
             SiAnKeSiGangZi();
-            // 四連刻
-            SiLianKe();
             // 大三元
             DaSanYuan();
             // 小四喜・大四喜
@@ -2237,8 +2243,19 @@ namespace Assets.Source.Sikao
             JiuLianBaoDeng();
             // 緑一色
             LuYiSe();
-            // 大車輪
-            DaCheLun();
+            if (Chang.LocalYi)
+            {
+                // 人和
+                RenHe();
+                // 四連刻
+                SiLianKe();
+                // 小車輪・大車輪
+                DaCheLun();
+                // 大竹林
+                DaZhuLin();
+                // 大数隣
+                DaShuLin();
+            }
 
             fanShuJi = 0;
             foreach ((_, int fanShu) in yiFan)
@@ -2265,8 +2282,8 @@ namespace Assets.Source.Sikao
             }
         }
 
-        // 人和・地和
-        private void RenHeDeHe()
+        // 地和
+        private void DeHe()
         {
             if (feng == 0x31)
             {
@@ -2278,12 +2295,20 @@ namespace Assets.Source.Sikao
                 {
                     YiZhuiJia(YiManDingYi.DeHe, 1);
                 }
-                else
+            }
+        }
+
+        // 人和
+        private void RenHe()
+        {
+            if (feng == 0x31)
+            {
+                return;
+            }
+            if (yiXunMu)
+            {
+                if (!jiJia)
                 {
-                    if (!Chang.LocalYi)
-                    {
-                        return;
-                    }
                     YiZhuiJia(YiManDingYi.RenHe, 1);
                 }
             }
@@ -2345,10 +2370,6 @@ namespace Assets.Source.Sikao
         // 四連刻
         private void SiLianKe()
         {
-            if (!Chang.LocalYi)
-            {
-                return;
-            }
             if (keZi.Count < 4)
             {
                 return;
@@ -2608,11 +2629,6 @@ namespace Assets.Source.Sikao
         // 小車輪・大車輪
         private void DaCheLun()
         {
-            if (!Chang.LocalYi)
-            {
-                return;
-            }
-
             // 手牌数計算
             ShouPaiShuJiSuan();
             // 大車輪
@@ -2656,14 +2672,39 @@ namespace Assets.Source.Sikao
             }
         }
 
+        // 大竹林
+        private void DaZhuLin()
+        {
+            // 手牌数計算
+            ShouPaiShuJiSuan();
+            for (int i = 0x22; i <= 0x28; i++)
+            {
+                if (shouPaiShu[i] != 2)
+                {
+                    return;
+                }
+            }
+            YiZhuiJia(YiManDingYi.DaZhuLin, 1);
+        }
+
+        // 大数隣
+        private void DaShuLin()
+        {
+            // 手牌数計算
+            ShouPaiShuJiSuan();
+            for (int i = 0x02; i <= 0x08; i++)
+            {
+                if (shouPaiShu[i] != 2)
+                {
+                    return;
+                }
+            }
+            YiZhuiJia(YiManDingYi.DaShuLin, 1);
+        }
+
         // 十三不塔判定
         private bool ShiSanBuTaPanDing()
         {
-            if (!Chang.LocalYi)
-            {
-                return false;
-            }
-
             yiMan = false;
             yiFan = new();
             fanShuJi = 0;
@@ -2761,14 +2802,18 @@ namespace Assets.Source.Sikao
             DuiDuiHe();
             // 三暗刻・三槓子
             SanAnKeSanGangZi();
-            // 三連刻
-            SanLianKe();
             // 小三元
             XiaoSanYuan();
             // 混一色・清一色
             HunYiSeQingYiSe();
             // 七対子
             QiDuiZi();
+            if (Chang.LocalYi)
+            {
+                // 三連刻
+                SanLianKe();
+            }
+
             if (yiFan.Count > 0)
             {
                 // 懸賞牌
@@ -3209,10 +3254,6 @@ namespace Assets.Source.Sikao
         // 三連刻
         private void SanLianKe()
         {
-            if (!Chang.LocalYi)
-            {
-                return;
-            }
             if (keZi.Count < 3)
             {
                 return;
