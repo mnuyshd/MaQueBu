@@ -121,6 +121,13 @@ namespace Assets.Source.Gongtong
             get { return taJiaXuanZe; }
             set { taJiaXuanZe = value; }
         }
+        // ローカル役
+        private static bool localYi;
+        internal static bool LocalYi
+        {
+            get { return localYi; }
+            set { localYi = value; }
+        }
 
         // 風
         private static int feng;

@@ -185,6 +185,7 @@ namespace Assets.Source.Maqiao
         private Button goDaiPaiBiaoShi;
         private Button goXiangTingShuBiaoShi;
         private Button goMingquXiao;
+        private Button goLocalYi;
         private Button goDebugDisplay;
         private Button goSetting;
         private Button goScore;
@@ -296,6 +297,7 @@ namespace Assets.Source.Maqiao
             if (File.Exists(filePath))
             {
                 sheDing = JsonUtility.FromJson<SheDing>(File.ReadAllText(filePath));
+                Chang.LocalYi = sheDing.localYi;
             }
             else
             {
@@ -595,8 +597,8 @@ namespace Assets.Source.Maqiao
         {
             // オプション
             float x = paiWidth * 4.5f;
-            float y = paiHeight * 2.5f;
-            float offset = paiHeight * 1.8f;
+            float y = paiHeight * 3f;
+            float offset = paiHeight * 1.6f;
             int len = 7;
             // 1タップ打牌
             string[] labelDaPaiFangFa = new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" };
@@ -678,6 +680,19 @@ namespace Assets.Source.Maqiao
                 WriteSheDing();
             });
             DrawButton(ref goMingquXiao, sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1], new Vector2(-x, y), len);
+            // ローカル役
+            string[] labelLocalYi = new string[] { "ローカル役有", "ローカル役無" };
+            ClearGameObject(ref goLocalYi);
+            goLocalYi = Instantiate(goButton, goSettingPanel.transform);
+            goLocalYi.onClick.AddListener(delegate
+            {
+                sheDing.localYi = !sheDing.localYi;
+                goLocalYi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.localYi ? labelLocalYi[0] : labelLocalYi[1];
+                Chang.LocalYi = sheDing.localYi;
+                WriteSheDing();
+            });
+            DrawButton(ref goLocalYi, sheDing.localYi ? labelLocalYi[0] : labelLocalYi[1], new Vector2(x, y), len);
+            y -= offset;
             // デバッグ表示
             string[] labelDebugDisplay = new string[] { "デバッグ表示有", "デバッグ表示無" };
             ClearGameObject(ref goDebugDisplay);
@@ -688,7 +703,7 @@ namespace Assets.Source.Maqiao
                 goDebugDisplay.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.debugDisplay ? labelDebugDisplay[0] : labelDebugDisplay[1];
                 WriteSheDing();
             });
-            DrawButton(ref goDebugDisplay, sheDing.debugDisplay ? labelDebugDisplay[0] : labelDebugDisplay[1], new Vector2(x, y), len);
+            DrawButton(ref goDebugDisplay, sheDing.debugDisplay ? labelDebugDisplay[0] : labelDebugDisplay[1], new Vector2(-x, y), len);
             y -= offset;
             // リセット
             goSettingDialogPanel = GameObject.Find("SettingDialogPanel");

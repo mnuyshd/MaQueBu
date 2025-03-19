@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using Assets.Source.Gongtong;
+using Assets.Source.Maqiao;
 
 namespace Assets.Source.Sikao
 {
@@ -95,12 +96,12 @@ namespace Assets.Source.Sikao
         // 役満名
         internal static readonly string[] YiManMing = new string[] {
             "天和", "人和", "地和", "国士無双", "国士無双十三面", "四暗刻", "四暗刻単騎", "四槓子", "四連刻", "大三元",
-            "小四喜", "大四喜", "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "大車輪", "十三不塔"
+            "小四喜", "大四喜", "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "小車輪", "大車輪", "十三不塔"
         };
         // 役名
         internal static readonly string[] YiMing = new string[] {
             "立直", "Ｗ立直", "一発", "海底撈月", "河底撈魚", "嶺上開花", "槍槓", "面前清自摸和", "平和", "断幺九",
-            "一盃口", "二盃口", "一気通貫", "三色同順", "全帯幺", "純全帯", "混老頭", "三暗刻", "三槓子", "三連刻",
+            "一盃口", "二盃口", "一気通貫", "三色同順", "混全帯么九", "純全帯么九", "混老頭", "三暗刻", "三槓子", "三連刻",
             "小三元", "混一色", "清一色", "対々和", "役牌", "七対子", "ドラ", "流し満貫"
         };
         // 得点役
@@ -113,7 +114,7 @@ namespace Assets.Source.Sikao
         {
             // 天和
             TianHe = 0,
-            // 人和
+            // 人和(ローカル)
             RenHe = 1,
             // 地和
             DeHe = 2,
@@ -127,7 +128,7 @@ namespace Assets.Source.Sikao
             SiAnKeDanQi = 6,
             // 四槓子
             SiGangZi = 7,
-            // 四連刻
+            // 四連刻(ローカル)
             SiLianKe = 8,
             // 大三元
             DaSanYuan = 9,
@@ -145,10 +146,12 @@ namespace Assets.Source.Sikao
             ChunZhengJiuLian = 15,
             // 緑一色
             LuYiSe = 16,
-            // 大車輪
-            DaCheLun = 17,
-            // 十三不塔
-            ShiSanBuTa = 18,
+            // 小車輪(ローカル)
+            XiaoCheLun = 17,
+            // 大車輪(ローカル)
+            DaCheLun = 18,
+            // 十三不塔(ローカル)
+            ShiSanBuTa = 19,
         }
 
         // 役
@@ -192,7 +195,7 @@ namespace Assets.Source.Sikao
             SanAnKe = 17,
             // 三槓子
             SanGangZi = 18,
-            // 三連刻
+            // 三連刻(ローカル)
             SanLianKe = 19,
             // 小三元
             XiaoSanYuan = 20,
@@ -2277,6 +2280,10 @@ namespace Assets.Source.Sikao
                 }
                 else
                 {
+                    if (!Chang.LocalYi)
+                    {
+                        return;
+                    }
                     YiZhuiJia(YiManDingYi.RenHe, 1);
                 }
             }
@@ -2338,15 +2345,21 @@ namespace Assets.Source.Sikao
         // 四連刻
         private void SiLianKe()
         {
+            if (!Chang.LocalYi)
+            {
+                return;
+            }
             if (keZi.Count < 4)
             {
                 return;
             }
-            List<int> k = new();
-            k.Add(keZi[0].pais[0]);
-            k.Add(keZi[1].pais[0]);
-            k.Add(keZi[2].pais[0]);
-            k.Add(keZi[3].pais[0]);
+            List<int> k = new()
+            {
+                keZi[0].pais[0],
+                keZi[1].pais[0],
+                keZi[2].pais[0],
+                keZi[3].pais[0]
+            };
             k.Sort();
             foreach (int p in k)
             {
@@ -2592,24 +2605,65 @@ namespace Assets.Source.Sikao
             YiZhuiJia(YiManDingYi.LuYiSe, 1);
         }
 
-        // 大車輪
+        // 小車輪・大車輪
         private void DaCheLun()
         {
+            if (!Chang.LocalYi)
+            {
+                return;
+            }
+
             // 手牌数計算
             ShouPaiShuJiSuan();
+            // 大車輪
+            bool daCheLun = true;
             for (int i = 0x12; i <= 0x18; i++)
             {
                 if (shouPaiShu[i] != 2)
                 {
-                    return;
+                    daCheLun = false;
+                    break;
                 }
             }
-            YiZhuiJia(YiManDingYi.DaCheLun, 1);
+            // 小車輪(1-7)
+            bool xiaoCheLun17 = true;
+            for (int i = 0x11; i <= 0x17; i++)
+            {
+                if (shouPaiShu[i] != 2)
+                {
+                    xiaoCheLun17 = false;
+                    break;
+                }
+            }
+            // 小車輪(3-9)
+            bool xiaoCheLun39 = true;
+            for (int i = 0x13; i <= 0x19; i++)
+            {
+                if (shouPaiShu[i] != 2)
+                {
+                    xiaoCheLun39 = false;
+                    break;
+                }
+            }
+
+            if (daCheLun)
+            {
+                YiZhuiJia(YiManDingYi.DaCheLun, 1);
+            }
+            else if (xiaoCheLun17 || xiaoCheLun39)
+            {
+                YiZhuiJia(YiManDingYi.XiaoCheLun, 1);
+            }
         }
 
         // 十三不塔判定
         private bool ShiSanBuTaPanDing()
         {
+            if (!Chang.LocalYi)
+            {
+                return false;
+            }
+
             yiMan = false;
             yiFan = new();
             fanShuJi = 0;
@@ -3155,6 +3209,10 @@ namespace Assets.Source.Sikao
         // 三連刻
         private void SanLianKe()
         {
+            if (!Chang.LocalYi)
+            {
+                return;
+            }
             if (keZi.Count < 3)
             {
                 return;
@@ -3165,10 +3223,12 @@ namespace Assets.Source.Sikao
                 {
                     continue;
                 }
-                List<int> k = new();
-                k.Add(keZi[i].pais[0]);
-                k.Add(keZi[i + 1].pais[0]);
-                k.Add(keZi[i + 2].pais[0]);
+                List<int> k = new()
+                {
+                    keZi[i].pais[0],
+                    keZi[i + 1].pais[0],
+                    keZi[i + 2].pais[0]
+                };
                 k.Sort();
                 if ((k[0] + 1 == k[1]) && (k[0] + 2 == k[2]))
                 {
