@@ -749,8 +749,10 @@ namespace Assets.Source.Maqiao
             // 得点パネル
             goScorePanel = GameObject.Find("ScorePanel");
             EventTrigger etScore = goScorePanel.AddComponent<EventTrigger>();
-            EventTrigger.Entry eScore = new();
-            eScore.eventID = EventTriggerType.PointerClick;
+            EventTrigger.Entry eScore = new()
+            {
+                eventID = EventTriggerType.PointerClick
+            };
             eScore.callback.AddListener((eventData) =>
             {
                 goScorePanel.SetActive(false);
@@ -889,7 +891,12 @@ namespace Assets.Source.Maqiao
             rtBack.pivot = new Vector2(0, 1);
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
 
-            float y = paiHeight * 35f;
+            goYiMing = new TextMeshProUGUI[QiaoShi.YiMing.Length];
+            goYiShu = new TextMeshProUGUI[QiaoShi.YiMing.Length];
+            goYiManMing = new TextMeshProUGUI[QiaoShi.YiManMing.Length];
+            goYiManShu = new TextMeshProUGUI[QiaoShi.YiManMing.Length];
+            float sizeY = paiHeight * (goYiShu.Length + goYiManShu.Length + 27f);
+            float y = sizeY / 2 - (paiHeight * 2f);
             goJiJuMingQian = Instantiate(goText, goDataContent.transform);
             DrawText(ref goJiJuMingQian, "", new Vector2(0, y), 0, 25);
 
@@ -936,20 +943,12 @@ namespace Assets.Source.Maqiao
             y -= paiHeight;
             DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", y);
             y -= paiHeight;
-            goYiMing = new TextMeshProUGUI[QiaoShi.YiMing.Length];
-            goYiShu = new TextMeshProUGUI[QiaoShi.YiMing.Length];
             for (int i = 0; i < goYiShu.Length; i++)
             {
-                if (QiaoShi.YiMing[i] == "ドラ")
-                {
-                    continue;
-                }
                 y -= paiHeight;
                 DrawData(ref goYiMing[i], ref goYiShu[i], QiaoShi.YiMing[i], y);
             }
             y -= paiHeight;
-            goYiManMing = new TextMeshProUGUI[QiaoShi.YiManMing.Length];
-            goYiManShu = new TextMeshProUGUI[QiaoShi.YiManMing.Length];
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 y -= paiHeight;
@@ -958,7 +957,7 @@ namespace Assets.Source.Maqiao
 
             RectTransform rtDataContent = goDataContent.GetComponent<RectTransform>();
             Vector2 size = rtDataContent.sizeDelta;
-            size.y = paiHeight * 73f;
+            size.y = sizeY;
             rtDataContent.sizeDelta = size;
             ScrollRect scrollRect = goDataScrollView.GetComponent<ScrollRect>();
             scrollRect.verticalNormalizedPosition = 1f;
@@ -1101,10 +1100,6 @@ namespace Assets.Source.Maqiao
             goJiLuPingJunFangChongDian.text = shi.JiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongDian / shi.JiLu.fangChongShu) + "点";
             for (int i = 0; i < goYiShu.Length; i++)
             {
-                if (QiaoShi.YiMing[i] == "ドラ")
-                {
-                    continue;
-                }
                 goYiShu[i].text = shi.JiLu.yiShu[i] + "回";
                 goYiMing[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
                 goYiShu[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
