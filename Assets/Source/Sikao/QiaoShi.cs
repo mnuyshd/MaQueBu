@@ -95,9 +95,9 @@ namespace Assets.Source.Sikao
 
         // 役満名
         internal static readonly string[] YiManMing = new string[] {
-            "天和", "地和", "国士無双", "国士無双十三面", "四暗刻", "四暗刻単騎", "四槓子", "四連刻", "大三元", "小四喜",
-            "大四喜", "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "人和", "小車輪", "大車輪", "大竹林",
-            "大数隣", "十三不塔"
+            "天和", "地和", "国士無双", "国士無双十三面", "四暗刻", "四暗刻単騎", "四槓子", "大三元", "小四喜", "大四喜",
+            "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "人和", "四連刻", "小車輪", "大車輪", "大竹林",
+            "大数隣", "紅孔雀", "百万石", "純正百万石", "十三不塔"
         };
         // 役名
         internal static readonly string[] YiMing = new string[] {
@@ -115,38 +115,38 @@ namespace Assets.Source.Sikao
         {
             // 天和
             TianHe = 0,
-            // 人和(ローカル)
-            RenHe = 1,
             // 地和
-            DeHe = 2,
+            DeHe = 1,
             // 国士無双
-            GuoShiWuShuang = 3,
+            GuoShiWuShuang = 2,
             // 国士無双十三面
-            GuoShiShiSanMian = 4,
+            GuoShiShiSanMian = 3,
             // 四暗刻
-            SiAnKe = 5,
+            SiAnKe = 4,
             // 四暗刻単騎
-            SiAnKeDanQi = 6,
+            SiAnKeDanQi = 5,
             // 四槓子
-            SiGangZi = 7,
-            // 四連刻(ローカル)
-            SiLianKe = 8,
+            SiGangZi = 6,
             // 大三元
-            DaSanYuan = 9,
+            DaSanYuan = 7,
             // 小四喜
-            XiaoSiXi = 10,
+            XiaoSiXi = 8,
             // 大四喜
-            DaSiXi = 11,
+            DaSiXi = 9,
             // 字一色
-            ZiYiSe = 12,
+            ZiYiSe = 10,
             // 清老頭
-            QingLaoTou = 13,
+            QingLaoTou = 11,
             // 九連宝燈
-            JiuLianBaoDegn = 14,
+            JiuLianBaoDegn = 12,
             // 純正九連宝燈
-            ChunZhengJiuLian = 15,
+            ChunZhengJiuLian = 13,
             // 緑一色
-            LuYiSe = 16,
+            LuYiSe = 14,
+            // 人和(ローカル)
+            RenHe = 15,
+            // 四連刻(ローカル)
+            SiLianKe = 16,
             // 小車輪(ローカル)
             XiaoCheLun = 17,
             // 大車輪(ローカル)
@@ -155,8 +155,14 @@ namespace Assets.Source.Sikao
             DaZhuLin = 19,
             // 大数隣(ローカル)
             DaShuLin = 20,
+            // 紅孔雀(ローカル)
+            GongKongQiao = 21,
+            // 百万石(ローカル)
+            BaiWanShi = 22,
+            // 純正百万石(ローカル)
+            ChunZhengBaiWanShi = 23,
             // 十三不塔(ローカル)
-            ShiSanBuTa = 21,
+            ShiSanBuTa = 24,
         }
 
         // 役
@@ -200,24 +206,24 @@ namespace Assets.Source.Sikao
             SanAnKe = 17,
             // 三槓子
             SanGangZi = 18,
-            // 三連刻(ローカル)
-            SanLianKe = 19,
             // 小三元
-            XiaoSanYuan = 20,
+            XiaoSanYuan = 19,
             // 混一色
-            HunYiSe = 21,
+            HunYiSe = 20,
             // 清一色
-            QingYiSe = 22,
+            QingYiSe = 21,
             // 対々和
-            DuiDuiHe = 23,
+            DuiDuiHe = 22,
             // 役牌
-            YiPai = 24,
+            YiPai = 23,
             // 七対子
-            QiDuiZi = 25,
+            QiDuiZi = 24,
             // 懸賞
-            XuanShang = 26,
+            XuanShang = 25,
             // 流し満貫
-            LiuManGuan = 27,
+            LiuManGuan = 26,
+            // 三連刻(ローカル)
+            SanLianKe = 27,
         }
 
         protected enum Ting
@@ -2255,6 +2261,10 @@ namespace Assets.Source.Sikao
                 DaZhuLin();
                 // 大数隣
                 DaShuLin();
+                // 紅孔雀
+                GongKongQiao();
+                // 百万石・純正百万石
+                BaiWanShi();
             }
 
             fanShuJi = 0;
@@ -2700,6 +2710,86 @@ namespace Assets.Source.Sikao
                 }
             }
             YiZhuiJia(YiManDingYi.DaShuLin, 1);
+        }
+
+        // 紅孔雀
+        private void GongKongQiao()
+        {
+            foreach (int sp in shouPai)
+            {
+                int p = sp & QIAO_PAI;
+                bool gongKong = false;
+                foreach (int lp in Pai.GongKongQiaoPaiDingYi)
+                {
+                    if (p == lp)
+                    {
+                        gongKong = true;
+                        break;
+                    }
+                }
+                if (!gongKong)
+                {
+                    return;
+                }
+            }
+            foreach ((List<int> pais, _, _) in fuLuPai)
+            {
+                foreach (int fp in pais)
+                {
+                    int p = fp & QIAO_PAI;
+                    bool gongKong = false;
+                    foreach (int lp in Pai.GongKongQiaoPaiDingYi)
+                    {
+                        if (p == lp)
+                        {
+                            gongKong = true;
+                            break;
+                        }
+                    }
+                    if (!gongKong)
+                    {
+                        return;
+                    }
+                }
+            }
+            YiZhuiJia(YiManDingYi.GongKongQiao, 1);
+        }
+
+        // 百万石・純正百万石
+        private void BaiWanShi()
+        {
+            int wanShi = 0;
+            foreach (int sp in shouPai)
+            {
+                int se = sp & SE_PAI;
+                if (se != 0x00)
+                {
+                    return;
+                }
+                wanShi += sp & SHU_PAI;
+            }
+
+            foreach ((List<int> pais, int jia, YaoDingYi yao) in fuLuPai)
+            {
+                foreach (int fp in pais)
+                {
+                    int se = fp & SE_PAI;
+                    if (se != 0x00)
+                    {
+                        return;
+                    }
+                    wanShi += fp & SHU_PAI;
+                }
+            }
+
+            if (wanShi == 100)
+            {
+                YiZhuiJia(YiManDingYi.ChunZhengBaiWanShi, 2);
+            }
+            else if (wanShi > 100)
+            {
+                YiZhuiJia(YiManDingYi.BaiWanShi, 1);
+            }
         }
 
         // 十三不塔判定

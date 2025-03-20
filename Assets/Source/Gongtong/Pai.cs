@@ -45,6 +45,12 @@ namespace Assets.Source.Gongtong
         {
             get { return luYiSePaiDingYi; }
         }
+        // 紅孔雀牌定義
+        private static readonly int[] gongKongQiaoPaiDingYi = new int[] { 0x21, 0x25, 0x27, 0x29, 0x37 };
+        internal static int[] GongKongQiaoPaiDingYi
+        {
+            get { return gongKongQiaoPaiDingYi; }
+        }
         // 風牌定義
         private static readonly int[] fengPaiDingYi = new int[] { 0x31, 0x32, 0x33, 0x34 };
         internal static int[] FengPaiDingYi
