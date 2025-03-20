@@ -503,6 +503,9 @@ namespace Assets.Source.Maqiao
                     keyPress = true;
                 }
                 goSettingPanel.SetActive(false);
+                if (eventStatus == Event.FOLLOW_QIAO_SHI_XUAN_ZE){
+                    OnClickScreenFollowNone();
+                }
             });
             RectTransform rtFast = goFast.GetComponent<RectTransform>();
             rtFast.localScale *= scale.x;
