@@ -1017,6 +1017,15 @@ namespace Assets.Source.Maqiao
             if (File.Exists(filePath))
             {
                 shi.JiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
+                // ファイル書き込み後にプログラムでローカル役を追加した場合は、配列サイズを変更する
+                if (shi.JiLu.yiManShu.Length != QiaoShi.YiManMing.Count)
+                {
+                    Array.Resize(ref shi.JiLu.yiManShu, QiaoShi.YiManMing.Count);
+                }
+                if (shi.JiLu.yiShu.Length != QiaoShi.YiMing.Count)
+                {
+                    Array.Resize(ref shi.JiLu.yiShu, QiaoShi.YiMing.Count);
+                }
             }
             else
             {

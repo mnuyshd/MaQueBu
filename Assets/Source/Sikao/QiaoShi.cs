@@ -145,6 +145,8 @@ namespace Assets.Source.Sikao
             ChunZhengBaiWanShi,
             // 十三不塔(ローカル)
             ShiSanBuTa,
+            // 八連荘(ローカル)
+            BaLianZhuang,
         }
 
         // 役満名
@@ -175,6 +177,7 @@ namespace Assets.Source.Sikao
             { YiManDingYi.BaiWanShi, "百万石" },
             { YiManDingYi.ChunZhengBaiWanShi, "純正百万石" },
             { YiManDingYi.ShiSanBuTa, "十三不塔" },
+            { YiManDingYi.BaLianZhuang, "八連荘" },
         };
 
         // 役
@@ -236,6 +239,8 @@ namespace Assets.Source.Sikao
             LiuManGuan,
             // 三連刻(ローカル)
             SanLianKe,
+            // 燕返し(ローカル)
+            YanFan,
         }
 
         // 役名
@@ -269,6 +274,7 @@ namespace Assets.Source.Sikao
             { YiDingYi.XuanShang, "ドラ" },
             { YiDingYi.LiuManGuan, "流し満貫" },
             { YiDingYi.SanLianKe, "三連刻" },
+            { YiDingYi.YanFan, "燕返し" },
         };
 
         // 得点役
@@ -623,6 +629,13 @@ namespace Assets.Source.Sikao
         internal int[] ShouPaiDian
         {
             get { return shouPaiDian; }
+        }
+        // 連荘数
+        private int lianZhuangShu;
+        internal int LianZhuangShu
+        {
+            get { return lianZhuangShu; }
+            set { lianZhuangShu = value; }
         }
 
         // コンストラクタ
@@ -2315,6 +2328,11 @@ namespace Assets.Source.Sikao
                 GongKongQiao();
                 // 百万石・純正百万石
                 BaiWanShi();
+                if (lianZhuangShu == 7)
+                {
+                    // 八連荘
+                    YiZhuiJia(YiManDingYi.BaLianZhuang, 1);
+                }
             }
 
             fanShuJi = 0;
@@ -2958,6 +2976,24 @@ namespace Assets.Source.Sikao
             {
                 // 懸賞牌
                 XuanShangPai();
+                if (Chang.LocalYi)
+                {
+                    if (!jiJia)
+                    {
+                        if (Chang.QiaoShis[Chang.ZiMoFan].ziJiaYao == YaoDingYi.LiZhi) {
+                            // 燕返し
+                            YiZhuiJia(YiDingYi.YanFan, 1);
+                        }
+                    }
+
+                    if (lianZhuangShu == 7)
+                    {
+                        // 八連荘
+                        yiFan = new();
+                        YiZhuiJia(YiManDingYi.BaLianZhuang, 1);
+                        yiMan = true;
+                    }
+                }
             }
 
             fanShuJi = 0;
@@ -3391,33 +3427,6 @@ namespace Assets.Source.Sikao
             }
         }
 
-        // 三連刻
-        private void SanLianKe()
-        {
-            if (keZi.Count < 3)
-            {
-                return;
-            }
-            for (int i = 0; i < keZi.Count - 2; i++)
-            {
-                if (ZiPaiPanDing(keZi[i].pais[0]))
-                {
-                    continue;
-                }
-                List<int> k = new()
-                {
-                    keZi[i].pais[0],
-                    keZi[i + 1].pais[0],
-                    keZi[i + 2].pais[0]
-                };
-                k.Sort();
-                if ((k[0] + 1 == k[1]) && (k[0] + 2 == k[2]))
-                {
-                    YiZhuiJia(YiDingYi.SanLianKe, 2);
-                }
-            }
-        }
-
         // 小三元
         private void XiaoSanYuan()
         {
@@ -3600,6 +3609,33 @@ namespace Assets.Source.Sikao
             if (xuan > 0)
             {
                 YiZhuiJia(YiDingYi.XuanShang, xuan);
+            }
+        }
+
+        // 三連刻
+        private void SanLianKe()
+        {
+            if (keZi.Count < 3)
+            {
+                return;
+            }
+            for (int i = 0; i < keZi.Count - 2; i++)
+            {
+                if (ZiPaiPanDing(keZi[i].pais[0]))
+                {
+                    continue;
+                }
+                List<int> k = new()
+                {
+                    keZi[i].pais[0],
+                    keZi[i + 1].pais[0],
+                    keZi[i + 2].pais[0]
+                };
+                k.Sort();
+                if ((k[0] + 1 == k[1]) && (k[0] + 2 == k[2]))
+                {
+                    YiZhuiJia(YiDingYi.SanLianKe, 2);
+                }
             }
         }
 

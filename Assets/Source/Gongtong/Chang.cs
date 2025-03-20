@@ -184,6 +184,10 @@ namespace Assets.Source.Gongtong
             feng = 0;
             changFeng = Pai.FengPaiDingYi[feng];
             gongTuo = 0;
+            foreach (QiaoShi shi in QiaoShis)
+            {
+                shi.LianZhuangShu = 0;
+            }
         }
 
         // 局初期化
@@ -263,12 +267,15 @@ namespace Assets.Source.Gongtong
         // 連荘
         internal static void LianZhuang()
         {
+            LianZhuangShuJiSuan();
             benChang++;
         }
 
         // 輪荘
         internal static void LunZhuang()
         {
+            LianZhuangShuJiSuan();
+
             ju++;
             if (ju >= (4 - (4 - qiaoShis.Count)))
             {
@@ -286,6 +293,34 @@ namespace Assets.Source.Gongtong
             }
             qin++;
             qin %= qiaoShis.Count;
+        }
+
+        // 連荘数計算
+        private static void LianZhuangShuJiSuan() {
+            for (int i = 0; i < QiaoShis.Count; i++)
+            {
+                QiaoShi shi = QiaoShis[i];
+                bool isHeLe = false;
+                foreach (int fan in RongHeFan)
+                {
+                    if (i == fan)
+                    {
+                        isHeLe = true;
+                    }
+                }
+                if (isHeLe || HeleFan == i)
+                {
+                    shi.LianZhuangShu++;
+                    if (shi.LianZhuangShu > 7)
+                    {
+                        shi.LianZhuangShu = 0;
+                    }
+                }
+                else
+                {
+                    shi.LianZhuangShu = 0;
+                }
+            }
         }
 
         // 点計算
