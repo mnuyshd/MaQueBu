@@ -56,8 +56,8 @@ namespace Assets.Source.Maqiao
         public int fangChongDian = 0;
 
         // 役満数
-        public int[] yiManShu = new int[Sikao.QiaoShi.YiManMing.Length];
+        public int[] yiManShu = new int[Sikao.QiaoShi.YiManMing.Count];
         // 役数
-        public int[] yiShu = new int[Sikao.QiaoShi.YiMing.Length];
+        public int[] yiShu = new int[Sikao.QiaoShi.YiMing.Count];
     }
 }

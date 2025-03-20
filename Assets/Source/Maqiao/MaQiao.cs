@@ -891,10 +891,10 @@ namespace Assets.Source.Maqiao
             rtBack.pivot = new Vector2(0, 1);
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
 
-            goYiMing = new TextMeshProUGUI[QiaoShi.YiMing.Length];
-            goYiShu = new TextMeshProUGUI[QiaoShi.YiMing.Length];
-            goYiManMing = new TextMeshProUGUI[QiaoShi.YiManMing.Length];
-            goYiManShu = new TextMeshProUGUI[QiaoShi.YiManMing.Length];
+            goYiMing = new TextMeshProUGUI[QiaoShi.YiMing.Count];
+            goYiShu = new TextMeshProUGUI[QiaoShi.YiMing.Count];
+            goYiManMing = new TextMeshProUGUI[QiaoShi.YiManMing.Count];
+            goYiManShu = new TextMeshProUGUI[QiaoShi.YiManMing.Count];
             float sizeY = paiHeight * (goYiShu.Length + goYiManShu.Length + 27f);
             float y = sizeY / 2 - (paiHeight * 2f);
             goJiJuMingQian = Instantiate(goText, goDataContent.transform);
@@ -943,16 +943,20 @@ namespace Assets.Source.Maqiao
             y -= paiHeight;
             DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", y);
             y -= paiHeight;
-            for (int i = 0; i < goYiShu.Length; i++)
+            int index = 0;
+            foreach (KeyValuePair<QiaoShi.YiDingYi, string> kvp in QiaoShi.YiMing)
             {
                 y -= paiHeight;
-                DrawData(ref goYiMing[i], ref goYiShu[i], QiaoShi.YiMing[i], y);
+                DrawData(ref goYiMing[index], ref goYiShu[index], kvp.Value, y);
+                index++;
             }
             y -= paiHeight;
-            for (int i = 0; i < goYiManShu.Length; i++)
+            index = 0;
+            foreach (KeyValuePair<QiaoShi.YiManDingYi, string> kvp in QiaoShi.YiManMing)
             {
                 y -= paiHeight;
-                DrawData(ref goYiManMing[i], ref goYiManShu[i], QiaoShi.YiManMing[i], y);
+                DrawData(ref goYiManMing[index], ref goYiManShu[index], kvp.Value, y);
+                index++;
             }
 
             RectTransform rtDataContent = goDataContent.GetComponent<RectTransform>();
@@ -4010,24 +4014,24 @@ namespace Assets.Source.Maqiao
                         }
                         if (isMingPai)
                         {
-                            x -= (paiHeight / 2);
+                            x -= paiHeight / 2;
                             DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y - (paiHeight - paiWidth) / 2), 90);
                             if (zhong == QiaoShi.YaoDingYi.JiaGang)
                             {
                                 DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (paiHeight - paiWidth) / 2 + paiWidth), 90);
                             }
-                            x -= (paiHeight / 2);
+                            x -= paiHeight / 2;
                         }
                         else
                         {
-                            x -= (paiWidth / 2);
+                            x -= paiWidth / 2;
                             DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y), 0);
-                            x -= (paiWidth / 2);
+                            x -= paiWidth / 2;
                         }
                     }
                 }
 
-                string hele = (shi.FanShuJi >= 13 ? QiaoShi.DeDianYi[13] : QiaoShi.DeDianYi[shi.FanShuJi]);
+                string hele = shi.FanShuJi >= 13 ? QiaoShi.DeDianYi[13] : QiaoShi.DeDianYi[shi.FanShuJi];
                 if (hele == "")
                 {
                     if ((shi.Fu >= 40 && shi.FanShuJi >= 4) || (shi.Fu >= 70 && shi.FanShuJi >= 3))
@@ -4043,7 +4047,7 @@ namespace Assets.Source.Maqiao
                 {
                     y -= paiHeight;
                     goYi[index] = Instantiate(goText, goText.transform.parent);
-                    string ming = (shi.YiMan ? QiaoShi.YiManMing[yi] : QiaoShi.YiMing[yi]);
+                    string ming = shi.YiMan ? QiaoShi.YiManMing[(QiaoShi.YiManDingYi)yi] : QiaoShi.YiMing[(QiaoShi.YiDingYi)yi];
                     DrawText(ref goYi[index], ming, new Vector2(0, y), 0, 25, TextAlignmentOptions.Left, 7);
                     goFanShu[index] = Instantiate(goText, goText.transform.parent);
                     DrawText(ref goFanShu[index], fanShu.ToString(), new Vector2(paiWidth * 3.3f, y), 0, 25, TextAlignmentOptions.Right, 2);

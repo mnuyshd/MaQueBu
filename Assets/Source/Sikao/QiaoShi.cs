@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using TMPro;
 
 using Assets.Source.Gongtong;
-using Assets.Source.Maqiao;
 
 namespace Assets.Source.Sikao
 {
@@ -93,138 +92,189 @@ namespace Assets.Source.Sikao
             return YaoMingButtonDingYi[(int)yao];
         }
 
+        // 役満
+        internal enum YiManDingYi
+        {
+            // 天和
+            TianHe,
+            // 地和
+            DeHe,
+            // 国士無双
+            GuoShiWuShuang,
+            // 国士無双十三面
+            GuoShiShiSanMian,
+            // 四暗刻
+            SiAnKe,
+            // 四暗刻単騎
+            SiAnKeDanQi,
+            // 四槓子
+            SiGangZi,
+            // 大三元
+            DaSanYuan,
+            // 小四喜
+            XiaoSiXi,
+            // 大四喜
+            DaSiXi,
+            // 字一色
+            ZiYiSe,
+            // 清老頭
+            QingLaoTou,
+            // 九連宝燈
+            JiuLianBaoDegn,
+            // 純正九連宝燈
+            ChunZhengJiuLian,
+            // 緑一色
+            LuYiSe,
+            // 人和(ローカル)
+            RenHe,
+            // 四連刻(ローカル)
+            SiLianKe,
+            // 小車輪(ローカル)
+            XiaoCheLun,
+            // 大車輪(ローカル)
+            DaCheLun,
+            // 大竹林(ローカル)
+            DaZhuLin,
+            // 大数隣(ローカル)
+            DaShuLin,
+            // 紅孔雀(ローカル)
+            GongKongQiao,
+            // 百万石(ローカル)
+            BaiWanShi,
+            // 純正百万石(ローカル)
+            ChunZhengBaiWanShi,
+            // 十三不塔(ローカル)
+            ShiSanBuTa,
+        }
+
         // 役満名
-        internal static readonly string[] YiManMing = new string[] {
-            "天和", "地和", "国士無双", "国士無双十三面", "四暗刻", "四暗刻単騎", "四槓子", "大三元", "小四喜", "大四喜",
-            "字一色", "清老頭", "九連宝燈", "純正九連宝燈", "緑一色", "人和", "四連刻", "小車輪", "大車輪", "大竹林",
-            "大数隣", "紅孔雀", "百万石", "純正百万石", "十三不塔"
+        internal static Dictionary<YiManDingYi, string> YiManMing = new()
+        {
+            { YiManDingYi.TianHe, "天和" },
+            { YiManDingYi.DeHe, "地和" },
+            { YiManDingYi.GuoShiWuShuang, "国士無双" },
+            { YiManDingYi.GuoShiShiSanMian, "国士無双十三面" },
+            { YiManDingYi.SiAnKe, "四暗刻" },
+            { YiManDingYi.SiAnKeDanQi, "四暗刻単騎" },
+            { YiManDingYi.SiGangZi, "四槓子" },
+            { YiManDingYi.DaSanYuan, "大三元" },
+            { YiManDingYi.XiaoSiXi, "小四喜" },
+            { YiManDingYi.DaSiXi, "大四喜" },
+            { YiManDingYi.ZiYiSe, "字一色" },
+            { YiManDingYi.QingLaoTou, "清老頭" },
+            { YiManDingYi.JiuLianBaoDegn, "九連宝燈" },
+            { YiManDingYi.ChunZhengJiuLian, "純正九連宝燈" },
+            { YiManDingYi.LuYiSe, "緑一色" },
+            { YiManDingYi.RenHe, "人和" },
+            { YiManDingYi.SiLianKe, "四連刻" },
+            { YiManDingYi.XiaoCheLun, "小車輪" },
+            { YiManDingYi.DaCheLun, "大車輪" },
+            { YiManDingYi.DaZhuLin, "大竹林" },
+            { YiManDingYi.DaShuLin, "大数隣" },
+            { YiManDingYi.GongKongQiao, "紅孔雀" },
+            { YiManDingYi.BaiWanShi, "百万石" },
+            { YiManDingYi.ChunZhengBaiWanShi, "純正百万石" },
+            { YiManDingYi.ShiSanBuTa, "十三不塔" },
         };
+
+        // 役
+        internal enum YiDingYi
+        {
+            // 立直
+            LiZi,
+            // Ｗ立直
+            WLiZi,
+            // 一発
+            YiFa,
+            // 海底撈月
+            HaiDiLaoYue,
+            // 河底撈魚
+            HeDiLaoYu,
+            // 嶺上開花
+            LingShangKaiHua,
+            // 槍槓
+            QiangGang,
+            // 面前清自摸和
+            MianQianQingZiMoHe,
+            // 平和
+            PingHe,
+            // 断幺九
+            DuanYaoJiu,
+            // 一盃口
+            YiBeiKou,
+            // 二盃口
+            ErBeiKou,
+            // 一気通貫
+            YiQiTongGuan,
+            // 三色同順
+            SanSeTongShun,
+            // 全帯幺
+            QuanDaiYao,
+            // 純全帯
+            ChunQuanDai,
+            // 混老頭
+            HunLaoTou,
+            // 三暗刻
+            SanAnKe,
+            // 三槓子
+            SanGangZi,
+            // 小三元
+            XiaoSanYuan,
+            // 混一色
+            HunYiSe,
+            // 清一色
+            QingYiSe,
+            // 対々和
+            DuiDuiHe,
+            // 役牌
+            YiPai,
+            // 七対子
+            QiDuiZi,
+            // 懸賞
+            XuanShang,
+            // 流し満貫
+            LiuManGuan,
+            // 三連刻(ローカル)
+            SanLianKe,
+        }
+
         // 役名
-        internal static readonly string[] YiMing = new string[] {
-            "立直", "Ｗ立直", "一発", "海底撈月", "河底撈魚", "嶺上開花", "槍槓", "面前清自摸和", "平和", "断幺九",
-            "一盃口", "二盃口", "一気通貫", "三色同順", "混全帯么九", "純全帯么九", "混老頭", "三暗刻", "三槓子", "小三元",
-            "混一色", "清一色", "対々和", "役牌", "七対子", "ドラ", "流し満貫", "三連刻"
+        internal static Dictionary<YiDingYi, string> YiMing = new()
+        {
+            { YiDingYi.LiZi, "立直" },
+            { YiDingYi.WLiZi, "Ｗ立直" },
+            { YiDingYi.YiFa, "一発" },
+            { YiDingYi.HaiDiLaoYue, "海底撈月" },
+            { YiDingYi.HeDiLaoYu, "河底撈魚" },
+            { YiDingYi.LingShangKaiHua, "嶺上開花" },
+            { YiDingYi.QiangGang, "槍槓" },
+            { YiDingYi.MianQianQingZiMoHe, "面前清自摸和" },
+            { YiDingYi.PingHe, "平和" },
+            { YiDingYi.DuanYaoJiu, "断幺九" },
+            { YiDingYi.YiBeiKou, "一盃口" },
+            { YiDingYi.ErBeiKou, "二盃口" },
+            { YiDingYi.YiQiTongGuan, "一気通貫" },
+            { YiDingYi.SanSeTongShun, "三色同順" },
+            { YiDingYi.QuanDaiYao, "混全帯么九" },
+            { YiDingYi.ChunQuanDai, "純全帯么九" },
+            { YiDingYi.HunLaoTou, "混老頭" },
+            { YiDingYi.SanAnKe, "三暗刻" },
+            { YiDingYi.SanGangZi, "三槓子" },
+            { YiDingYi.XiaoSanYuan, "小三元" },
+            { YiDingYi.HunYiSe, "混一色" },
+            { YiDingYi.QingYiSe, "清一色" },
+            { YiDingYi.DuiDuiHe, "対々和" },
+            { YiDingYi.YiPai, "役牌" },
+            { YiDingYi.QiDuiZi, "七対子" },
+            { YiDingYi.XuanShang, "ドラ" },
+            { YiDingYi.LiuManGuan, "流し満貫" },
+            { YiDingYi.SanLianKe, "三連刻" },
         };
+
         // 得点役
         internal static readonly string[] DeDianYi = new string[] {
             "", "", "", "", "", "満貫", "跳満", "跳満", "倍満", "倍満", "倍満", "三倍満", "三倍満", "役満"
         };
-
-        // 役満
-        private enum YiManDingYi
-        {
-            // 天和
-            TianHe = 0,
-            // 地和
-            DeHe = 1,
-            // 国士無双
-            GuoShiWuShuang = 2,
-            // 国士無双十三面
-            GuoShiShiSanMian = 3,
-            // 四暗刻
-            SiAnKe = 4,
-            // 四暗刻単騎
-            SiAnKeDanQi = 5,
-            // 四槓子
-            SiGangZi = 6,
-            // 大三元
-            DaSanYuan = 7,
-            // 小四喜
-            XiaoSiXi = 8,
-            // 大四喜
-            DaSiXi = 9,
-            // 字一色
-            ZiYiSe = 10,
-            // 清老頭
-            QingLaoTou = 11,
-            // 九連宝燈
-            JiuLianBaoDegn = 12,
-            // 純正九連宝燈
-            ChunZhengJiuLian = 13,
-            // 緑一色
-            LuYiSe = 14,
-            // 人和(ローカル)
-            RenHe = 15,
-            // 四連刻(ローカル)
-            SiLianKe = 16,
-            // 小車輪(ローカル)
-            XiaoCheLun = 17,
-            // 大車輪(ローカル)
-            DaCheLun = 18,
-            // 大竹林(ローカル)
-            DaZhuLin = 19,
-            // 大数隣(ローカル)
-            DaShuLin = 20,
-            // 紅孔雀(ローカル)
-            GongKongQiao = 21,
-            // 百万石(ローカル)
-            BaiWanShi = 22,
-            // 純正百万石(ローカル)
-            ChunZhengBaiWanShi = 23,
-            // 十三不塔(ローカル)
-            ShiSanBuTa = 24,
-        }
-
-        // 役
-        private enum YiDingYi
-        {
-            // 立直
-            LiZi = 0,
-            // Ｗ立直
-            WLiZi = 1,
-            // 一発
-            YiFa = 2,
-            // 海底撈月
-            HaiDiLaoYue = 3,
-            // 河底撈魚
-            HeDiLaoYu = 4,
-            // 嶺上開花
-            LingShangKaiHua = 5,
-            // 槍槓
-            QiangGang = 6,
-            // 面前清自摸和
-            MianQianQingZiMoHe = 7,
-            // 平和
-            PingHe = 8,
-            // 断幺九
-            DuanYaoJiu = 9,
-            // 一盃口
-            YiBeiKou = 10,
-            // 二盃口
-            ErBeiKou = 11,
-            // 一気通貫
-            YiQiTongGuan = 12,
-            // 三色同順
-            SanSeTongShun = 13,
-            // 全帯幺
-            QuanDaiYao = 14,
-            // 純全帯
-            ChunQuanDai = 15,
-            // 混老頭
-            HunLaoTou = 16,
-            // 三暗刻
-            SanAnKe = 17,
-            // 三槓子
-            SanGangZi = 18,
-            // 小三元
-            XiaoSanYuan = 19,
-            // 混一色
-            HunYiSe = 20,
-            // 清一色
-            QingYiSe = 21,
-            // 対々和
-            DuiDuiHe = 22,
-            // 役牌
-            YiPai = 23,
-            // 七対子
-            QiDuiZi = 24,
-            // 懸賞
-            XuanShang = 25,
-            // 流し満貫
-            LiuManGuan = 26,
-            // 三連刻(ローカル)
-            SanLianKe = 27,
-        }
 
         protected enum Ting
         {
