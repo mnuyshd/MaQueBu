@@ -99,63 +99,22 @@ namespace Assets.Source.Sikao
             if (LiZhi)
             {
                 // 暗槓判定
-                int liDian = 999;
-                wei = -1;
-                for (int i = 0; i < AnGangPaiWei.Count; i++)
-                {
-                    List<int> weis = AnGangPaiWei[i];
-                    int dian = 999;
-                    foreach (int w in weis)
-                    {
-                        if (dian > shouPaiDian[w])
-                        {
-                            dian = shouPaiDian[w];
-                            wei = i;
-                        }
-                    }
-                    if (liDian > dian)
-                    {
-                        liDian = dian;
-                        wei = i;
-                    }
-                }
+                wei = AnGang();
                 if (wei >= 0)
                 {
-                    if (liDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
-                    {
-                        // 暗槓
-                        ZiJiaYao = YaoDingYi.AnGang;
-                        ZiJiaXuanZe = wei;
-                        return;
-                    }
+                    ZiJiaYao = YaoDingYi.AnGang;
+                    ZiJiaXuanZe = wei;
+                    return;
                 }
                 // 加槓判定
-                liDian = 999;
-                wei = -1;
-                for (int i = 0; i < JiaGangPaiWei.Count; i++)
-                {
-                    List<int> weis = JiaGangPaiWei[i];
-                    int dian = 0;
-                    foreach (int w in weis)
-                    {
-                        dian += shouPaiDian[w];
-                    }
-                    if (liDian > dian)
-                    {
-                        liDian = dian;
-                        wei = i;
-                    }
-                }
+                wei = JiaGang();
                 if (wei >= 0)
                 {
-                    if (liDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
-                    {
-                        // 加槓
-                        ZiJiaYao = YaoDingYi.JiaGang;
-                        ZiJiaXuanZe = wei;
-                        return;
-                    }
+                    ZiJiaYao = YaoDingYi.JiaGang;
+                    ZiJiaXuanZe = wei;
+                    return;
                 }
+
                 // 立直後自摸切
                 ZiJiaYao = YaoDingYi.Wu;
                 ZiJiaXuanZe = ShouPai.Count - 1;
@@ -187,19 +146,27 @@ namespace Assets.Source.Sikao
             // 手牌点数計算
             ShouPaiDianShuJiSuan();
 
-            if (AnGangPaiWei.Count > 0 && shouPaiDian[ShouPai.Count - 1] < nao[XingGe.SHUN_ZI])
+            if (AnGangPaiWei.Count > 0)
             {
-                // 暗槓
-                ZiJiaYao = YaoDingYi.AnGang;
-                ZiJiaXuanZe = 0;
-                return;
+                wei = AnGang();
+                if (wei >= 0)
+                {
+                    // 暗槓
+                    ZiJiaYao = YaoDingYi.AnGang;
+                    ZiJiaXuanZe = 0;
+                    return;
+                }
             }
-            if (JiaGangPaiWei.Count > 0 && shouPaiDian[ShouPai.Count - 1] < nao[XingGe.SHUN_ZI])
+            if (JiaGangPaiWei.Count > 0)
             {
-                // 加槓
-                ZiJiaYao = YaoDingYi.JiaGang;
-                ZiJiaXuanZe = 0;
-                return;
+                wei = JiaGang();
+                if (wei >= 0)
+                {
+                    // 加槓
+                    ZiJiaYao = YaoDingYi.JiaGang;
+                    ZiJiaXuanZe = wei;
+                    return;
+                }
             }
 
             wei = ShouPai.Count - 1;
@@ -260,6 +227,90 @@ namespace Assets.Source.Sikao
 
             ZiJiaYao = YaoDingYi.Wu;
             ZiJiaXuanZe = PaiXuanZe(wei);
+        }
+
+        // 暗槓判定
+        private int AnGang()
+        {
+            int minDian = 999;
+            int wei = -1;
+            for (int i = 0; i < AnGangPaiWei.Count; i++)
+            {
+                List<int> weis = AnGangPaiWei[i];
+                int dian = 999;
+                foreach (int w in weis)
+                {
+                    if (dian > shouPaiDian[w])
+                    {
+                        dian = shouPaiDian[w];
+                        wei = i;
+                    }
+                }
+                if (minDian > dian)
+                {
+                    minDian = dian;
+                    wei = i;
+                }
+            }
+            if (wei >= 0)
+            {
+                if (minDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
+                {
+                    if (minDian < nao[XingGe.XUAN_SHANG] - (nao[XingGe.SHUN_ZI] - 50))
+                    {
+                        for (int i = 0; i < ShouPai.Count; i++)
+                        {
+                            if (minDian > shouPaiDian[i])
+                            {
+                                return -1;
+                            }
+                        }
+                    }
+                    // 暗槓
+                    return wei;
+                }
+            }
+            return -1;
+        }
+
+        // 加槓判定
+        private int JiaGang()
+        {
+            int minDian = 999;
+            int wei = -1;
+            for (int i = 0; i < JiaGangPaiWei.Count; i++)
+            {
+                List<int> weis = JiaGangPaiWei[i];
+                int dian = 0;
+                foreach (int w in weis)
+                {
+                    dian += shouPaiDian[w];
+                }
+                if (minDian > dian)
+                {
+                    minDian = dian;
+                    wei = i;
+                }
+            }
+            if (wei >= 0)
+            {
+                if (minDian < nao[XingGe.MING] - (nao[XingGe.TAO] - 50))
+                {
+                    if (minDian < nao[XingGe.XUAN_SHANG] - (nao[XingGe.SHUN_ZI] - 50))
+                    {
+                        for (int i = 0; i < ShouPai.Count; i++)
+                        {
+                            if (minDian > shouPaiDian[i])
+                            {
+                                return -1;
+                            }
+                        }
+                    }
+                    // 加槓
+                    return wei;
+                }
+            }
+            return -1;
         }
 
         // 思考他家
@@ -657,11 +708,38 @@ namespace Assets.Source.Sikao
                     for (int j = 0; j < ShouPai.Count; j++)
                     {
                         int p = ShouPai[j] & QIAO_PAI;
-                        if (p == i && k > 0)
+                        if (p == i)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
-                            ShouPaiShu[i]--;
-                            k--;
+                            if (k > 0)
+                            {
+                                shouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
+                                ShouPaiShu[i]--;
+                                k--;
+                            }
+                            else
+                            {
+                                if (p >= ZI_PAI)
+                                {
+                                    continue;
+                                }
+                                int s = p & SHU_PAI;
+                                if ((s >= 3 && ShouPaiShu[i - 2] > 0 && ShouPaiShu[i - 1] > 0) || (s <= 7 && ShouPaiShu[i + 1] > 0 && ShouPaiShu[i + 2] > 0) || (s >= 2 && s <= 8 && ShouPaiShu[i - 1] > 0 && ShouPaiShu[i + 1] > 0))
+                                {
+                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2;
+                                }
+                                if ((s >= 3 && ShouPaiShu[i - 1] > 0) || (s <= 7 && ShouPaiShu[i + 1] > 0))
+                                {
+                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 3;
+                                }
+                                if ((s >= 3 && ShouPaiShu[i - 2] > 0) || (s <= 7 && ShouPaiShu[i + 2] > 0))
+                                {
+                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 4;
+                                }
+                                if ((s == 1 && ShouPaiShu[i + 1] > 0) || (s == 2 && ShouPaiShu[i - 1] > 0) || (s == 8 && ShouPaiShu[i + 1] > 0) || (s == 9 && ShouPaiShu[i - 1] > 0))
+                                {
+                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 5;
+                                }
+                            }
                         }
                     }
                 }

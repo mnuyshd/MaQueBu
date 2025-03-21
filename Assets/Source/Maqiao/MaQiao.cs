@@ -1252,7 +1252,20 @@ namespace Assets.Source.Maqiao
             y -= offset;
             DrawToggleButton(() => Chang.guiZe.baoZe, v => Chang.guiZe.baoZe = v, "パオ（責任払い）有り", "パオ（責任払い）無し", new Vector2(x, y));
             y -= offset;
-            DrawToggleButton("赤ドラ（萬子" + Number2Full(Chang.guiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(Chang.guiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(Chang.guiZe.chiPaiShu[2]) + "枚）", new Vector2(x, y));
+
+            Button buttonChiPaiShu = Instantiate(goButton, goGuiZeContent.transform);
+            Destroy(buttonChiPaiShu.GetComponent<Image>());
+            DrawButton(ref buttonChiPaiShu, Chang.guiZe.chiPaiShu[0] == 0 ? "赤ドラ無し" : "赤ドラ（萬子" + Number2Full(Chang.guiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(Chang.guiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(Chang.guiZe.chiPaiShu[2]) + "枚）", new Vector2(x, y), 18);
+            TextMeshProUGUI text = buttonChiPaiShu.GetComponentInChildren<TextMeshProUGUI>();
+            text.alignment = TextAlignmentOptions.Left;
+            text.fontSize = 20f;
+            buttonChiPaiShu.onClick.AddListener(delegate
+            {
+                Chang.guiZe.chiPaiShu = Chang.guiZe.chiPaiShu[0] == 0 ? new int[] { 1, 1, 1 } : new int[] { 0, 0, 0 };
+                text.text = Chang.guiZe.chiPaiShu[0] == 0 ? "赤ドラ無し" : "赤ドラ（萬子" + Number2Full(Chang.guiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(Chang.guiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(Chang.guiZe.chiPaiShu[2]) + "枚）";
+                File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
+            });
+
             y -= offset;
             DrawToggleButton(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, "九種九牌は親の連荘", "九種九牌は流局（親流れ）", new Vector2(x, y));
             y -= offset;
