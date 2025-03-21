@@ -252,7 +252,7 @@ namespace Assets.Source.Sikao
             QiDuiZi,
             // 懸賞
             XuanShang,
-            // 流し満貫
+            // 流し満貫(ローカル)
             LiuManGuan,
             // 三連刻(ローカル)
             SanLianKe,
@@ -691,7 +691,7 @@ namespace Assets.Source.Sikao
         // 荘初期化
         internal void ZhuangChuQiHua()
         {
-            dianBang = GuiZe.kaiShiDian;
+            dianBang = Chang.guiZe.kaiShiDian;
             jiJiDian = 0;
         }
 
@@ -736,14 +736,10 @@ namespace Assets.Source.Sikao
 
             // 九種九牌判定
             JiuZhongJiuPaiPanDing();
-
-            if (Chang.LocalYi)
+            // 十三不塔判定
+            if (ShiSanBuTaPanDing())
             {
-                // 十三不塔判定
-                if (ShiSanBuTaPanDing())
-                {
-                    heLe = true;
-                }
+                heLe = true;
             }
 
             // 食替牌判定
@@ -984,7 +980,7 @@ namespace Assets.Source.Sikao
         // 包則判定
         private void BaoZePanDing()
         {
-            if (!GuiZe.baoZe)
+            if (!Chang.guiZe.baoZe)
             {
                 return;
             }
@@ -1646,7 +1642,7 @@ namespace Assets.Source.Sikao
                 }
                 if (yi == (int)YiDingYi.PingHe)
                 {
-                    if (GuiZe.ziMoPingHe && jiJia)
+                    if (Chang.guiZe.ziMoPingHe && jiJia)
                     {
                         fu = 20;
                         return;
@@ -1902,7 +1898,7 @@ namespace Assets.Source.Sikao
                 {
                     heLePai.Add((hp, i, dian));
 
-                    if (Pai.CanShanPaiShu() >= 4 && taJiaFuLuShu == 0 && (dianBang >= 1000 || GuiZe.jieJinLiZhi))
+                    if (Pai.CanShanPaiShu() >= 4 && taJiaFuLuShu == 0 && (dianBang >= 1000 || Chang.guiZe.jieJinLiZhi))
                     {
                         liZhiPaiWei.Add(i);
                     }
@@ -2179,7 +2175,7 @@ namespace Assets.Source.Sikao
         // 食替牌判定
         private void ShiTiPaiPanDing()
         {
-            if (GuiZe.shiTi || !fuLuShun)
+            if (Chang.guiZe.shiTi || !fuLuShun)
             {
                 return;
             }
@@ -2329,27 +2325,24 @@ namespace Assets.Source.Sikao
             JiuLianBaoDeng();
             // 緑一色
             LuYiSe();
-            if (Chang.LocalYi)
+            // 人和
+            RenHe();
+            // 四連刻
+            SiLianKe();
+            // 小車輪・大車輪
+            DaCheLun();
+            // 大竹林
+            DaZhuLin();
+            // 大数隣
+            DaShuLin();
+            // 紅孔雀
+            GongKongQiao();
+            // 百万石・純正百万石
+            BaiWanShi();
+            if (Chang.guiZe.baLianZhuang && lianZhuangShu == 7)
             {
-                // 人和
-                RenHe();
-                // 四連刻
-                SiLianKe();
-                // 小車輪・大車輪
-                DaCheLun();
-                // 大竹林
-                DaZhuLin();
-                // 大数隣
-                DaShuLin();
-                // 紅孔雀
-                GongKongQiao();
-                // 百万石・純正百万石
-                BaiWanShi();
-                if (lianZhuangShu == 7)
-                {
-                    // 八連荘
-                    YiZhuiJia(YiManDingYi.BaLianZhuang, 1);
-                }
+                // 八連荘
+                YiZhuiJia(YiManDingYi.BaLianZhuang, 1);
             }
 
             fanShuJi = 0;
@@ -2389,22 +2382,6 @@ namespace Assets.Source.Sikao
                 if (jiJia)
                 {
                     YiZhuiJia(YiManDingYi.DeHe, 1);
-                }
-            }
-        }
-
-        // 人和
-        private void RenHe()
-        {
-            if (feng == 0x31)
-            {
-                return;
-            }
-            if (yiXunMu)
-            {
-                if (!jiJia)
-                {
-                    YiZhuiJia(YiManDingYi.RenHe, 1);
                 }
             }
         }
@@ -2459,34 +2436,6 @@ namespace Assets.Source.Sikao
             if (gangZi == 4)
             {
                 YiZhuiJia(YiManDingYi.SiGangZi, 1);
-            }
-        }
-
-        // 四連刻
-        private void SiLianKe()
-        {
-            if (keZi.Count < 4)
-            {
-                return;
-            }
-            List<int> k = new()
-            {
-                keZi[0].pais[0],
-                keZi[1].pais[0],
-                keZi[2].pais[0],
-                keZi[3].pais[0]
-            };
-            k.Sort();
-            foreach (int p in k)
-            {
-                if (ZiPaiPanDing(p))
-                {
-                    return;
-                }
-            }
-            if ((k[0] + 1 == k[1]) && (k[0] + 2 == k[2]) && (k[0] + 3 == k[3]))
-            {
-                YiZhuiJia(YiManDingYi.SiLianKe, 1);
             }
         }
 
@@ -2721,9 +2670,65 @@ namespace Assets.Source.Sikao
             YiZhuiJia(YiManDingYi.LuYiSe, 1);
         }
 
+        // 人和
+        private void RenHe()
+        {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
+            if (feng == 0x31)
+            {
+                return;
+            }
+            if (yiXunMu)
+            {
+                if (!jiJia)
+                {
+                    YiZhuiJia(YiManDingYi.RenHe, 1);
+                }
+            }
+        }
+
+        // 四連刻
+        private void SiLianKe()
+        {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
+            if (keZi.Count < 4)
+            {
+                return;
+            }
+            List<int> k = new()
+            {
+                keZi[0].pais[0],
+                keZi[1].pais[0],
+                keZi[2].pais[0],
+                keZi[3].pais[0]
+            };
+            k.Sort();
+            foreach (int p in k)
+            {
+                if (ZiPaiPanDing(p))
+                {
+                    return;
+                }
+            }
+            if ((k[0] + 1 == k[1]) && (k[0] + 2 == k[2]) && (k[0] + 3 == k[3]))
+            {
+                YiZhuiJia(YiManDingYi.SiLianKe, 1);
+            }
+        }
+
         // 小車輪・大車輪
         private void DaCheLun()
         {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
             // 手牌数計算
             ShouPaiShuJiSuan();
             // 大車輪
@@ -2770,6 +2775,10 @@ namespace Assets.Source.Sikao
         // 大竹林
         private void DaZhuLin()
         {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
             // 手牌数計算
             ShouPaiShuJiSuan();
             for (int i = 0x22; i <= 0x28; i++)
@@ -2785,6 +2794,10 @@ namespace Assets.Source.Sikao
         // 大数隣
         private void DaShuLin()
         {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
             // 手牌数計算
             ShouPaiShuJiSuan();
             for (int i = 0x02; i <= 0x08; i++)
@@ -2800,6 +2813,10 @@ namespace Assets.Source.Sikao
         // 紅孔雀
         private void GongKongQiao()
         {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
             foreach (int sp in shouPai)
             {
                 int p = sp & QIAO_PAI;
@@ -2843,6 +2860,10 @@ namespace Assets.Source.Sikao
         // 百万石・純正百万石
         private void BaiWanShi()
         {
+            if (!Chang.guiZe.localYiMan)
+            {
+                return;
+            }
             int wanShi = 0;
             foreach (int sp in shouPai)
             {
@@ -2880,6 +2901,11 @@ namespace Assets.Source.Sikao
         // 十三不塔判定
         private bool ShiSanBuTaPanDing()
         {
+            if (!Chang.guiZe.shiSanBuTa)
+            {
+                return false;
+            }
+
             yiMan = false;
             yiFan = new();
             fanShuJi = 0;
@@ -2983,33 +3009,28 @@ namespace Assets.Source.Sikao
             HunYiSeQingYiSe();
             // 七対子
             QiDuiZi();
-            if (Chang.LocalYi)
-            {
-                // 三連刻
-                SanLianKe();
-            }
+            // 三連刻
+            SanLianKe();
 
             if (yiFan.Count > 0)
             {
                 // 懸賞牌
                 XuanShangPai();
-                if (Chang.LocalYi)
+                if (!jiJia)
                 {
-                    if (!jiJia)
+                    if (Chang.guiZe.yanFan && Chang.QiaoShis[Chang.ZiMoFan].ziJiaYao == YaoDingYi.LiZhi)
                     {
-                        if (Chang.QiaoShis[Chang.ZiMoFan].ziJiaYao == YaoDingYi.LiZhi) {
-                            // 燕返し
-                            YiZhuiJia(YiDingYi.YanFan, 1);
-                        }
+                        // 燕返し
+                        YiZhuiJia(YiDingYi.YanFan, 1);
                     }
+                }
 
-                    if (lianZhuangShu == 7)
-                    {
-                        // 八連荘
-                        yiFan = new();
-                        YiZhuiJia(YiManDingYi.BaLianZhuang, 1);
-                        yiMan = true;
-                    }
+                if (lianZhuangShu == 7)
+                {
+                    // 八連荘
+                    yiFan = new();
+                    YiZhuiJia(YiManDingYi.BaLianZhuang, 1);
+                    yiMan = true;
                 }
             }
 
@@ -3096,7 +3117,7 @@ namespace Assets.Source.Sikao
             {
                 return;
             }
-            if (!GuiZe.ziMoPingHe && jiJia)
+            if (!Chang.guiZe.ziMoPingHe && jiJia)
             {
                 // 自摸平和無し
                 return;
@@ -3128,7 +3149,7 @@ namespace Assets.Source.Sikao
                     return;
                 }
             }
-            if (!GuiZe.shiDuan && fuLuPai.Count > 0)
+            if (!Chang.guiZe.shiDuan && fuLuPai.Count > 0)
             {
                 // 喰断無し
                 return;
@@ -3632,6 +3653,10 @@ namespace Assets.Source.Sikao
         // 三連刻
         private void SanLianKe()
         {
+            if (!Chang.guiZe.sanLianKe)
+            {
+                return;
+            }
             if (keZi.Count < 3)
             {
                 return;

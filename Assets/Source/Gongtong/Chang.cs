@@ -7,6 +7,8 @@ namespace Assets.Source.Gongtong
     // 場
     internal class Chang
     {
+        // ルール
+        internal static GuiZe guiZe;
         // 雀士
         private static List<QiaoShi> qiaoShis = new();
         internal static List<QiaoShi> QiaoShis
@@ -120,13 +122,6 @@ namespace Assets.Source.Gongtong
         {
             get { return taJiaXuanZe; }
             set { taJiaXuanZe = value; }
-        }
-        // ローカル役
-        private static bool localYi;
-        internal static bool LocalYi
-        {
-            get { return localYi; }
-            set { localYi = value; }
         }
 
         // 風

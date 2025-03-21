@@ -128,7 +128,7 @@ namespace Assets.Source.Gongtong
             for (int i = 0; i < ChiPaiDingYi.Length; i++)
             {
                 int cp = ChiPaiDingYi[i];
-                for (int j = 0; j < GuiZe.chiPaiShu[i]; j++)
+                for (int j = 0; j < Chang.guiZe.chiPaiShu[i]; j++)
                 {
                     for (int k = 0; k < shanPai.Count; k++)
                     {

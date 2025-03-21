@@ -1,39 +1,49 @@
 namespace Assets.Source.Gongtong
 {
     // 規則
-    internal class GuiZe
+    public class GuiZe
     {
         // 喰断
-        internal static bool shiDuan = true;
+        public bool shiDuan = true;
         // 自摸平和
-        internal static bool ziMoPingHe = true;
+        public bool ziMoPingHe = true;
         // 食い替え
-        internal static bool shiTi = false;
+        public bool shiTi = false;
         // 箱(ドボン)
-        internal static bool xiang = true;
+        public bool xiang = true;
         // 赤牌数
-        internal static int[] chiPaiShu = new int[] { 1, 1, 1 };
+        public int[] chiPaiShu = new int[] { 1, 1, 1 };
         // W栄和(falseの場合、頭ハネ)
-        internal static bool wRongHe = true;
+        public bool wRongHe = true;
         // 借金立直
-        internal static bool jieJinLiZhi = false;
+        public bool jieJinLiZhi = false;
         // 南場不聴連荘
-        internal static bool nanChangBuTingLianZhuang = false;
+        public bool nanChangBuTingLianZhuang = false;
         // 開始点
-        internal static int kaiShiDian = 25000;
+        public int kaiShiDian = 25000;
         // 返し点
-        internal static int fanDian = 30000;
+        public int fanDian = 30000;
         // 九種九牌 連荘
-        internal static bool jiuZhongJiuPaiLianZhuang = true;
+        public bool jiuZhongJiuPaiLianZhuang = true;
         // 四家立直 連荘
-        internal static bool siJiaLiZhiLianZhuang = true;
+        public bool siJiaLiZhiLianZhuang = true;
         // 四風子連打 連荘
-        internal static bool siFengZiLianDaLianZhuang = true;
+        public bool siFengZiLianDaLianZhuang = true;
         // 四開槓 連荘
-        internal static bool siKaiGangLianZhuang = false;
-        // 流し満貫
-        internal static bool liuManGuan = true;
+        public bool siKaiGangLianZhuang = false;
         // 包則
-        internal static bool baoZe = true;
+        public bool baoZe = true;
+        // 流し満貫
+        public bool liuManGuan = false;
+        // 三連刻
+        public bool sanLianKe = false;
+        // 燕返し
+        public bool yanFan = false;
+        // 十三不塔
+        public bool shiSanBuTa = false;
+        // 八連荘
+        public bool baLianZhuang = false;
+        // ローカル役満
+        public bool localYiMan = false;
     }
 }

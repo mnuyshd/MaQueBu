@@ -30,9 +30,7 @@ namespace Assets.Source.Maqiao
         public bool xiangTingShuBiaoShi = true;
         // 鳴パスはボタン
         public bool mingQuXiao = true;
-        // ローカル役無し
-        public bool localYi = false;
-        // デバッグ表示無し
-        public bool debugDisplay = false;
+        // 手牌点表示無し
+        public bool shouPaiDianBiaoShi = false;
     }
 }
