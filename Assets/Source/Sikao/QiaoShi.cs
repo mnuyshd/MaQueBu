@@ -68,20 +68,37 @@ namespace Assets.Source.Sikao
             Clear = 20
         }
 
-        // 腰名
-        private static readonly string[] YaoMingDingYi = new string[] {
-            "", "チー", "ポン", "カン", "カン", "カン", "リーチ", "ツモ", "ロン", "九種九牌",
-            "テンパイ", "ノーテン", "和了", "四開槓", "四家立直", "流し満貫", "四風子連打", "チョンボ", "", "", ""
+        // 腰
+        private static readonly Dictionary<YaoDingYi, (string ming, string yao, string button)> YaoMingDingYi = new(){
+            { YaoDingYi.Wu, ("無", "", "パス") },
+            { YaoDingYi.Chi, ("吃", "チー", "チー") },
+            { YaoDingYi.Bing, ("石並", "ポン", "ポン") },
+            { YaoDingYi.DaMingGang, ("大明槓", "カン", "カン") },
+            { YaoDingYi.JiaGang, ("加槓", "カン", "加槓") },
+            { YaoDingYi.AnGang, ("暗槓", "カン", "暗槓") },
+            { YaoDingYi.LiZhi, ("立直", "リーチ", "立直") },
+            { YaoDingYi.ZiMo, ("自摸", "ツモ", "ツモ") },
+            { YaoDingYi.RongHe, ("栄和", "ロン", "ロン") },
+            { YaoDingYi.JiuZhongJiuPai, ("九種九牌", "九種九牌", "九種") },
+            { YaoDingYi.TingPai, ("聴牌", "テンパイ", "") },
+            { YaoDingYi.BuTing, ("不聴", "ノーテン", "") },
+            { YaoDingYi.HeLe, ("和了", "和了", "") },
+            { YaoDingYi.SiKaiGang, ("四開槓", "四開槓", "") },
+            { YaoDingYi.SiJiaLiZhi, ("四家立直", "四家立直", "") },
+            { YaoDingYi.LiuManGuan, ("流し満貫", "流し満貫", "") },
+            { YaoDingYi.SiFengZiLianDa, ("四風子連打", "四風子連打", "") },
+            { YaoDingYi.CuHe, ("錯和", "チョンボ", "") },
+            { YaoDingYi.Select, ("選択", "", "") },
+            { YaoDingYi.DaPai, ("打牌", "", "") },
+            { YaoDingYi.Clear, ("取消", "", "取消") },
         };
+
+        // 腰名
         internal static string YaoMing(YaoDingYi yao)
         {
-            return YaoMingDingYi[(int)yao];
+            return YaoMingDingYi[yao].yao;
         }
         // ボタン腰名
-        private static readonly string[] YaoMingButtonDingYi = new string[] {
-            "パス", "チー", "ポン", "カン", "加槓", "暗槓", "立直", "ツモ", "ロン", "九種",
-            "", "", "", "", "", "", "", "", "", "", "取消"
-        };
         internal string YaoMingButton(YaoDingYi yao)
         {
             if ((yao == YaoDingYi.JiaGang || yao == YaoDingYi.AnGang) && (anGangPaiWei.Count == 0 || jiaGangPaiWei.Count == 0))
@@ -89,7 +106,7 @@ namespace Assets.Source.Sikao
                 // 加槓、暗槓で片方のみ可能な場合、ボタン名は「カン」
                 yao = YaoDingYi.DaMingGang;
             }
-            return YaoMingButtonDingYi[(int)yao];
+            return YaoMingDingYi[yao].button;
         }
 
         // 役満
