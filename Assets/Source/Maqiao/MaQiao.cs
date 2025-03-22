@@ -2730,7 +2730,7 @@ namespace Assets.Source.Maqiao
                     // 嶺上処理
                     Pai.LingShanChuLi();
                     // 立直
-                    ziJiaShi.LiZi();
+                    ziJiaShi.LiZhiChuLi();
                     break;
 
                 case QiaoShi.YaoDingYi.AnGang:
@@ -3611,19 +3611,19 @@ namespace Assets.Source.Maqiao
                     }
                     if (isMingPai)
                     {
-                        x -= (paiHeight / 2);
+                        x -= paiHeight / 2;
                         DrawPai(ref shi.goFuLuPai[i][j], p, Cal(x, y - (paiHeight - paiWidth) / 2, shi.PlayOrder), 90);
                         if (fYao == QiaoShi.YaoDingYi.JiaGang)
                         {
                             DrawPai(ref shi.goFuLuPai[i][3], p, Cal(x, y - (paiHeight - paiWidth) / 2 + paiWidth, shi.PlayOrder), 90);
                         }
-                        x -= (paiHeight / 2);
+                        x -= paiHeight / 2;
                     }
                     else
                     {
-                        x -= (paiWidth / 2);
+                        x -= paiWidth / 2;
                         DrawPai(ref shi.goFuLuPai[i][j], p, Cal(x, y, shi.PlayOrder), 0);
-                        x -= (paiWidth / 2);
+                        x -= paiWidth / 2;
                     }
                 }
             }

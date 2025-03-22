@@ -25,47 +25,47 @@ namespace Assets.Source.Sikao
         internal enum YaoDingYi
         {
             // 無
-            Wu = 0,
+            Wu,
             // 吃
-            Chi = 1,
+            Chi,
             // 石並
-            Bing = 2,
+            Bing,
             // 大明槓
-            DaMingGang = 3,
+            DaMingGang,
             // 加槓
-            JiaGang = 4,
+            JiaGang,
             // 暗槓
-            AnGang = 5,
+            AnGang,
             // 立直
-            LiZhi = 6,
+            LiZhi,
             // 自摸
-            ZiMo = 7,
+            ZiMo,
             // 栄和
-            RongHe = 8,
+            RongHe,
             // 九種九牌
-            JiuZhongJiuPai = 9,
+            JiuZhongJiuPai,
             // 聴牌
-            TingPai = 10,
+            TingPai,
             // 不聴
-            BuTing = 11,
+            BuTing,
             // 和了
-            HeLe = 12,
+            HeLe,
             // 四開槓
-            SiKaiGang = 13,
+            SiKaiGang,
             // 四家立直
-            SiJiaLiZhi = 14,
+            SiJiaLiZhi,
             // 流し満貫
-            LiuManGuan = 15,
+            LiuManGuan,
             // 四風子連打
-            SiFengZiLianDa = 16,
+            SiFengZiLianDa,
             // 錯和
-            CuHe = 17,
+            CuHe,
             // 選択
-            Select = 18,
+            Select,
             // 打牌
-            DaPai = 19,
+            DaPai,
             // 取消
-            Clear = 20
+            Clear,
         }
 
         // 腰
@@ -911,7 +911,7 @@ namespace Assets.Source.Sikao
         }
 
         // 立直
-        internal void LiZi()
+        internal void LiZhiChuLi()
         {
             if (shePai.Count == 0)
             {
