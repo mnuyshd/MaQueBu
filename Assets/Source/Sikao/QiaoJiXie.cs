@@ -205,23 +205,34 @@ namespace Assets.Source.Sikao
                     }
                 }
             }
-            foreach (int w in LiZhiPaiWei)
+
+            if (!IsKaiLiZhi())
             {
-                if (wei == w)
+                foreach (int w in LiZhiPaiWei)
                 {
-                    // 点差
-                    int dian = DianCha() / 1000;
-                    dian += Pai.CanShanPaiShu();
-                    if (nao[XingGe.LI_ZHI] + dian >= 100)
+                    if (wei == w)
                     {
-                        ZiJiaYao = YaoDingYi.LiZhi;
+                        // 点差
+                        int dian = DianCha() / 1000;
+                        dian += Pai.CanShanPaiShu();
+                        if (nao[XingGe.LI_ZHI] + dian >= 100)
+                        {
+                            ZiJiaYao = YaoDingYi.LiZhi;
+                        }
+                        if (nao[XingGe.LI_ZHI] / 10 * heLePaiShu >= 50 - Pai.CanShanPaiShu())
+                        {
+                            ZiJiaYao = YaoDingYi.LiZhi;
+                        }
+                        if (Chang.guiZe.kaiLiZhi)
+                        {
+                            if (heLePaiShu * (nao[XingGe.LI_ZHI] / 5) + dian >= 100)
+                            {
+                                ZiJiaYao = YaoDingYi.KaiLiZhi;
+                            }
+                        }
+                        ZiJiaXuanZe = PaiXuanZe(wei);
+                        return;
                     }
-                    if (nao[XingGe.LI_ZHI] / 10 * heLePaiShu >= 50 - Pai.CanShanPaiShu())
-                    {
-                        ZiJiaYao = YaoDingYi.LiZhi;
-                    }
-                    ZiJiaXuanZe = PaiXuanZe(wei);
-                    return;
                 }
             }
 
@@ -313,8 +324,25 @@ namespace Assets.Source.Sikao
             return -1;
         }
 
+        // 開立直確認
+        private bool IsKaiLiZhi()
+        {
+            foreach (QiaoShi shi in Chang.QiaoShis)
+            {
+                if (shi.Feng == Feng)
+                {
+                    continue;
+                }
+                if (shi.KaiLiZhi)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         // 思考他家
-        internal override void SiKaoTaJia(int jia)
+        internal override void SiKaoTaJia()
         {
             // 和了判定
             if (HeLe)
@@ -357,6 +385,16 @@ namespace Assets.Source.Sikao
                 if (shi.LiZhi)
                 {
                     weiXian += nao[XingGe.TAO] * (XiangTingShu == 0 ? 1 : XiangTingShu);
+                }
+            }
+
+            if (IsKaiLiZhi())
+            {
+                if (FuLuPai.Count >= 2)
+                {
+                    TaJiaYao = YaoDingYi.Wu;
+                    TaJiaXuanZe = 0;
+                    return;
                 }
             }
 
@@ -565,75 +603,97 @@ namespace Assets.Source.Sikao
             // 安全度
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                if (shi.Player)
+                if (shi.Feng == Feng)
                 {
                     continue;
                 }
-                if (shi.LiZhi || shi.FuLuPai.Count >= 3 || (Pai.CanShanPaiShu() <= XiangTingShu * 4))
+                if (shi.KaiLiZhi)
                 {
-                    // 得点掛率
-                    float taoDian = nao[XingGe.TAO] / 50;
-                    // 一発警戒
-                    taoDian *= shi.YiFa ? nao[XingGe.TAO] / 25 : 1;
-                    // 親警戒
-                    taoDian *= shi.Feng == Chang.Qin ? nao[XingGe.TAO] / 25 : 1;
-                    // シャンテン数分 降り気味
-                    taoDian *= (XiangTingShu > 0 ? XiangTingShu : 1) * nao[XingGe.TAO] / 50;
-                    for (int j = 0; j < ShouPai.Count; j++)
+                    shi.KaiLiZhiTingPaiPanDing();
+                    if (shi.ZhenTingPanDing())
                     {
-                        int p = ShouPai[j] & QIAO_PAI;
-                        int s = p & SHU_PAI;
-                        // 安全点
-                        int anQuanDian = 0;
-                        if (shi.ShePaiShu[p] + shi.LiZhiShePaiShu[p] > 0)
+                        continue;
+                    }
+                    foreach (int dp in shi.DaiPai)
+                    {
+                        for (int k = 0; k < ShouPai.Count; k++)
                         {
-                            // 現物
-                            anQuanDian += (int)(10 * taoDian);
-                        }
-                        else
-                        {
-                            if ((p & ZI_PAI) == ZI_PAI)
+                            int sp = ShouPai[k] & QIAO_PAI;
+                            if (dp == sp)
                             {
-                                // 字牌
-                                anQuanDian += (int)(GongKaiPaiShu[p] * 3 * taoDian);
+                                shouPaiDian[k] += 2000;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (shi.LiZhi || shi.FuLuPai.Count >= 3 || (Pai.CanShanPaiShu() <= XiangTingShu * 4))
+                    {
+                        // 得点掛率
+                        float taoDian = nao[XingGe.TAO] / 50;
+                        // 一発警戒
+                        taoDian *= shi.YiFa ? nao[XingGe.TAO] / 25 : 1;
+                        // 親警戒
+                        taoDian *= shi.Feng == Chang.Qin ? nao[XingGe.TAO] / 25 : 1;
+                        // シャンテン数分 降り気味
+                        taoDian *= (XiangTingShu > 0 ? XiangTingShu : 1) * nao[XingGe.TAO] / 50;
+                        for (int j = 0; j < ShouPai.Count; j++)
+                        {
+                            int p = ShouPai[j] & QIAO_PAI;
+                            int s = p & SHU_PAI;
+                            // 安全点
+                            int anQuanDian = 0;
+                            if (shi.ShePaiShu[p] + shi.LiZhiShePaiShu[p] > 0)
+                            {
+                                // 現物
+                                anQuanDian += (int)(10 * taoDian);
                             }
                             else
                             {
-                                // 数牌
-                                if ((s == 1 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 9 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
+                                if ((p & ZI_PAI) == ZI_PAI)
                                 {
-                                    anQuanDian += (int)(9 * taoDian);
+                                    // 字牌
+                                    anQuanDian += (int)(GongKaiPaiShu[p] * 3 * taoDian);
                                 }
-                                else if ((s == 2 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 8 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
+                                else
                                 {
-                                    anQuanDian += (int)(8 * taoDian);
-                                }
-                                else if ((s == 3 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 7 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
-                                {
-                                    anQuanDian += (int)(7 * taoDian);
-                                }
-                                else if (s >= 4 && s <= 6)
-                                {
-                                    if (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0 && shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)
+                                    // 数牌
+                                    if ((s == 1 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 9 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
+                                    {
+                                        anQuanDian += (int)(9 * taoDian);
+                                    }
+                                    else if ((s == 2 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 8 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
+                                    {
+                                        anQuanDian += (int)(8 * taoDian);
+                                    }
+                                    else if ((s == 3 && (shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)) || (s == 7 && (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0)))
                                     {
                                         anQuanDian += (int)(7 * taoDian);
                                     }
-                                }
-                                // 壁
-                                if (s <= 3 && (GongKaiPaiShu[p + 1] >= 2 || GongKaiPaiShu[p + 2] >= 2))
-                                {
-                                    anQuanDian += (int)(GongKaiPaiShu[p + 1] * GongKaiPaiShu[p + 2] * taoDian);
-                                }
-                                else if (s >= 7 && GongKaiPaiShu[p - 1] >= 2 && GongKaiPaiShu[p - 2] >= 2)
-                                {
-                                    anQuanDian += (int)(GongKaiPaiShu[p - 1] * GongKaiPaiShu[p - 2] * taoDian);
+                                    else if (s >= 4 && s <= 6)
+                                    {
+                                        if (shi.ShePaiShu[p - 3] + shi.LiZhiShePaiShu[p - 3] > 0 && shi.ShePaiShu[p + 3] + shi.LiZhiShePaiShu[p + 3] > 0)
+                                        {
+                                            anQuanDian += (int)(7 * taoDian);
+                                        }
+                                    }
+                                    // 壁
+                                    if (s <= 3 && (GongKaiPaiShu[p + 1] >= 2 || GongKaiPaiShu[p + 2] >= 2))
+                                    {
+                                        anQuanDian += (int)(GongKaiPaiShu[p + 1] * GongKaiPaiShu[p + 2] * taoDian);
+                                    }
+                                    else if (s >= 7 && GongKaiPaiShu[p - 1] >= 2 && GongKaiPaiShu[p - 2] >= 2)
+                                    {
+                                        anQuanDian += (int)(GongKaiPaiShu[p - 1] * GongKaiPaiShu[p - 2] * taoDian);
+                                    }
                                 }
                             }
-                        }
-                        shouPaiDian[j] -= anQuanDian;
-                        if (anQuanDian == 0)
-                        {
-                            shouPaiDian[j] += nao[XingGe.TAO];
+                            shouPaiDian[j] -= anQuanDian;
+                            if (anQuanDian == 0)
+                            {
+                                shouPaiDian[j] += nao[XingGe.TAO];
+                            }
                         }
                     }
                 }

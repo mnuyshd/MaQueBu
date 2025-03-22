@@ -1011,6 +1011,21 @@ namespace Assets.Source.Maqiao
             DrawText(ref goValue, goShu.value.ToString(), new Vector2(paiWidth * 5.5f, y), 0, 25, TextAlignmentOptions.Right, 3);
         }
 
+        private void ResizeYiManShu(QiaoShi shi)
+        {
+            if (shi.JiLu.yiManShu.Length != QiaoShi.YiManMing.Count)
+            {
+                Array.Resize(ref shi.JiLu.yiManShu, QiaoShi.YiManMing.Count);
+            }
+        }
+        private void ResizeYiShu(QiaoShi shi)
+        {
+            if (shi.JiLu.yiShu.Length != QiaoShi.YiMing.Count)
+            {
+                Array.Resize(ref shi.JiLu.yiShu, QiaoShi.YiMing.Count);
+            }
+        }
+
         // 得点パネル 雀士名クリック
         private void OnClickScoreQiaoShi(string mingQian)
         {
@@ -1020,14 +1035,8 @@ namespace Assets.Source.Maqiao
             {
                 shi.JiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
                 // ファイル書き込み後にプログラムでローカル役を追加した場合は、配列サイズを変更する
-                if (shi.JiLu.yiManShu.Length != QiaoShi.YiManMing.Count)
-                {
-                    Array.Resize(ref shi.JiLu.yiManShu, QiaoShi.YiManMing.Count);
-                }
-                if (shi.JiLu.yiShu.Length != QiaoShi.YiMing.Count)
-                {
-                    Array.Resize(ref shi.JiLu.yiShu, QiaoShi.YiMing.Count);
-                }
+                ResizeYiManShu(shi);
+                ResizeYiShu(shi);
             }
             else
             {
@@ -1222,7 +1231,7 @@ namespace Assets.Source.Maqiao
 
             RectTransform rtGuiZeContent = goGuiZeContent.GetComponent<RectTransform>();
             Vector2 size = rtGuiZeContent.sizeDelta;
-            size.y = paiHeight * 27f;
+            size.y = paiHeight * 28f;
             rtGuiZeContent.sizeDelta = size;
             ScrollRect scrollRect = goGuiZeScrollView.GetComponent<ScrollRect>();
             scrollRect.verticalNormalizedPosition = 1f;
@@ -1230,7 +1239,7 @@ namespace Assets.Source.Maqiao
 
         private void DrawGuiZe()
         {
-            float y = paiHeight * 12f;
+            float y = paiHeight * 13f;
             float x = 0;
             float offset = paiHeight * 1.1f;
 
@@ -1284,6 +1293,8 @@ namespace Assets.Source.Maqiao
             DrawToggleButton(() => Chang.guiZe.sanLianKe, v => Chang.guiZe.sanLianKe = v, "三連刻有り", "三連刻無し", new Vector2(x, y));
             y -= offset;
             DrawToggleButton(() => Chang.guiZe.yanFan, v => Chang.guiZe.yanFan = v, "燕返し有り", "燕返し無し", new Vector2(x, y));
+            y -= offset;
+            DrawToggleButton(() => Chang.guiZe.kaiLiZhi, v => Chang.guiZe.kaiLiZhi = v, "オープンリーチ有り", "オープンリーチ無し", new Vector2(x, y));
             y -= offset;
             DrawToggleButton(() => Chang.guiZe.shiSanBuTa, v => Chang.guiZe.shiSanBuTa = v, "十三不塔有り", "十三不塔無し", new Vector2(x, y));
             y -= offset;
@@ -2661,13 +2672,18 @@ namespace Assets.Source.Maqiao
                 {
                     DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.Wu, -1, true, ziJiaShi.Follow);
                 }
-                if (!(sheDing.liZhiAuto && ziJiaShi.LiZhi) || ziJiaShi.HeLe || ziJiaShi.AnGangPaiWei.Count > 0 || ziJiaShi.JiaGangPaiWei.Count > 0)
+                if (!(sheDing.liZhiAuto && (ziJiaShi.LiZhi || ziJiaShi.KaiLiZhi)) || ziJiaShi.HeLe || ziJiaShi.AnGangPaiWei.Count > 0 || ziJiaShi.JiaGangPaiWei.Count > 0)
                 {
                     if (ziJiaShi.Follow && ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.Wu)
                     {
                         DrawDaiPai(Chang.ZiMoFan, ziJiaShi.ZiJiaXuanZe);
                     }
                     yield return Pause(ForwardMode.NORMAL);
+                }
+                if (ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.KaiLiZhi)
+                {
+                    ziJiaShi.KaiLiZhi = true;
+                    ziJiaShi.ZiJiaYao = QiaoShi.YaoDingYi.LiZhi;
                 }
                 Chang.ZiJiaYao = ziJiaShi.ZiJiaYao;
                 Chang.ZiJiaXuanZe = ziJiaShi.ZiJiaXuanZe;
@@ -2679,6 +2695,11 @@ namespace Assets.Source.Maqiao
             else
             {
                 ziJiaShi.SiKaoZiJia();
+                if (ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.KaiLiZhi)
+                {
+                    ziJiaShi.KaiLiZhi = true;
+                    ziJiaShi.ZiJiaYao = QiaoShi.YaoDingYi.LiZhi;
+                }
                 Chang.ZiJiaYao = ziJiaShi.ZiJiaYao;
                 Chang.ZiJiaXuanZe = ziJiaShi.ZiJiaXuanZe;
             }
@@ -2861,7 +2882,7 @@ namespace Assets.Source.Maqiao
                 {
                     continue;
                 }
-                taJiaShi.SiKaoTaJia(jia);
+                taJiaShi.SiKaoTaJia();
                 // 錯和他家判定
                 if (taJiaShi.CuHeTaJiaPanDing())
                 {
@@ -2911,7 +2932,7 @@ namespace Assets.Source.Maqiao
                     {
                         DrawShePai(Chang.ZiMoFan, true);
 
-                        taJiaShi.SiKaoTaJia(jia);
+                        taJiaShi.SiKaoTaJia();
                         DrawTaJiaYao(jia, taJiaShi, 0, true);
                         DrawShouPai(jia, QiaoShi.YaoDingYi.Wu, -2);
                         yield return Pause(ForwardMode.NORMAL);
@@ -3223,6 +3244,12 @@ namespace Assets.Source.Maqiao
                 DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.LiZhi, wei, ShouPaiWei, isFollow);
                 x += width;
                 index++;
+                if (Chang.guiZe.kaiLiZhi)
+                {
+                    DrawOnClickZiJiaYao(ref goYao[index], shi, new Vector2(x, y), QiaoShi.YaoDingYi.KaiLiZhi, wei, ShouPaiWei, isFollow);
+                    x += width;
+                    index++;
+                }
             }
             if (shi.AnGangPaiWei.Count > 0)
             {
@@ -3284,7 +3311,7 @@ namespace Assets.Source.Maqiao
                     DrawSelectDaPai(jia, shi, shi.ShouPai.Count - 1);
                 }
             }
-            else if (yao == QiaoShi.YaoDingYi.LiZhi)
+            else if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi)
             {
                 DrawZiJiaYao(shi, (mingWei + 1) % shi.LiZhiPaiWei.Count, ShouPaiWei, false, true);
                 DrawShouPai(jia, yao, mingWei, true, isFollow);
@@ -3309,6 +3336,18 @@ namespace Assets.Source.Maqiao
             else
             {
                 shi.ZiJiaYao = yao;
+                if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi)
+                {
+                    mingWei %= shi.LiZhiPaiWei.Count;
+                }
+                else if (yao == QiaoShi.YaoDingYi.AnGang)
+                {
+                    mingWei %= shi.AnGangPaiWei.Count;
+                }
+                else if (yao == QiaoShi.YaoDingYi.JiaGang)
+                {
+                    mingWei %= shi.JiaGangPaiWei.Count;
+                }
                 shi.ZiJiaXuanZe = mingWei;
                 keyPress = true;
             }
@@ -3450,7 +3489,7 @@ namespace Assets.Source.Maqiao
                 shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
                 if (shi.PlayOrder != 0 && yao != QiaoShi.YaoDingYi.TingPai && yao != QiaoShi.YaoDingYi.HeLe && yao != QiaoShi.YaoDingYi.JiuZhongJiuPai && yao != QiaoShi.YaoDingYi.CuHe && p != 0xff)
                 {
-                    if (!shouPaiOpen)
+                    if (!shouPaiOpen && !shi.KaiLiZhi)
                     {
                         p = 0x00;
                     }
@@ -3466,7 +3505,7 @@ namespace Assets.Source.Maqiao
                     }
 
                     int wei = i;
-                    if (yao == QiaoShi.YaoDingYi.LiZhi)
+                    if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi)
                     {
                         if (shi.LiZhiPaiWei[mingWei] == i)
                         {
@@ -3706,7 +3745,7 @@ namespace Assets.Source.Maqiao
         // 牌クリック
         private void OnClickShouPai(int jia, QiaoShi shi, QiaoShi.YaoDingYi yao, int xuanZe)
         {
-            if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.AnGang || yao == QiaoShi.YaoDingYi.JiaGang)
+            if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi || yao == QiaoShi.YaoDingYi.AnGang || yao == QiaoShi.YaoDingYi.JiaGang)
             {
                 shi.ZiJiaYao = yao;
                 shi.ZiJiaXuanZe = xuanZe;
@@ -3926,7 +3965,15 @@ namespace Assets.Source.Maqiao
         // 【描画】立直
         private void DrawLiZi(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.LiZhi));
+            QiaoShi shi = Chang.QiaoShis[jia];
+            if (shi.KaiLiZhi)
+            {
+                DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.KaiLiZhi));
+            }
+            else
+            {
+                DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.LiZhi));
+            }
         }
 
         // 【描画】暗槓
@@ -4209,10 +4256,12 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.YiMan)
                         {
+                            ResizeYiManShu(shi);
                             shi.JiLu.yiManShu[yi]++;
                         }
                         else
                         {
+                            ResizeYiShu(shi);
                             shi.JiLu.yiShu[yi]++;
                         }
                     }
@@ -4227,10 +4276,12 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.YiMan)
                         {
+                            ResizeYiManShu(shi);
                             shi.JiLu.yiManShu[yi]++;
                         }
                         else
                         {
+                            ResizeYiShu(shi);
                             shi.JiLu.yiShu[yi]++;
                         }
                     }

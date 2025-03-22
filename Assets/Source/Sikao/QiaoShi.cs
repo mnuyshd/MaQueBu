@@ -58,6 +58,8 @@ namespace Assets.Source.Sikao
             LiuManGuan,
             // 四風子連打
             SiFengZiLianDa,
+            // 開立直
+            KaiLiZhi,
             // 錯和
             CuHe,
             // 選択
@@ -87,6 +89,7 @@ namespace Assets.Source.Sikao
             { YaoDingYi.SiJiaLiZhi, ("四家立直", "四家立直", "") },
             { YaoDingYi.LiuManGuan, ("流し満貫", "流し満貫", "") },
             { YaoDingYi.SiFengZiLianDa, ("四風子連打", "四風子連打", "") },
+            { YaoDingYi.KaiLiZhi, ("開立直", "オープンリーチ", "開立直") },
             { YaoDingYi.CuHe, ("錯和", "チョンボ", "") },
             { YaoDingYi.Select, ("選択", "", "") },
             { YaoDingYi.DaPai, ("打牌", "", "") },
@@ -258,6 +261,10 @@ namespace Assets.Source.Sikao
             SanLianKe,
             // 燕返し(ローカル)
             YanFan,
+            // 開立直(ローカル)
+            KaiLiZhi,
+            // 開Ｗ立直(ローカル)
+            KaiWLiZhi,
         }
 
         // 役名
@@ -292,6 +299,8 @@ namespace Assets.Source.Sikao
             { YiDingYi.LiuManGuan, "流し満貫" },
             { YiDingYi.SanLianKe, "三連刻" },
             { YiDingYi.YanFan, "燕返し" },
+            { YiDingYi.KaiLiZhi, "開立直" },
+            { YiDingYi.KaiWLiZhi, "開Ｗ立直" },
         };
 
         // 得点役
@@ -545,6 +554,13 @@ namespace Assets.Source.Sikao
         {
             get { return liZhi; }
         }
+        // 開立直
+        private bool kaiLiZhi;
+        internal bool KaiLiZhi
+        {
+            get { return kaiLiZhi; }
+            set { kaiLiZhi = value; }
+        }
         // W立直
         private bool wLiZhi;
         // 一発
@@ -677,7 +693,7 @@ namespace Assets.Source.Sikao
         internal abstract void SiKaoZiJia();
 
         // 思考他家
-        internal abstract void SiKaoTaJia(int jia);
+        internal abstract void SiKaoTaJia();
 
         // 初期化
         protected static void Init(int[] list, int value)
@@ -713,6 +729,7 @@ namespace Assets.Source.Sikao
             xiangTingShu = 0;
 
             liZhi = false;
+            kaiLiZhi = false;
             wLiZhi = false;
             yiFa = false;
             yiXunMu = true;
@@ -1837,7 +1854,7 @@ namespace Assets.Source.Sikao
         }
 
         // 振聴判定
-        private bool ZhenTingPanDing()
+        internal bool ZhenTingPanDing()
         {
             foreach (int dp in daiPai)
             {
@@ -1906,6 +1923,28 @@ namespace Assets.Source.Sikao
 
                 shouPai = new(shouPaiC);
             }
+        }
+
+        // 開立直聴牌判定
+        internal void KaiLiZhiTingPaiPanDing()
+        {
+            if (!kaiLiZhi)
+            {
+                return;
+            }
+
+            List<int> shouPaiC = new(shouPai);
+            daiPai = new();
+            shouPai.Add(0xff);
+            foreach (int p in Pai.QiaoPai)
+            {
+                shouPai[^1] = p;
+                if (HeLePanDing() == Ting.TingPai)
+                {
+                    daiPai.Add(p);
+                }
+            }
+            shouPai = new(shouPaiC);
         }
 
         // 暗槓判定
@@ -3024,7 +3063,47 @@ namespace Assets.Source.Sikao
                         YiZhuiJia(YiDingYi.YanFan, 1);
                     }
                 }
+                if (kaiLiZhi)
+                {
+                    // 開立直
+                    if (taJiaYao == YaoDingYi.RongHe)
+                    {
+                        bool isYiman = false;
+                        QiaoShi ziMoShi = Chang.QiaoShis[Chang.ZiMoFan];
+                        if (!ziMoShi.liZhi)
+                        {
+                            isYiman = true;
+                        }
+                        int ziMoFanLiZhiWei = 0;
+                        for (int i = 0; i < ziMoShi.ShePai.Count; i++)
+                        {
+                            if (ziMoShi.ShePai[i].yao == YaoDingYi.LiZhi)
+                            {
+                                break;
+                            }
+                            ziMoFanLiZhiWei++;
+                        }
+                        int ronHeFanLiZhiWei = 0;
+                        for (int i = 0; i < shePai.Count; i++)
+                        {
+                            if (shePai[i].yao == YaoDingYi.LiZhi)
+                            {
+                                break;
+                            }
+                            ronHeFanLiZhiWei++;
+                        }
+                        if (ziMoFanLiZhiWei > ronHeFanLiZhiWei || (ziMoFanLiZhiWei == ronHeFanLiZhiWei && ziMoShi.Feng > feng))
+                        {
+                            isYiman = true;
+                        }
 
+                        if (isYiman)
+                        {
+                            yiFan = new();
+                            YiZhuiJia(YiDingYi.KaiLiZhi, 13);
+                        }
+                    }
+                }
                 if (lianZhuangShu == 7)
                 {
                     // 八連荘
@@ -3044,14 +3123,29 @@ namespace Assets.Source.Sikao
         // 立直・Ｗ立直・一発
         private void LiZhiWLiZhiYiFa()
         {
-            if (wLiZhi)
+            if (kaiLiZhi)
             {
-                YiZhuiJia(YiDingYi.WLiZi, 2);
+                if (wLiZhi)
+                {
+                    YiZhuiJia(YiDingYi.KaiWLiZhi, 3);
+                }
+                else if (liZhi)
+                {
+                    YiZhuiJia(YiDingYi.KaiLiZhi, 2);
+                }
             }
-            else if (liZhi)
+            else
             {
-                YiZhuiJia(YiDingYi.LiZi, 1);
+                if (wLiZhi)
+                {
+                    YiZhuiJia(YiDingYi.WLiZi, 2);
+                }
+                else if (liZhi)
+                {
+                    YiZhuiJia(YiDingYi.LiZi, 1);
+                }
             }
+
             if (yiFa)
             {
                 YiZhuiJia(YiDingYi.YiFa, 1);
@@ -3871,6 +3965,15 @@ namespace Assets.Source.Sikao
             Init(gongKaiPaiShu, 0);
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
+                if (shi.kaiLiZhi)
+                {
+                    // 開立直の場合、手牌
+                    foreach (int sp in shouPai)
+                    {
+                        int p = sp & QIAO_PAI;
+                        gongKaiPaiShu[p]++;
+                    }
+                }
                 // 捨牌
                 foreach ((int pai, _, _) in shi.ShePai)
                 {
@@ -4014,6 +4117,11 @@ namespace Assets.Source.Sikao
                         if (taJiaFuLuShu > 0)
                         {
                             cuHeSheng = "立直不可";
+                            return true;
+                        }
+                        if (!Chang.guiZe.kaiLiZhi && kaiLiZhi)
+                        {
+                            cuHeSheng = "開立直不可";
                             return true;
                         }
                         break;

@@ -39,6 +39,8 @@ namespace Assets.Source.Gongtong
         public bool sanLianKe = false;
         // 燕返し
         public bool yanFan = false;
+        // 開立直
+        public bool kaiLiZhi = false;
         // 十三不塔
         public bool shiSanBuTa = false;
         // 八連荘
