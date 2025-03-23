@@ -180,14 +180,6 @@ namespace Assets.Source.Maqiao
         private Button goSelect;
         private Button goMingWu;
         private Button goDianCha;
-        private Button goLiZhiAuto;
-        private Button goDaPaiFangFa;
-        private Button goXuanShangYin;
-        private Button goZiMoQieBiaoShi;
-        private Button goDaiPaiBiaoShi;
-        private Button goXiangTingShuBiaoShi;
-        private Button goMingquXiao;
-        private Button goDebugDisplay;
         private Button goSetting;
         private Button goScore;
         private Button goGuiZe;
@@ -580,6 +572,8 @@ namespace Assets.Source.Maqiao
             // オプションボタン
             DrawOption();
 
+            goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
+
             EventTrigger etResetPanel = goSettingDialogPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eResetPanel = new();
             eResetPanel.eventID = EventTriggerType.PointerClick;
@@ -597,7 +591,13 @@ namespace Assets.Source.Maqiao
             goYes.onClick.AddListener(delegate
             {
                 ResetSheDing();
+                Button[] buttons = goSettingPanel.GetComponentsInChildren<Button>();
+                foreach (Button btn in buttons)
+                {
+                    Destroy(btn.gameObject);
+                }
                 goSettingDialogPanel.SetActive(false);
+                DrawOption();
             });
             Button goNo = Instantiate(goButton, goSettingDialogPanel.transform);
             goNo.onClick.AddListener(delegate
@@ -615,106 +615,50 @@ namespace Assets.Source.Maqiao
             float y = paiHeight * 3f;
             float offset = paiHeight * 1.6f;
             int len = 7;
-            // 1タップ打牌
+
             string[] labelDaPaiFangFa = new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" };
-            ClearGameObject(ref goDaPaiFangFa);
-            goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
+            Button goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
             goDaPaiFangFa.onClick.AddListener(delegate
             {
                 sheDing.daPaiFangFa = (SheDing.DaPaiFangFa)((int)(sheDing.daPaiFangFa + 1) % Enum.GetValues(typeof(SheDing.DaPaiFangFa)).Length);
                 goDaPaiFangFa.GetComponentInChildren<TextMeshProUGUI>().text = labelDaPaiFangFa[(int)sheDing.daPaiFangFa];
-                WriteSheDing();
+                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
             });
             DrawButton(ref goDaPaiFangFa, labelDaPaiFangFa[(int)sheDing.daPaiFangFa], new Vector2(-x, y), len);
-            // 立直後 自動・手動
-            string[] labelLiZhiAuto = new string[] { "立直後自動打牌", "立直後手動打牌" };
-            ClearGameObject(ref goLiZhiAuto);
-            goLiZhiAuto = Instantiate(goButton, goSettingPanel.transform);
-            goLiZhiAuto.onClick.AddListener(delegate
-            {
-                sheDing.liZhiAuto = !sheDing.liZhiAuto;
-                goLiZhiAuto.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goLiZhiAuto, sheDing.liZhiAuto ? labelLiZhiAuto[0] : labelLiZhiAuto[1], new Vector2(x, y), len);
+            DrawToggleOption(() => sheDing.liZhiAuto, v => sheDing.liZhiAuto = v, new string[] { "立直後自動打牌", "立直後手動打牌" }, new Vector2(x, y), len);
             y -= offset;
-            // ドラマーク
-            string[] labelXuanShangYin = new string[] { "ドラマーク有り", "ドラマーク無し" };
-            ClearGameObject(ref goXuanShangYin);
-            goXuanShangYin = Instantiate(goButton, goSettingPanel.transform);
-            goXuanShangYin.onClick.AddListener(delegate
-            {
-                sheDing.xuanShangYin = !sheDing.xuanShangYin;
-                goXuanShangYin.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goXuanShangYin, sheDing.xuanShangYin ? labelXuanShangYin[0] : labelXuanShangYin[1], new Vector2(-x, y), len);
-            // ツモ切表示有り・無し
-            string[] labelZiMoQieBiaoShi = new string[] { "ツモ切表示有り", "ツモ切表示無し" };
-            ClearGameObject(ref goZiMoQieBiaoShi);
-            goZiMoQieBiaoShi = Instantiate(goButton, goSettingPanel.transform);
-            goZiMoQieBiaoShi.onClick.AddListener(delegate
-            {
-                sheDing.ziMoQieBiaoShi = !sheDing.ziMoQieBiaoShi;
-                goZiMoQieBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goZiMoQieBiaoShi, sheDing.ziMoQieBiaoShi ? labelZiMoQieBiaoShi[0] : labelZiMoQieBiaoShi[1], new Vector2(x, y), len);
+            DrawToggleOption(() => sheDing.xuanShangYin, v => sheDing.xuanShangYin = v, new string[] { "ドラマーク有り", "ドラマーク無し" }, new Vector2(-x, y), len);
+            DrawToggleOption(() => sheDing.ziMoQieBiaoShi, v => sheDing.ziMoQieBiaoShi = v, new string[] { "ツモ切表示有り", "ツモ切表示無し" }, new Vector2(x, y), len);
             y -= offset;
-            // 待牌表示有り・無し
-            string[] labelDaiPaiBiaoShi = new string[] { "待牌表示有り", "待牌表示無し" };
-            ClearGameObject(ref goDaiPaiBiaoShi);
-            goDaiPaiBiaoShi = Instantiate(goButton, goSettingPanel.transform);
-            goDaiPaiBiaoShi.onClick.AddListener(delegate
-            {
-                sheDing.daiPaiBiaoShi = !sheDing.daiPaiBiaoShi;
-                goDaiPaiBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goDaiPaiBiaoShi, sheDing.daiPaiBiaoShi ? labelDaiPaiBiaoShi[0] : labelDaiPaiBiaoShi[1], new Vector2(-x, y), len);
-            // 向聴数表示有り・無し
-            string[] labelXiangTingShuBiaoShi = new string[] { "向聴数表示有り", "向聴数表示無し" };
-            ClearGameObject(ref goXiangTingShuBiaoShi);
-            goXiangTingShuBiaoShi = Instantiate(goButton, goSettingPanel.transform);
-            goXiangTingShuBiaoShi.onClick.AddListener(delegate
-            {
-                sheDing.xiangTingShuBiaoShi = !sheDing.xiangTingShuBiaoShi;
-                goXiangTingShuBiaoShi.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goXiangTingShuBiaoShi, sheDing.xiangTingShuBiaoShi ? labelXiangTingShuBiaoShi[0] : labelXiangTingShuBiaoShi[1], new Vector2(x, y), len);
+            DrawToggleOption(() => sheDing.daiPaiBiaoShi, v => sheDing.daiPaiBiaoShi = v, new string[] { "待牌表示有り", "待牌表示無し" }, new Vector2(-x, y), len);
+            DrawToggleOption(() => sheDing.xiangTingShuBiaoShi, v => sheDing.xiangTingShuBiaoShi = v, new string[] { "向聴数表示有り", "向聴数表示無し" }, new Vector2(x, y), len);
             y -= offset;
-            // 鳴きの取消
-            string[] labelMingQuXiao = new string[] { "鳴パスはボタン", "鳴パスはタップ" };
-            ClearGameObject(ref goMingquXiao);
-            goMingquXiao = Instantiate(goButton, goSettingPanel.transform);
-            goMingquXiao.onClick.AddListener(delegate
-            {
-                sheDing.mingQuXiao = !sheDing.mingQuXiao;
-                goMingquXiao.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goMingquXiao, sheDing.mingQuXiao ? labelMingQuXiao[0] : labelMingQuXiao[1], new Vector2(-x, y), len);
-            // 手牌点表示
-            string[] labelDebugDisplay = new string[] { "手牌点表示有り", "手牌点表示無し" };
-            ClearGameObject(ref goDebugDisplay);
-            goDebugDisplay = Instantiate(goButton, goSettingPanel.transform);
-            goDebugDisplay.onClick.AddListener(delegate
-            {
-                sheDing.shouPaiDianBiaoShi = !sheDing.shouPaiDianBiaoShi;
-                goDebugDisplay.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.shouPaiDianBiaoShi ? labelDebugDisplay[0] : labelDebugDisplay[1];
-                WriteSheDing();
-            });
-            DrawButton(ref goDebugDisplay, sheDing.shouPaiDianBiaoShi ? labelDebugDisplay[0] : labelDebugDisplay[1], new Vector2(x, y), len);
+            DrawToggleOption(() => sheDing.mingQuXiao, v => sheDing.mingQuXiao = v, new string[] { "鳴パスはボタン", "鳴パスはタップ" }, new Vector2(-x, y), len);
+            DrawToggleOption(() => sheDing.shouPaiDianBiaoShi, v => sheDing.shouPaiDianBiaoShi = v, new string[] { "手牌点表示有り", "手牌点表示無し" }, new Vector2(x, y), len);
             y -= offset;
             // リセット
-            goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
-            Button goOptionReset = Instantiate(goButton, goSettingPanel.transform);
-            goOptionReset.onClick.AddListener(delegate
+            Button resetButton = Instantiate(goButton, goSettingPanel.transform);
+            resetButton.onClick.AddListener(delegate
             {
                 goSettingDialogPanel.SetActive(true);
             });
-            DrawButton(ref goOptionReset, "リセット", new Vector2(0, y));
+            DrawButton(ref resetButton, "リセット", new Vector2(0, y));
+        }
+
+        // オプションボタン
+        private void DrawToggleOption(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
+        {
+            Button button = Instantiate(goButton, goSettingPanel.transform);
+            string displayText = getValue() ? textOnOff[0] : textOnOff[1];
+            DrawButton(ref button, displayText, xy, len);
+            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
+            button.onClick.AddListener(delegate
+            {
+                bool newValue = !getValue();
+                setValue(newValue);
+                text.text = newValue ? textOnOff[0] : textOnOff[1];
+                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
+            });
         }
 
         // 相手牌オープン切り替え
@@ -1231,111 +1175,96 @@ namespace Assets.Source.Maqiao
 
             RectTransform rtGuiZeContent = goGuiZeContent.GetComponent<RectTransform>();
             Vector2 size = rtGuiZeContent.sizeDelta;
-            size.y = paiHeight * 28f;
+            size.y = paiHeight * 30f;
             rtGuiZeContent.sizeDelta = size;
             ScrollRect scrollRect = goGuiZeScrollView.GetComponent<ScrollRect>();
             scrollRect.verticalNormalizedPosition = 1f;
         }
 
+        // ルール描画
         private void DrawGuiZe()
         {
-            float y = paiHeight * 13f;
+            float y = paiHeight * 14f;
             float x = 0;
-            float offset = paiHeight * 1.1f;
+            float offset = paiHeight * 1.3f;
 
             TextMeshProUGUI title = Instantiate(goText, goGuiZeContent.transform);
             DrawText(ref title, "ルール", new Vector2(0, y), 0, 25);
             y -= offset;
 
-            DrawToggleButton(() => Chang.guiZe.banZhuang, v => Chang.guiZe.banZhuang = v, "半荘戦（" + Number2Full(Chang.guiZe.kaiShiDian) + "点開始、" + Number2Full(Chang.guiZe.fanDian) + "点返し）", "東風戦（" + Number2Full(Chang.guiZe.kaiShiDian) + "点開始、" + Number2Full(Chang.guiZe.fanDian) + "点返し）", new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.banZhuang, v => Chang.guiZe.banZhuang = v, new string[] { "半荘戦", "東風戦" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleButton(() => Chang.guiZe.ziMoPingHe, v => Chang.guiZe.ziMoPingHe = v, "ピンヅモ有り", "ピンヅモ無し", new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.ziMoPingHe, v => Chang.guiZe.ziMoPingHe = v, new string[] { "ピンヅモ有り", "ピンヅモ無し" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleButton(() => Chang.guiZe.shiDuan, v => Chang.guiZe.shiDuan = v, "食いタン有り", "食いタン無し", new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.shiDuan, v => Chang.guiZe.shiDuan = v, new string[] { "食いタン有り", "食いタン無し" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleButton(() => Chang.guiZe.shiTi, v => Chang.guiZe.shiTi = v, "食い替え有り", "食い替え無し（食い替えの場合、チョンボ）", new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.shiTi, v => Chang.guiZe.shiTi = v, new string[] { "食い替え有り", "食い替え無し（チョンボ扱い）" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleButton(() => Chang.guiZe.wRongHe, v => Chang.guiZe.wRongHe = v, "ダブロン、トリプルロン有り", "ダブロン、トリプルロン無し（頭ハネ）", new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.wRongHe, v => Chang.guiZe.wRongHe = v, new string[] { "ダブロン、トリロン有り", "ダブロン、トリロン無し（頭ハネ）" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleButton("供託あがりどり（ダブロン以上は上家どり）", new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.baoZe, v => Chang.guiZe.baoZe = v, new string[] { "パオ（責任払い）有り", "パオ（責任払い）無し" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleButton(() => Chang.guiZe.baoZe, v => Chang.guiZe.baoZe = v, "パオ（責任払い）有り", "パオ（責任払い）無し", new Vector2(x, y));
-            y -= offset;
-
+            string[] chiPaiShuText = new string[] { "赤ドラ無し", "赤ドラ有り（各１枚）" };
             Button buttonChiPaiShu = Instantiate(goButton, goGuiZeContent.transform);
-            Destroy(buttonChiPaiShu.GetComponent<Image>());
-            DrawButton(ref buttonChiPaiShu, Chang.guiZe.chiPaiShu[0] == 0 ? "赤ドラ無し" : "赤ドラ（萬子" + Number2Full(Chang.guiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(Chang.guiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(Chang.guiZe.chiPaiShu[2]) + "枚）", new Vector2(x, y), 18);
+            DrawButton(ref buttonChiPaiShu, Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1], new Vector2(x, y), 12);
             TextMeshProUGUI text = buttonChiPaiShu.GetComponentInChildren<TextMeshProUGUI>();
-            text.alignment = TextAlignmentOptions.Left;
-            text.fontSize = 20f;
+            text.fontSize = 17f;
             buttonChiPaiShu.onClick.AddListener(delegate
             {
                 Chang.guiZe.chiPaiShu = Chang.guiZe.chiPaiShu[0] == 0 ? new int[] { 1, 1, 1 } : new int[] { 0, 0, 0 };
-                text.text = Chang.guiZe.chiPaiShu[0] == 0 ? "赤ドラ無し" : "赤ドラ（萬子" + Number2Full(Chang.guiZe.chiPaiShu[0]) + "枚、筒子" + Number2Full(Chang.guiZe.chiPaiShu[1]) + "枚、索子" + Number2Full(Chang.guiZe.chiPaiShu[2]) + "枚）";
+                text.text = Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1];
                 File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
             });
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌は親の連荘", "九種九牌は流局（親流れ）" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.siJiaLiZhiLianZhuang, v => Chang.guiZe.siJiaLiZhiLianZhuang = v, new string[] { "四家立直は親の連荘", "四家立直は流局（親流れ）" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.siFengZiLianDaLianZhuang, v => Chang.guiZe.siFengZiLianDaLianZhuang = v, new string[] { "四風子連打は親の連荘", "四風子連打は流局（親流れ）" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.siKaiGangLianZhuang, v => Chang.guiZe.siKaiGangLianZhuang = v, new string[] { "四開槓は親の連荘", "四開槓は流局（親流れ）" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.xiang, v => Chang.guiZe.xiang = v, new string[] { "箱（０点以下で終了）有り", "箱（０点以下で終了）無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.jieJinLiZhi, v => Chang.guiZe.jieJinLiZhi = v, new string[] { "１０００点未満のリーチ可能", "１０００点未満のリーチ不可" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.liuManGuan, v => Chang.guiZe.liuManGuan = v, new string[] { "流し満貫有り（親は連荘）", "流し満貫無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.sanLianKe, v => Chang.guiZe.sanLianKe = v, new string[] { "三連刻有り", "三連刻無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.yanFan, v => Chang.guiZe.yanFan = v, new string[] { "燕返し有り", "燕返し無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.kaiLiZhi, v => Chang.guiZe.kaiLiZhi = v, new string[] { "オープンリーチ有り", "オープンリーチ無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.shiSanBuTa, v => Chang.guiZe.shiSanBuTa = v, new string[] { "十三不塔有り", "十三不塔無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.baLianZhuang, v => Chang.guiZe.baLianZhuang = v, new string[] { "八連荘有り", "八連荘無し" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.localYiMan, v => Chang.guiZe.localYiMan = v, new string[] { "ローカル役満有り", "ローカル役満無し" }, new Vector2(x, y));
+            y -= offset;
 
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, "九種九牌は親の連荘", "九種九牌は流局（親流れ）", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.siJiaLiZhiLianZhuang, v => Chang.guiZe.siJiaLiZhiLianZhuang = v, "四家立直は親の連荘", "四家立直は流局（親流れ）", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.siFengZiLianDaLianZhuang, v => Chang.guiZe.siFengZiLianDaLianZhuang = v, "四風子連打は親の連荘", "四風子連打は流局（親流れ）", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.siKaiGangLianZhuang, v => Chang.guiZe.siKaiGangLianZhuang = v, "四開槓は親の連荘", "四開槓は流局（親流れ）", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.xiang, v => Chang.guiZe.xiang = v, "箱（０点以下で終了）有り", "箱（０点以下で終了）無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.jieJinLiZhi, v => Chang.guiZe.jieJinLiZhi = v, "１０００点未満のリーチ可能", "１０００点未満のリーチ不可", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.liuManGuan, v => Chang.guiZe.liuManGuan = v, "流し満貫有り（親は連荘）", "流し満貫無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.sanLianKe, v => Chang.guiZe.sanLianKe = v, "三連刻有り", "三連刻無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.yanFan, v => Chang.guiZe.yanFan = v, "燕返し有り", "燕返し無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.kaiLiZhi, v => Chang.guiZe.kaiLiZhi = v, "オープンリーチ有り", "オープンリーチ無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.shiSanBuTa, v => Chang.guiZe.shiSanBuTa = v, "十三不塔有り", "十三不塔無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.baLianZhuang, v => Chang.guiZe.baLianZhuang = v, "八連荘有り", "八連荘無し", new Vector2(x, y));
-            y -= offset;
-            DrawToggleButton(() => Chang.guiZe.localYiMan, v => Chang.guiZe.localYiMan = v, "ローカル役満有り", "ローカル役満無し", new Vector2(x, y));
-            y -= offset;
-
-            Button goGuiZeReset = Instantiate(goButton, goGuiZeContent.transform);
-            goGuiZeReset.onClick.AddListener(delegate
+            Button resetButton = Instantiate(goButton, goGuiZeContent.transform);
+            resetButton.onClick.AddListener(delegate
             {
                 goGuiZeDialogPanel.SetActive(true);
             });
-            DrawButton(ref goGuiZeReset, "リセット", new Vector2(0, y - paiHeight * 0.5f));
+            DrawButton(ref resetButton, "リセット", new Vector2(0, y - paiHeight * 0.5f));
         }
 
         // トグルボタン描画
-        private void DrawToggleButton(string displayText, Vector2 xy)
+        private void DrawToggleGuiZe(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy)
         {
             Button button = Instantiate(goButton, goGuiZeContent.transform);
-            Destroy(button.GetComponent<Image>());
-            DrawButton(ref button, displayText, xy, 18);
-            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            text.alignment = TextAlignmentOptions.Left;
-            text.fontSize = 20f;
-        }
-        private void DrawToggleButton(Func<bool> getValue, Action<bool> setValue, string textOn, string textOff, Vector2 xy)
-        {
-            Button button = Instantiate(goButton, goGuiZeContent.transform);
-            Destroy(button.GetComponent<Image>());
 
-            string displayText = getValue() ? textOn : textOff;
-            DrawButton(ref button, displayText, xy, 18);
+            string displayText = getValue() ? textOnOff[0] : textOnOff[1];
+            DrawButton(ref button, displayText, xy, 12);
             TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            text.alignment = TextAlignmentOptions.Left;
-            text.fontSize = 20f;
+            text.fontSize = 17f;
             button.onClick.AddListener(delegate
             {
                 bool newValue = !getValue();
                 setValue(newValue);
-                text.text = newValue ? textOn : textOff;
+                text.text = newValue ? textOnOff[0] : textOnOff[1];
                 File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
             });
         }
@@ -2032,7 +1961,7 @@ namespace Assets.Source.Maqiao
             {
                 sheDing.mingWu = !sheDing.mingWu;
                 goMingWu.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
-                WriteSheDing();
+                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
             });
             float x = paiWidth * 8f;
             float y = -(paiHeight * 9.3f);
@@ -2338,14 +2267,6 @@ namespace Assets.Source.Maqiao
                 qjx.Nao[QiaoJiXie.XingGe.RAN] = shi.JiLu.naoRan;
                 qjx.Nao[QiaoJiXie.XingGe.TAO] = shi.JiLu.naoTao;
             }
-            else if (shi is QiaoXiaoLu qxl)
-            {
-                qxl.Nao[QiaoXiaoLu.XingGe.XUAN_SHANG] = shi.JiLu.naoXuanShang;
-                qxl.Nao[QiaoXiaoLu.XingGe.YI_PAI] = shi.JiLu.naoYiPai;
-                qxl.Nao[QiaoXiaoLu.XingGe.LI_ZHI] = shi.JiLu.naoLiZhi;
-                qxl.Nao[QiaoXiaoLu.XingGe.MING] = shi.JiLu.naoMing;
-                qxl.Nao[QiaoXiaoLu.XingGe.TAO] = shi.JiLu.naoTao;
-            }
         }
 
         // 脳を記録へ反映
@@ -2361,14 +2282,6 @@ namespace Assets.Source.Maqiao
                 shi.JiLu.naoMing = qjx.Nao[QiaoJiXie.XingGe.MING];
                 shi.JiLu.naoRan = qjx.Nao[QiaoJiXie.XingGe.RAN];
                 shi.JiLu.naoTao = qjx.Nao[QiaoJiXie.XingGe.TAO];
-            }
-            else if (shi is QiaoXiaoLu qxl)
-            {
-                shi.JiLu.naoXuanShang = qxl.Nao[QiaoXiaoLu.XingGe.XUAN_SHANG];
-                shi.JiLu.naoYiPai = qxl.Nao[QiaoXiaoLu.XingGe.YI_PAI];
-                shi.JiLu.naoLiZhi = qxl.Nao[QiaoXiaoLu.XingGe.LI_ZHI];
-                shi.JiLu.naoMing = qxl.Nao[QiaoXiaoLu.XingGe.MING];
-                shi.JiLu.naoTao = qxl.Nao[QiaoXiaoLu.XingGe.TAO];
             }
 
             File.WriteAllText(Application.persistentDataPath + "/" + shi.MingQian + ".json", JsonUtility.ToJson(shi.JiLu));
