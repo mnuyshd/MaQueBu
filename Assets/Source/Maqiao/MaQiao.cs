@@ -135,10 +135,6 @@ namespace Assets.Source.Maqiao
         private Image goFrame;
         private Image goLine;
         private Button goButton;
-        private Button goFast;
-        private Button goReproduction;
-        private Button goRestart;
-        private Button goShouPaiOpen;
         private Image goBenChang;
         private Image goGongTou;
         private Slider goSlider;
@@ -492,8 +488,55 @@ namespace Assets.Source.Maqiao
             rtSetting.pivot = new Vector2(1, 1);
             rtSetting.anchoredPosition = new Vector2(-(paiWidth * 0.5f), -(paiHeight * 0.5f));
 
+            // デバッグボタン
+            DrawDebugOption();
+            // オプションボタン
+            DrawOption();
+
+            goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
+
+            EventTrigger etResetPanel = goSettingDialogPanel.AddComponent<EventTrigger>();
+            EventTrigger.Entry eResetPanel = new();
+            eResetPanel.eventID = EventTriggerType.PointerClick;
+            eResetPanel.callback.AddListener((eventData) =>
+            {
+                goSettingDialogPanel.SetActive(false);
+            });
+            etResetPanel.triggers.Add(eResetPanel);
+
+            goSettingDialogPanel.SetActive(false);
+            TextMeshProUGUI message = Instantiate(goText, goSettingDialogPanel.transform);
+            DrawText(ref message, "全ての設定をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
+            Button goYes = Instantiate(goButton, goSettingDialogPanel.transform);
+            DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
+            goYes.onClick.AddListener(delegate
+            {
+                ResetSheDing();
+                Button[] buttons = goSettingPanel.GetComponentsInChildren<Button>();
+                foreach (Button b in buttons)
+                {
+                    if (b.name == "Fast" || b.name == "Reproduction" || b.name == "Restart" || b.name == "ShouPaiOpen")
+                    {
+                        continue;
+                    }
+                    Destroy(b.gameObject);
+                }
+                goSettingDialogPanel.SetActive(false);
+                DrawOption();
+            });
+            Button goNo = Instantiate(goButton, goSettingDialogPanel.transform);
+            goNo.onClick.AddListener(delegate
+            {
+                goSettingDialogPanel.SetActive(false);
+            });
+            DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
+        }
+
+        // 【描画】デバッグボタン
+        private void DrawDebugOption()
+        {
             // 早送り
-            goFast = goSettingPanel.transform.Find("Fast").GetComponent<Button>();
+            Button goFast = goSettingPanel.transform.Find("Fast").GetComponent<Button>();
             goFast.onClick.AddListener(delegate
             {
                 forwardMode = (ForwardMode)(((int)forwardMode + 1) % Enum.GetValues(typeof(ForwardMode)).Length);
@@ -520,7 +563,7 @@ namespace Assets.Source.Maqiao
             rtFast.pivot = new Vector2(1, 1);
             rtFast.anchoredPosition = new Vector2(-paiWidth, -(rtFast.sizeDelta.y * scale.x));
             // 再生
-            goReproduction = goSettingPanel.transform.Find("Reproduction").GetComponent<Button>();
+            Button goReproduction = goSettingPanel.transform.Find("Reproduction").GetComponent<Button>();
             goReproduction.onClick.AddListener(delegate
             {
                 forwardMode = ForwardMode.NORMAL;
@@ -535,7 +578,7 @@ namespace Assets.Source.Maqiao
             rtReproduction.pivot = new Vector2(1, 1);
             rtReproduction.anchoredPosition = new Vector2(-(rtReproduction.sizeDelta.x * scale.x + (paiWidth * 1.5f)), -(rtReproduction.sizeDelta.y * scale.x));
             // リスタート
-            goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
+            Button goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
             goRestart.onClick.AddListener(delegate
             {
                 Application.targetFrameRate = FRAME_RATE;
@@ -549,11 +592,12 @@ namespace Assets.Source.Maqiao
             rtRestart.pivot = new Vector2(0, 1);
             rtRestart.anchoredPosition = new Vector2(paiWidth, -(rtRestart.sizeDelta.y * scale.x));
             // 相手牌オープン
-            goShouPaiOpen = Instantiate(goPai, goSettingPanel.transform);
+            Button goShouPaiOpen = Instantiate(goPai, goSettingPanel.transform);
+            goShouPaiOpen.name = "ShouPaiOpen";
             goShouPaiOpen.onClick.AddListener(delegate
             {
                 shouPaiOpen = !shouPaiOpen;
-                SwitchShouPaiOpenImage();
+                goShouPaiOpen.image.sprite = goPais[shouPaiOpen ? 0x31 : 0x00].GetComponent<SpriteRenderer>().sprite;
                 switch (eventStatus)
                 {
                     case Event.PEI_PAI:
@@ -563,50 +607,13 @@ namespace Assets.Source.Maqiao
                         break;
                 }
             });
+            goShouPaiOpen.image.sprite = goPais[shouPaiOpen ? 0x31 : 0x00].GetComponent<SpriteRenderer>().sprite;
             RectTransform rtShouPaiOpen = goShouPaiOpen.GetComponent<RectTransform>();
             rtShouPaiOpen.localScale *= scale.x * 0.7f;
             rtShouPaiOpen.anchorMin = new Vector2(0, 0);
             rtShouPaiOpen.anchorMax = new Vector2(0, 0);
             rtShouPaiOpen.pivot = new Vector2(0, 0);
             rtShouPaiOpen.anchoredPosition = new Vector2(paiWidth, paiHeight / 2f);
-            SwitchShouPaiOpenImage();
-
-            // オプションボタン
-            DrawOption();
-
-            goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
-
-            EventTrigger etResetPanel = goSettingDialogPanel.AddComponent<EventTrigger>();
-            EventTrigger.Entry eResetPanel = new();
-            eResetPanel.eventID = EventTriggerType.PointerClick;
-            eResetPanel.callback.AddListener((eventData) =>
-            {
-                goSettingDialogPanel.SetActive(false);
-            });
-            etResetPanel.triggers.Add(eResetPanel);
-
-            goSettingDialogPanel.SetActive(false);
-            TextMeshProUGUI message = Instantiate(goText, goSettingDialogPanel.transform);
-            DrawText(ref message, "全ての設定をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
-            Button goYes = Instantiate(goButton, goSettingDialogPanel.transform);
-            DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
-            goYes.onClick.AddListener(delegate
-            {
-                ResetSheDing();
-                Button[] buttons = goSettingPanel.GetComponentsInChildren<Button>();
-                foreach (Button btn in buttons)
-                {
-                    Destroy(btn.gameObject);
-                }
-                goSettingDialogPanel.SetActive(false);
-                DrawOption();
-            });
-            Button goNo = Instantiate(goButton, goSettingDialogPanel.transform);
-            goNo.onClick.AddListener(delegate
-            {
-                goSettingDialogPanel.SetActive(false);
-            });
-            DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
         }
 
         // 【描画】オプションボタン
@@ -661,12 +668,6 @@ namespace Assets.Source.Maqiao
                 text.text = newValue ? textOnOff[0] : textOnOff[1];
                 File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
             });
-        }
-
-        // 相手牌オープン切り替え
-        private void SwitchShouPaiOpenImage()
-        {
-            goShouPaiOpen.image.sprite = goPais[shouPaiOpen ? 0x31 : 0x00].GetComponent<SpriteRenderer>().sprite;
         }
 
         // 設定オプションのリセット
