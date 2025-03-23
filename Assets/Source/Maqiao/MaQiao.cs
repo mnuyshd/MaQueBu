@@ -244,6 +244,7 @@ namespace Assets.Source.Maqiao
             { KouzuTorako.MING_QIAN, false },
             { YakudaJunji.MING_QIAN, false },
             { MenzenJunko.MING_QIAN, false },
+            { TakamiNozomu.MING_QIAN, false },
         };
         // 雀士取得
         private QiaoShi GetQiaoShi(string mingQian, bool isNew)
@@ -269,6 +270,7 @@ namespace Assets.Source.Maqiao
                 KouzuTorako.MING_QIAN => new KouzuTorako(),
                 YakudaJunji.MING_QIAN => new YakudaJunji(),
                 MenzenJunko.MING_QIAN => new MenzenJunko(),
+                TakamiNozomu.MING_QIAN => new TakamiNozomu(),
                 _ => new QiaoJiXie(mingQian),
             };
             newShi.JiLu = new JiLu();
@@ -758,7 +760,7 @@ namespace Assets.Source.Maqiao
             {
                 goScoreDialogPanel.SetActive(true);
             });
-            DrawButton(ref goScoreReset, "リセット", new Vector2(0, y - paiHeight * 1.5f));
+            DrawButton(ref goScoreReset, "リセット", new Vector2(0, y));
 
             EventTrigger etResetPanel = goScoreDialogPanel.AddComponent<EventTrigger>();
             EventTrigger.Entry eResetPanel = new()
@@ -2040,7 +2042,6 @@ namespace Assets.Source.Maqiao
                 index++;
             }
 
-            y -= paiHeight * 1.5f;
             DrawButton(ref goRandom, "ランダム", new Vector2(0, y));
             goRandom.onClick.AddListener(delegate
             {
