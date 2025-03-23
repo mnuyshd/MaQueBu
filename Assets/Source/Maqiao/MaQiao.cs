@@ -1247,7 +1247,7 @@ namespace Assets.Source.Maqiao
             DrawText(ref title, "ルール", new Vector2(0, y), 0, 25);
             y -= offset;
 
-            DrawToggleButton("半荘戦（" + Number2Full(Chang.guiZe.kaiShiDian) + "点開始、" + Number2Full(Chang.guiZe.fanDian) + "点返し）", new Vector2(x, y));
+            DrawToggleButton(() => Chang.guiZe.banZhuang, v => Chang.guiZe.banZhuang = v, "半荘戦（" + Number2Full(Chang.guiZe.kaiShiDian) + "点開始、" + Number2Full(Chang.guiZe.fanDian) + "点返し）", "東風戦（" + Number2Full(Chang.guiZe.kaiShiDian) + "点開始、" + Number2Full(Chang.guiZe.fanDian) + "点返し）", new Vector2(x, y));
             y -= offset;
             DrawToggleButton(() => Chang.guiZe.ziMoPingHe, v => Chang.guiZe.ziMoPingHe = v, "ピンヅモ有り", "ピンヅモ無し", new Vector2(x, y));
             y -= offset;
@@ -4398,7 +4398,8 @@ namespace Assets.Source.Maqiao
             }
 
             // 点表示
-            if (Chang.ChangFeng > 0x32 || (Chang.guiZe.xiang && Chang.XiangPanDing()) || isQinTop)
+            int zhan = Chang.guiZe.banZhuang ? 0x32 : 0x31;
+            if (Chang.ChangFeng > zhan || (Chang.guiZe.xiang && Chang.XiangPanDing()) || isQinTop)
             {
                 eventStatus = Event.ZHUANG_ZHONG_LE;
             }
@@ -4460,7 +4461,13 @@ namespace Assets.Source.Maqiao
             }
 
             banZhuangShu++;
-            Debug.Log("半荘" + banZhuangShu + "回終了");
+
+            Debug.Log(banZhuangShu + "回戦");
+            for (int i = 0; i < shunWei.Count; i++)
+            {
+                QiaoShi shi = shunWei[i].shi;
+                Debug.Log(" " + (i + 1) + "位 " + shi.MingQian + "(" + shi.JiJiDian + ")");
+            }
             eventStatus = Event.QIAO_SHI_XUAN_ZE;
 
             isZhuangZhongLeCoroutine = false;
@@ -4493,7 +4500,7 @@ namespace Assets.Source.Maqiao
         // 【描画】荘終了
         private void DrawZhuangZhong()
         {
-            float y = paiHeight * 4;
+            float y = paiHeight * 3f;
             int maxMingQian = 0;
             int maxDianBang = 0;
             int maxDeDian = 0;
@@ -4518,9 +4525,18 @@ namespace Assets.Source.Maqiao
                 }
             }
 
-            for (int i = 0; i < Chang.QiaoShis.Count; i++)
+            List<(int dian, QiaoShi shi)> shunWei = new();
+            for (int i = Chang.QiaJia; i < Chang.QiaJia + Chang.QiaoShis.Count; i++)
             {
-                QiaoShi shi = Chang.QiaoShis[i];
+                int jia = i % Chang.QiaoShis.Count;
+                QiaoShi shi = Chang.QiaoShis[jia];
+                shunWei.Add((shi.DianBang, shi));
+            }
+            shunWei.Sort((x, y) => y.dian.CompareTo(x.dian));
+
+            for (int i = 0; i < shunWei.Count; i++)
+            {
+                QiaoShi shi = shunWei[i].shi;
                 string dianBang = shi.DianBang.ToString();
                 for (int j = dianBang.Length; j < maxDianBang; j++)
                 {

@@ -3,6 +3,8 @@ namespace Assets.Source.Gongtong
     // 規則
     public class GuiZe
     {
+        // 半荘戦
+        public bool banZhuang = true;
         // 喰断
         public bool shiDuan = true;
         // 自摸平和
