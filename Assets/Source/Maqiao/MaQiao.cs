@@ -86,6 +86,8 @@ namespace Assets.Source.Maqiao
         private ForwardMode forwardMode = ForwardMode.NORMAL;
         // 相手牌オープン
         private bool shouPaiOpen = false;
+        // プレイヤー有り
+        private bool existsPlayer = true;
 
         // 待ち時間
         private static float waitTime = WAIT_TIME;
@@ -163,6 +165,7 @@ namespace Assets.Source.Maqiao
         private TextMeshProUGUI[] goMingQian;
         private Button[] goQiaoShi;
         private Button goRandom;
+        private Button goPlayerNoExists;
         private Button[] goYao;
         private Image[] goLizhiBang;
         private Image goDianBang100;
@@ -1588,7 +1591,7 @@ namespace Assets.Source.Maqiao
                     selectedCount++;
                 }
             }
-            if (selectedCount == 3 || selectedCount == 2 || selectedCount == 1)
+            if ((!existsPlayer && selectedCount == 4) || selectedCount == 3 || selectedCount == 2 || selectedCount == 1)
             {
                 keyPress = true;
             }
@@ -1694,9 +1697,7 @@ namespace Assets.Source.Maqiao
                 }
             }
 
-            eventStatus = Event.FOLLOW_QIAO_SHI_XUAN_ZE;
-            //eventStatus = Event.CHANG_JUE;
-            //OnClickScreenFollowNone();
+            eventStatus = existsPlayer ? Event.FOLLOW_QIAO_SHI_XUAN_ZE : Event.CHANG_JUE;
             isQiaoShiXuanZeCoroutine = false;
         }
 
@@ -2043,7 +2044,46 @@ namespace Assets.Source.Maqiao
                 index++;
             }
 
-            DrawButton(ref goRandom, "ランダム", new Vector2(0, y));
+            string[] displayText = new string[] { "プレイヤー無し", "プレイヤー有り" };
+            DrawButton(ref goPlayerNoExists, existsPlayer ? displayText[1] : displayText[0], new Vector2(-paiWidth * 4, y));
+            goPlayerNoExists.onClick.AddListener(delegate
+            {
+                existsPlayer = !existsPlayer;
+                goPlayerNoExists.GetComponentInChildren<TextMeshProUGUI>().text = existsPlayer ? displayText[1] : displayText[0];
+
+                var keys = new List<string>(qiaoShiMingQian.Keys);
+                int selectedCount = 0;
+                foreach (string key in keys)
+                {
+                    if (qiaoShiMingQian[key])
+                    {
+                        selectedCount++;
+                    }
+                }
+                int index = 0;
+                if ((existsPlayer && selectedCount > 3) || (!existsPlayer && selectedCount > 4))
+                {
+                    foreach (string key in keys)
+                    {
+                        if (qiaoShiMingQian[key])
+                        {
+                            index++;
+                        }
+                        if (index == selectedCount)
+                        {
+                            qiaoShiMingQian[key] = false;
+                        }
+                    }
+                }
+
+                index = 0;
+                foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
+                {
+                    SetQiaoShiColor(kvp.Key, index++);
+                }
+            });
+
+            DrawButton(ref goRandom, "ランダム", new Vector2(paiWidth * 4, y));
             goRandom.onClick.AddListener(delegate
             {
                 RandomQiaoShiXuanZe();
@@ -2103,6 +2143,7 @@ namespace Assets.Source.Maqiao
                 string lastMing = "";
                 int lastPos = 0;
                 int index = 0;
+                int cnt = existsPlayer ? 2 : 3;
                 foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
                 {
                     if (kvp.Value)
@@ -2117,7 +2158,7 @@ namespace Assets.Source.Maqiao
                         lastMing = kvp.Key;
                         lastPos = index;
                     }
-                    if (selectedCount > 2)
+                    if (selectedCount > cnt)
                     {
                         string changeMing = lastMing;
                         int changePos = lastPos;
@@ -3402,7 +3443,7 @@ namespace Assets.Source.Maqiao
             {
                 int p = shi.ShouPai[i];
                 shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
-                if (shi.PlayOrder != 0 && yao != QiaoShi.YaoDingYi.TingPai && yao != QiaoShi.YaoDingYi.HeLe && yao != QiaoShi.YaoDingYi.JiuZhongJiuPai && yao != QiaoShi.YaoDingYi.CuHe && p != 0xff)
+                if (!shi.Player && yao != QiaoShi.YaoDingYi.TingPai && yao != QiaoShi.YaoDingYi.HeLe && yao != QiaoShi.YaoDingYi.JiuZhongJiuPai && yao != QiaoShi.YaoDingYi.CuHe && p != 0xff)
                 {
                     if (!shouPaiOpen && !shi.KaiLiZhi)
                     {
@@ -4622,6 +4663,7 @@ namespace Assets.Source.Maqiao
 
             ClearGameObject(ref goQiaoShi);
             ClearGameObject(ref goRandom);
+            ClearGameObject(ref goPlayerNoExists);
 
             ClearGameObject(ref goLeft);
             ClearGameObject(ref goRight);
