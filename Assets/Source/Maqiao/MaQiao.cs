@@ -729,7 +729,7 @@ namespace Assets.Source.Maqiao
             goScoreQiaoShi = new Button[qiaoShiMingQian.Count + 1];
 
             float x = 0;
-            float y = paiHeight * 4;
+            float y = paiHeight * 4.5f;
 
             goScoreQiaoShi[qiaoShiMingQian.Count] = Instantiate(goButton, goScorePanel.transform);
             goScoreQiaoShi[qiaoShiMingQian.Count].onClick.AddListener(delegate
@@ -1322,16 +1322,6 @@ namespace Assets.Source.Maqiao
                 SetScale();
                 switch (eventStatus)
                 {
-                    // 雀士選択
-                    case Event.QIAO_SHI_XUAN_ZE:
-                    // フォロー雀士選択
-                    case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                        DrawTitle();
-                        break;
-
-                    // 配牌
-                    case Event.PEI_PAI:
-                        break;
                     // 対局
                     case Event.DUI_JU:
                     // 対局終了
@@ -1670,7 +1660,6 @@ namespace Assets.Source.Maqiao
 
             // 描画
             ClearScreen();
-            DrawTitle();
             DrawQiaoShiXuanZe();
 
             yield return Pause(ForwardMode.FAST_FORWARD);
@@ -1708,7 +1697,6 @@ namespace Assets.Source.Maqiao
 
             // 描画
             ClearScreen();
-            DrawTitle();
             DrawFollowQiaoShiXuanZe();
 
             keyPress = false;
@@ -1722,27 +1710,6 @@ namespace Assets.Source.Maqiao
 
             eventStatus = Event.CHANG_JUE;
             isFollowQiaoShiXuanZeCoroutine = false;
-        }
-
-        // 【描画】タイトル
-        private void DrawTitle()
-        {
-            float x = 0;
-            float y = paiHeight * 4f;
-            string value;
-            switch (eventStatus)
-            {
-                case Event.QIAO_SHI_XUAN_ZE:
-                    value = "面子";
-                    break;
-                case Event.FOLLOW_QIAO_SHI_XUAN_ZE:
-                    value = "フォロー";
-                    break;
-                default:
-                    value = "";
-                    break;
-            }
-            DrawText(ref goJu, value, new Vector2(x, y), 0, 25);
         }
 
         // 【描画】局、残牌、供託、点、懸賞牌
@@ -1957,9 +1924,16 @@ namespace Assets.Source.Maqiao
         // 【描画】対局中オプション
         private void DrawJuOption()
         {
+            ClearGameObject(ref goMingWu);
+            ClearGameObject(ref goDianCha);
+
+            if (!existsPlayer)
+            {
+                return;
+            }
+
             // 鳴 有り・無し
             string[] labelMingWu = new string[] { "鳴無", "鳴有" };
-            ClearGameObject(ref goMingWu);
             goMingWu = Instantiate(goButton, goButton.transform.parent);
             goMingWu.onClick.AddListener(delegate
             {
@@ -1977,7 +1951,6 @@ namespace Assets.Source.Maqiao
             DrawButton(ref goMingWu, sheDing.mingWu ? labelMingWu[0] : labelMingWu[1], new Vector2(x, y));
 
             // 点差
-            ClearGameObject(ref goDianCha);
             goDianCha = Instantiate(goButton, goButton.transform.parent);
 
             if (orientation == ScreenOrientation.Portrait)
@@ -2024,28 +1997,10 @@ namespace Assets.Source.Maqiao
             }
 
             float x = 0;
-            float y = paiHeight * 2.5f;
-            int index = 0;
-            foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
-            {
-                x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
-                int pos = index;
-                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
-                goQiaoShi[index].onClick.AddListener(delegate
-                {
-                    OnClickQiaoShi(kvp.Key, pos);
-                });
+            float y = paiHeight * 4.5f;
 
-                SetQiaoShiColor(kvp.Key, index);
-                if (index % 2 == 1)
-                {
-                    y -= paiHeight * 1.5f;
-                }
-                index++;
-            }
-
-            string[] displayText = new string[] { "プレイヤー無し", "プレイヤー有り" };
-            DrawButton(ref goPlayerNoExists, existsPlayer ? displayText[1] : displayText[0], new Vector2(-paiWidth * 4, y));
+            string[] displayText = new string[] { "観戦", "対戦" };
+            DrawButton(ref goPlayerNoExists, existsPlayer ? displayText[1] : displayText[0], new Vector2(0, y), 4);
             goPlayerNoExists.onClick.AddListener(delegate
             {
                 existsPlayer = !existsPlayer;
@@ -2082,8 +2037,28 @@ namespace Assets.Source.Maqiao
                     SetQiaoShiColor(kvp.Key, index++);
                 }
             });
+            y -= paiHeight * 1.5f;
 
-            DrawButton(ref goRandom, "ランダム", new Vector2(paiWidth * 4, y));
+            int index = 0;
+            foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
+            {
+                x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
+                int pos = index;
+                DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
+                goQiaoShi[index].onClick.AddListener(delegate
+                {
+                    OnClickQiaoShi(kvp.Key, pos);
+                });
+
+                SetQiaoShiColor(kvp.Key, index);
+                if (index % 2 == 1)
+                {
+                    y -= paiHeight * 1.5f;
+                }
+                index++;
+            }
+
+            DrawButton(ref goRandom, "ランダム", new Vector2(0, y));
             goRandom.onClick.AddListener(delegate
             {
                 RandomQiaoShiXuanZe();
@@ -2188,8 +2163,10 @@ namespace Assets.Source.Maqiao
         // 【描画】フォロー雀士選択
         private void DrawFollowQiaoShiXuanZe()
         {
+            DrawText(ref goJu, "フォロー雀士", new Vector2(0, paiHeight * 4.5f), 0, 25);
+
             float x = 0;
-            float y = paiHeight * 2.5f;
+            float y = paiHeight * 3f;
             int i = 0;
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
