@@ -913,6 +913,24 @@ namespace Assets.Source.Sikao
                 }
             }
         }
+        internal void DaiPaiJiSuan(bool isZiMo)
+        {
+            List<int> shouPaiC = new(shouPai);
+            daiPai = new();
+            if (!isZiMo)
+            {
+                shouPai.Add(0xff);
+            }
+            foreach (int p in Pai.QiaoPai)
+            {
+                shouPai[^1] = p;
+                if (HeLePanDing() == Ting.TingPai)
+                {
+                    daiPai.Add(p);
+                }
+            }
+            shouPai = new(shouPaiC);
+        }
 
         // 和了処理
         internal void HeLeChuLi()
@@ -1856,6 +1874,7 @@ namespace Assets.Source.Sikao
         // 振聴判定
         internal bool ZhenTingPanDing()
         {
+            DaiPaiJiSuan(true);
             foreach (int dp in daiPai)
             {
                 // 振聴
@@ -1933,18 +1952,7 @@ namespace Assets.Source.Sikao
                 return;
             }
 
-            List<int> shouPaiC = new(shouPai);
-            daiPai = new();
-            shouPai.Add(0xff);
-            foreach (int p in Pai.QiaoPai)
-            {
-                shouPai[^1] = p;
-                if (HeLePanDing() == Ting.TingPai)
-                {
-                    daiPai.Add(p);
-                }
-            }
-            shouPai = new(shouPaiC);
+            DaiPaiJiSuan(false);
         }
 
         // 暗槓判定
