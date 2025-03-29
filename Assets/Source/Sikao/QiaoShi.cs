@@ -4137,7 +4137,7 @@ namespace Assets.Source.Sikao
 
                     case YaoDingYi.JiuZhongJiuPai:
                         // 九種九牌
-                        if (!jiuZhongJiuPai)
+                        if (!jiuZhongJiuPai || Chang.guiZe.jiuZhongJiuPaiLianZhuang == 0)
                         {
                             cuHeSheng = "誤九種九牌";
                             return true;

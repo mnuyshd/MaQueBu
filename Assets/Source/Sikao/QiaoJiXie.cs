@@ -83,7 +83,7 @@ namespace Assets.Source.Sikao
                 return;
             }
 
-            if (JiuZhongJiuPai)
+            if (Chang.guiZe.jiuZhongJiuPaiLianZhuang > 0 && JiuZhongJiuPai)
             {
                 int dian = DianCha() / 1000;
                 if (nao[XingGe.YI_PAI] + dian < 50)

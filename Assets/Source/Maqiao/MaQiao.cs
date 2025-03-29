@@ -12,6 +12,7 @@ using Assets.Source.Gongtong;
 using Assets.Source.Sikao;
 using Assets.Source.Sikao.Shi;
 using Unity.VisualScripting;
+using System.Linq;
 
 namespace Assets.Source.Maqiao
 {
@@ -1181,7 +1182,7 @@ namespace Assets.Source.Maqiao
 
             RectTransform rtGuiZeContent = goGuiZeContent.GetComponent<RectTransform>();
             Vector2 size = rtGuiZeContent.sizeDelta;
-            size.y = paiHeight * 30f;
+            size.y = paiHeight * 32f;
             rtGuiZeContent.sizeDelta = size;
             ScrollRect scrollRect = goGuiZeScrollView.GetComponent<ScrollRect>();
             scrollRect.verticalNormalizedPosition = 1f;
@@ -1190,7 +1191,7 @@ namespace Assets.Source.Maqiao
         // ルール描画
         private void DrawGuiZe()
         {
-            float y = paiHeight * 14f;
+            float y = paiHeight * 14.5f;
             float x = 0;
             float offset = paiHeight * 1.3f;
 
@@ -1206,7 +1207,9 @@ namespace Assets.Source.Maqiao
             y -= offset;
             DrawToggleGuiZe(() => Chang.guiZe.shiTi, v => Chang.guiZe.shiTi = v, new string[] { "食い替え有り", "食い替え無し（チョンボ扱い）" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.wRongHe, v => Chang.guiZe.wRongHe = v, new string[] { "ダブロン、トリロン有り", "ダブロン、トリロン無し（頭ハネ）" }, new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.wRongHe, v => Chang.guiZe.wRongHe = v, new string[] { "ダブルロン無し（頭ハネ）", "ダブルロン有り" }, new Vector2(x, y));
+            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.tRongHe, v => Chang.guiZe.tRongHe = v, new string[] { "トリプルロン無し（頭ハネ）", "トリプルロン有り", "トリプルロンは流局（親連荘）", "トリプルロンは流局（親流れ）" }, new Vector2(x, y));
             y -= offset;
             DrawToggleGuiZe(() => Chang.guiZe.baoZe, v => Chang.guiZe.baoZe = v, new string[] { "パオ（責任払い）有り", "パオ（責任払い）無し" }, new Vector2(x, y));
             y -= offset;
@@ -1222,19 +1225,19 @@ namespace Assets.Source.Maqiao
                 File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
             });
             y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌は親の連荘", "九種九牌は流局（親流れ）" }, new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌無し", "九種九牌は流局（親連荘）", "九種九牌は流局（親流れ）" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.siJiaLiZhiLianZhuang, v => Chang.guiZe.siJiaLiZhiLianZhuang = v, new string[] { "四家立直は親の連荘", "四家立直は流局（親流れ）" }, new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.siJiaLiZhiLianZhuang, v => Chang.guiZe.siJiaLiZhiLianZhuang = v, new string[] { "四家立直は続行", "四家立直は流局（親連荘）", "四家立直は流局（親流れ）" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.siFengZiLianDaLianZhuang, v => Chang.guiZe.siFengZiLianDaLianZhuang = v, new string[] { "四風子連打は親の連荘", "四風子連打は流局（親流れ）" }, new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.siFengZiLianDaLianZhuang, v => Chang.guiZe.siFengZiLianDaLianZhuang = v, new string[] { "四風子連打無し", "四風子連打は流局（親連荘）", "四風子連打は流局（親流れ）" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.siKaiGangLianZhuang, v => Chang.guiZe.siKaiGangLianZhuang = v, new string[] { "四開槓は親の連荘", "四開槓は流局（親流れ）" }, new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.siKaiGangLianZhuang, v => Chang.guiZe.siKaiGangLianZhuang = v, new string[] { "四開槓は流局（親連荘）", "四開槓は流局（親流れ）" }, new Vector2(x, y));
             y -= offset;
             DrawToggleGuiZe(() => Chang.guiZe.xiang, v => Chang.guiZe.xiang = v, new string[] { "箱（０点以下で終了）有り", "箱（０点以下で終了）無し" }, new Vector2(x, y));
             y -= offset;
             DrawToggleGuiZe(() => Chang.guiZe.jieJinLiZhi, v => Chang.guiZe.jieJinLiZhi = v, new string[] { "１０００点未満のリーチ可能", "１０００点未満のリーチ不可" }, new Vector2(x, y));
             y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.liuManGuan, v => Chang.guiZe.liuManGuan = v, new string[] { "流し満貫有り（親は連荘）", "流し満貫無し" }, new Vector2(x, y));
+            DrawToggleGuiZe(() => Chang.guiZe.liuManGuan, v => Chang.guiZe.liuManGuan = v, new string[] { "流し満貫有り", "流し満貫無し" }, new Vector2(x, y));
             y -= offset;
             DrawToggleGuiZe(() => Chang.guiZe.sanLianKe, v => Chang.guiZe.sanLianKe = v, new string[] { "三連刻有り", "三連刻無し" }, new Vector2(x, y));
             y -= offset;
@@ -1271,6 +1274,22 @@ namespace Assets.Source.Maqiao
                 bool newValue = !getValue();
                 setValue(newValue);
                 text.text = newValue ? textOnOff[0] : textOnOff[1];
+                File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
+            });
+        }
+        private void DrawToggleGuiZe(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy)
+        {
+            Button button = Instantiate(goButton, goGuiZeContent.transform);
+
+            string displayText = textOnOff[getValue()];
+            DrawButton(ref button, displayText, xy, 12);
+            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
+            text.fontSize = 17f;
+            button.onClick.AddListener(delegate
+            {
+                int newValue = (getValue() + 1) % textOnOff.Length;
+                setValue(newValue);
+                text.text = textOnOff[newValue];
                 File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
             });
         }
@@ -1896,7 +1915,7 @@ namespace Assets.Source.Maqiao
             {
                 isLiXuanShangPai = true;
             }
-            foreach (int fan in Chang.RongHeFan)
+            foreach ((int fan, _) in Chang.RongHeFan)
             {
                 QiaoShi shi = Chang.QiaoShis[fan];
                 if (shi.LiZhi)
@@ -2671,7 +2690,7 @@ namespace Assets.Source.Maqiao
                     // 描画
                     Chang.JiuZhongJiuPaiChuLi();
                     DrawJiuZhongJiuPai(Chang.ZiMoFan);
-                    tingPaiLianZhuang = Chang.guiZe.jiuZhongJiuPaiLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                    tingPaiLianZhuang = Chang.guiZe.jiuZhongJiuPaiLianZhuang == 1 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                     DrawShouPai(Chang.ZiMoFan, Chang.ZiJiaYao, 0);
                     yield return Pause(ForwardMode.FAST_FORWARD);
                     eventStatus = Event.DIAN_BIAO_SHI;
@@ -2707,7 +2726,7 @@ namespace Assets.Source.Maqiao
                     {
                         // 描画
                         DrawSiKaiGangPanDing(Chang.ZiMoFan);
-                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                         yield return Pause(ForwardMode.FAST_FORWARD);
                         eventStatus = Event.DIAN_BIAO_SHI;
                         yield break;
@@ -2764,11 +2783,11 @@ namespace Assets.Source.Maqiao
                 // 四風子連打処理
                 Chang.SiFengZiLianDaChuLi(Chang.ShePai);
                 // 四風子連打判定
-                if (Chang.SiFengZiLianDa)
+                if (Chang.SiFengZiLianDa && Chang.guiZe.siFengZiLianDaLianZhuang > 0)
                 {
                     // 描画
                     DrawSiFengZiLianDa(Chang.ZiMoFan);
-                    tingPaiLianZhuang = Chang.guiZe.siFengZiLianDaLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                    tingPaiLianZhuang = Chang.guiZe.siFengZiLianDaLianZhuang == 1 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                     yield return Pause(ForwardMode.FAST_FORWARD);
                     eventStatus = Event.DIAN_BIAO_SHI;
                     yield break;
@@ -2788,7 +2807,7 @@ namespace Assets.Source.Maqiao
                     {
                         // 描画
                         DrawSiKaiGangPanDing(Chang.ZiMoFan);
-                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                         yield return Pause(ForwardMode.FAST_FORWARD);
                         eventStatus = Event.DIAN_BIAO_SHI;
                         yield break;
@@ -2837,9 +2856,9 @@ namespace Assets.Source.Maqiao
                     Chang.TaJiaXuanZe = taJiaShi.TaJiaXuanZe;
                     Chang.MingFan = jia;
                 }
-                if (Chang.guiZe.wRongHe && taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
+                if (taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
                 {
-                    Chang.RongHeFan.Add(jia);
+                    Chang.RongHeFan.Add((jia, i));
                 }
             }
             // 思考他家プレイヤー分
@@ -2858,7 +2877,8 @@ namespace Assets.Source.Maqiao
                 if (taJiaShi.HeLe || taJiaShi.ChiPaiWei.Count > 0 || taJiaShi.BingPaiWei.Count > 0 || taJiaShi.DaMingGangPaiWei.Count > 0)
                 {
                     if ((taJiaShi.HeLe && Chang.TaJiaYao < QiaoShi.YaoDingYi.RongHe)
-                        || (Chang.guiZe.wRongHe && taJiaShi.HeLe)
+                        || (taJiaShi.HeLe && Chang.guiZe.wRongHe > 0)
+                        || (taJiaShi.HeLe && Chang.guiZe.tRongHe > 0)
                         || (taJiaShi.DaMingGangPaiWei.Count > 0 && Chang.TaJiaYao < QiaoShi.YaoDingYi.DaMingGang)
                         || (taJiaShi.BingPaiWei.Count > 0 && Chang.TaJiaYao < QiaoShi.YaoDingYi.Bing)
                         || (taJiaShi.ChiPaiWei.Count > 0 && Chang.TaJiaYao < QiaoShi.YaoDingYi.Chi))
@@ -2876,9 +2896,9 @@ namespace Assets.Source.Maqiao
                             Chang.TaJiaXuanZe = taJiaShi.TaJiaXuanZe;
                             Chang.MingFan = jia;
                         }
-                        if (Chang.guiZe.wRongHe && taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
+                        if (taJiaShi.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
                         {
-                            Chang.RongHeFan.Add(jia);
+                            Chang.RongHeFan.Add((jia, i));
                         }
                         DrawShePai(Chang.ZiMoFan);
                     }
@@ -2890,14 +2910,14 @@ namespace Assets.Source.Maqiao
                 // 栄和
                 if (Chang.RongHeFan.Count == 0)
                 {
-                    Chang.RongHeFan.Add(Chang.MingFan);
+                    Chang.RongHeFan.Add((Chang.MingFan, 0));
                 }
-                Chang.RongHeFan.Sort();
-                Chang.MingFan = Chang.RongHeFan[0];
+                Chang.RongHeFan = Chang.RongHeFan.OrderBy(x => x.index).ToList();
+                Chang.MingFan = Chang.RongHeFan[0].fan;
 
                 // 捨牌処理
                 Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.RongHe);
-                foreach (int fan in Chang.RongHeFan)
+                foreach ((int fan, _) in Chang.RongHeFan)
                 {
                     // 描画
                     DrawRongHe(fan);
@@ -2906,9 +2926,40 @@ namespace Assets.Source.Maqiao
                     // 和了
                     Chang.QiaoShis[fan].HeLeChuLi();
                 }
+
+                if (Chang.RongHeFan.Count == 3)
+                {
+                    if (Chang.guiZe.tRongHe == 0)
+                    {
+                        // トリプル栄和 無し(頭ハネ)
+                        Chang.RongHeFan.RemoveAt(2);
+                        Chang.RongHeFan.RemoveAt(1);
+                        DrawShang(Chang.MingFan, "ロン(頭ハネ)");
+                    }
+                    else if (Chang.guiZe.tRongHe >= 2)
+                    {
+                        // トリプル栄和 流局
+                        DrawShang(Chang.RongHeFan[2].fan, "ロン(流局)");
+                        Chang.RongHeFan.Clear();
+                        tingPaiLianZhuang = Chang.guiZe.tRongHe == 2 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                        yield return Pause(ForwardMode.FAST_FORWARD);
+                        eventStatus = Event.DIAN_BIAO_SHI;
+                        yield break;
+                    }
+                }
+                else if (Chang.RongHeFan.Count == 2)
+                {
+                    if (Chang.guiZe.wRongHe == 0)
+                    {
+                        // ダブル栄和 無し(頭ハネ)
+                        Chang.RongHeFan.RemoveAt(1);
+                        DrawShang(Chang.MingFan, "ロン(頭ハネ)");
+                    }
+                }
+
                 Chang.HeleFan = Chang.MingFan;
                 DrawJuFrame();
-                tingPaiLianZhuang = (Chang.MingFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG);
+                tingPaiLianZhuang = Chang.MingFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                 yield return Pause(ForwardMode.FAST_FORWARD);
                 eventStatus = Event.YI_BIAO_SHI;
                 yield break;
@@ -2936,7 +2987,7 @@ namespace Assets.Source.Maqiao
                     {
                         // 描画
                         DrawSiJiaLiZhi(Chang.ZiMoFan);
-                        tingPaiLianZhuang = Chang.guiZe.siJiaLiZhiLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                        tingPaiLianZhuang = Chang.guiZe.siJiaLiZhiLianZhuang == 1 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                         yield return Pause(ForwardMode.FAST_FORWARD);
                         eventStatus = Event.DIAN_BIAO_SHI;
                         yield break;
@@ -2962,7 +3013,7 @@ namespace Assets.Source.Maqiao
                     {
                         // 描画
                         DrawSiKaiGangPanDing(Chang.ZiMoFan);
-                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                         yield return Pause(ForwardMode.FAST_FORWARD);
                         eventStatus = Event.DIAN_BIAO_SHI;
                         yield break;
@@ -4011,7 +4062,7 @@ namespace Assets.Source.Maqiao
 
             if (Chang.RongHeFan.Count > 0)
             {
-                foreach (int fan in Chang.RongHeFan)
+                foreach ((int fan, _) in Chang.RongHeFan)
                 {
                     // 描画
                     ClearScreen();
@@ -4182,7 +4233,7 @@ namespace Assets.Source.Maqiao
             // 記録 役数・役満数
             if (Chang.RongHeFan.Count > 0)
             {
-                foreach (int fan in Chang.RongHeFan)
+                foreach ((int fan, _) in Chang.RongHeFan)
                 {
                     QiaoShi shi = Chang.QiaoShis[fan];
                     foreach ((int yi, _) in shi.YiFan)

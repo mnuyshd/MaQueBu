@@ -71,10 +71,11 @@ namespace Assets.Source.Gongtong
             set { mingFan = value; }
         }
         // 栄和番
-        private static List<int> rongHeFan;
-        internal static List<int> RongHeFan
+        private static List<(int fan, int index)> rongHeFan;
+        internal static List<(int fan, int index)> RongHeFan
         {
             get { return rongHeFan; }
+            set { rongHeFan = value; }
         }
         // 和了番
         private static int heleFan;
@@ -199,7 +200,7 @@ namespace Assets.Source.Gongtong
             siFengZiLianDaPai = new List<int>();
             ziJiaYao = QiaoShi.YaoDingYi.Wu;
             taJiaYao = QiaoShi.YaoDingYi.Wu;
-            rongHeFan = new List<int>();
+            rongHeFan = new List<(int, int)>();
         }
 
         // 立直処理
@@ -212,6 +213,10 @@ namespace Assets.Source.Gongtong
         // 四家立直判定
         internal static bool SiJiaLiZhiPanDing()
         {
+            if (guiZe.siJiaLiZhiLianZhuang == 0)
+            {
+                return false;
+            }
             if (qiaoShis.Count != 4)
             {
                 return false;
@@ -291,12 +296,13 @@ namespace Assets.Source.Gongtong
         }
 
         // 連荘数計算
-        private static void LianZhuangShuJiSuan() {
+        private static void LianZhuangShuJiSuan()
+        {
             for (int i = 0; i < QiaoShis.Count; i++)
             {
                 QiaoShi shi = QiaoShis[i];
                 bool isHeLe = false;
-                foreach (int fan in RongHeFan)
+                foreach ((int fan, int _) in RongHeFan)
                 {
                     if (i == fan)
                     {
@@ -413,14 +419,14 @@ namespace Assets.Source.Gongtong
                 // 栄和
                 for (int i = 0; i < rongHeFan.Count; i++)
                 {
-                    dian = qiaoShis[rongHeFan[i]].HeLeDian;
+                    dian = qiaoShis[rongHeFan[i].fan].HeLeDian;
                     // 本場
                     dian += benChang * 300;
 
-                    if (qiaoShis[rongHeFan[i]].BaoZeFan >= 0)
+                    if (qiaoShis[rongHeFan[i].fan].BaoZeFan >= 0)
                     {
                         // 包則
-                        int baoZeFan = (rongHeFan[i] + qiaoShis.Count - qiaoShis[rongHeFan[i]].BaoZeFan) % qiaoShis.Count;
+                        int baoZeFan = (rongHeFan[i].fan + qiaoShis.Count - qiaoShis[rongHeFan[i].fan].BaoZeFan) % qiaoShis.Count;
                         shouQu = Ceil(dian / 2, 100);
                         qiaoShis[ziMoFan].DianBangJiSuan(-(dian - shouQu));
                         qiaoShis[baoZeFan].DianBangJiSuan(-shouQu);
@@ -429,22 +435,22 @@ namespace Assets.Source.Gongtong
                     {
                         qiaoShis[ziMoFan].DianBangJiSuan(-dian);
                     }
-                    qiaoShis[rongHeFan[i]].DianBangJiSuan(dian);
+                    qiaoShis[rongHeFan[i].fan].DianBangJiSuan(dian);
                     // 供託
                     if (i == 0)
                     {
-                        qiaoShis[rongHeFan[i]].DianBangJiSuan(gongTuo);
-                        qiaoShis[rongHeFan[i]].ShouQuGongTuoJiSuan(gongTuo);
+                        qiaoShis[rongHeFan[i].fan].DianBangJiSuan(gongTuo);
+                        qiaoShis[rongHeFan[i].fan].ShouQuGongTuoJiSuan(gongTuo);
 
                     }
                     // 記録 和了数
-                    qiaoShis[rongHeFan[i]].JiLu.heLeShu++;
+                    qiaoShis[rongHeFan[i].fan].JiLu.heLeShu++;
                     // 記録 放銃数
                     qiaoShis[ziMoFan].JiLu.fangChongShu++;
                     // 記録 和了点
-                    qiaoShis[rongHeFan[i]].JiLu.heLeDian += qiaoShis[rongHeFan[i]].HeLeDian;
+                    qiaoShis[rongHeFan[i].fan].JiLu.heLeDian += qiaoShis[rongHeFan[i].fan].HeLeDian;
                     // 記録 放銃点
-                    qiaoShis[ziMoFan].JiLu.fangChongDian += qiaoShis[rongHeFan[i]].HeLeDian;
+                    qiaoShis[ziMoFan].JiLu.fangChongDian += qiaoShis[rongHeFan[i].fan].HeLeDian;
                 }
                 gongTuo = 0;
                 return;
