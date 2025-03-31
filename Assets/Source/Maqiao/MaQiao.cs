@@ -2,17 +2,17 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using Unity.VisualScripting;
 using TMPro;
 
 using Assets.Source.Gongtong;
 using Assets.Source.Sikao;
 using Assets.Source.Sikao.Shi;
-using Unity.VisualScripting;
-using System.Linq;
 
 namespace Assets.Source.Maqiao
 {
@@ -690,12 +690,6 @@ namespace Assets.Source.Maqiao
             }
         }
 
-        // 設定の書込
-        private void WriteSheDing()
-        {
-            File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
-        }
-
         // 【描画】得点画面
         private void DrawScorePanel()
         {
@@ -940,7 +934,6 @@ namespace Assets.Source.Maqiao
         private void DrawDataSlider(ref Slider goShu, ref TextMeshProUGUI goValue, string ming, float y)
         {
             TextMeshProUGUI text = Instantiate(goText, goDataContent.transform);
-            TextMeshProUGUI value = Instantiate(goText, goDataContent.transform);
             DrawDataSlider(ref text, ref goShu, ref goValue, ming, y);
         }
         private void DrawDataSlider(ref TextMeshProUGUI goMing, ref Slider goShu, ref TextMeshProUGUI goValue, string ming, float y)
@@ -1292,28 +1285,6 @@ namespace Assets.Source.Maqiao
                 text.text = textOnOff[newValue];
                 File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
             });
-        }
-
-        // 数値全角変換
-        private static string Number2Full(int num)
-        {
-            string str = num.ToString();
-            char[] result = new char[str.Length];
-
-            for (int i = 0; i < str.Length; i++)
-            {
-                char c = str[i];
-                if (c >= '0' && c <= '9')
-                {
-                    result[i] = (char)(c + 0xFEE0);
-                }
-                else
-                {
-                    result[i] = c;
-                }
-            }
-
-            return new string(result);
         }
 
         // ルールリセット
@@ -1857,7 +1828,7 @@ namespace Assets.Source.Maqiao
                 {
                     int dianCha = dianPlayer - shi.DianBang;
                     value = dianCha.ToString();
-                    goDianBang[i].color = (dianCha >= 0 ? Color.blue : Color.red);
+                    goDianBang[i].color = dianCha >= 0 ? Color.blue : Color.red;
                 }
                 else
                 {
@@ -4117,7 +4088,7 @@ namespace Assets.Source.Maqiao
 
                 // 名前
                 x = 0f;
-                y -= (paiHeight * 3.5f);
+                y -= paiHeight * 3.5f;
                 DrawText(ref goMingQian[jia], shi.MingQian, new Vector2(x, y), 0, 30);
 
                 // 手牌
@@ -4334,7 +4305,7 @@ namespace Assets.Source.Maqiao
             {
                 int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
                 QiaoShi shi = Chang.QiaoShis[jia];
-                DrawText(ref goDianBang[jia], (shi.DianBang).ToString(), Cal(x, y, shi.PlayOrder), 90 * GetDrawOrder(shi.PlayOrder), 30);
+                DrawText(ref goDianBang[jia], shi.DianBang.ToString(), Cal(x, y, shi.PlayOrder), 90 * GetDrawOrder(shi.PlayOrder), 30);
             }
 
             // 記録の書込
@@ -4651,7 +4622,7 @@ namespace Assets.Source.Maqiao
         private Vector2 Cal(float x, float y, int order)
         {
             int drawOrder = GetDrawOrder(order);
-            int plusMinus = (drawOrder == 0 || drawOrder == 3 ? 1 : -1);
+            int plusMinus = drawOrder == 0 || drawOrder == 3 ? 1 : -1;
             float xx = (drawOrder % 2 == 0 ? x : y) * plusMinus;
             float yy = (drawOrder % 2 == 0 ? y : -x) * plusMinus;
 
@@ -4765,14 +4736,7 @@ namespace Assets.Source.Maqiao
         }
 
         // テキストクリア
-        private void ClearGameObject(ref List<TextMeshProUGUI> go)
-        {
-            for (int i = 0; i < go.Count; i++)
-            {
-                TextMeshProUGUI t = go[i];
-                ClearGameObject(ref t);
-            }
-        }
+
         private void ClearGameObject(ref TextMeshProUGUI[] go)
         {
             for (int i = 0; i < go.Length; i++)
@@ -4782,14 +4746,7 @@ namespace Assets.Source.Maqiao
         }
 
         // ボタンクリア
-        private void ClearGameObject(ref List<Button> go)
-        {
-            for (int i = 0; i < go.Count; i++)
-            {
-                Button b = go[i];
-                ClearGameObject(ref b);
-            }
-        }
+
         private void ClearGameObject(ref Button[] go)
         {
             for (int i = 0; i < go.Length; i++)

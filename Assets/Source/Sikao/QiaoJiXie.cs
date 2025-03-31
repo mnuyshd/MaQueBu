@@ -939,7 +939,7 @@ namespace Assets.Source.Sikao
             for (int i = 0x01; i <= 0x28; i++)
             {
                 int s = i & SHU_PAI;
-                if ((s == 1 || s == 7) && (ShouPaiShu[i] >= 1 && ShouPaiShu[i + 1] >= 1))
+                if ((s == 1 || s == 7) && ShouPaiShu[i] >= 1 && ShouPaiShu[i + 1] >= 1)
                 {
                     int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i + 1]);
                     int s0 = m;
@@ -1085,7 +1085,7 @@ namespace Assets.Source.Sikao
             for (int i = 0x29; i >= 0x02; i--)
             {
                 int s = i & SHU_PAI;
-                if ((s == 2 || s == 9) && (ShouPaiShu[i] >= 1 && ShouPaiShu[i - 1] >= 1))
+                if ((s == 2 || s == 9) && ShouPaiShu[i] >= 1 && ShouPaiShu[i - 1] >= 1)
                 {
                     int m = Math.Min(ShouPaiShu[i], ShouPaiShu[i - 1]);
                     int s0 = m;

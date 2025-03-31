@@ -194,11 +194,9 @@ namespace Assets.Source.Gongtong
                             {
                                 wei = ShanPaiZiMoWei[j] + ((jia + i) % Chang.QiaoShis.Count);
                             }
-                            int tmp = shanPai[wei];
-                            shanPai[wei] = shanPai[k];
-                            shanPai[k] = tmp;
+                            (shanPai[k], shanPai[wei]) = (shanPai[wei], shanPai[k]);
                             shanPaiC[wei] = 0xff;
-                            shanPaiC[k] = tmp;
+                            shanPaiC[k] = shanPai[k];
                             break;
                         }
                     }

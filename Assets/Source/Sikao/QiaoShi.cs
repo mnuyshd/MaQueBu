@@ -1075,8 +1075,10 @@ namespace Assets.Source.Sikao
         // 大明槓
         internal void DaMingGang()
         {
-            List<int> pais = new();
-            pais.Add(Chang.ShePai);
+            List<int> pais = new()
+            {
+                Chang.ShePai
+            };
             foreach (int w in daMingGangPaiWei[Chang.TaJiaXuanZe])
             {
                 pais.Add(shouPai[w]);
@@ -1103,8 +1105,10 @@ namespace Assets.Source.Sikao
         // 石並
         internal void Bing()
         {
-            List<int> pais = new();
-            pais.Add(Chang.ShePai);
+            List<int> pais = new()
+            {
+                Chang.ShePai
+            };
             foreach (int w in bingPaiWei[Chang.TaJiaXuanZe])
             {
                 pais.Add(shouPai[w]);
@@ -1131,8 +1135,10 @@ namespace Assets.Source.Sikao
         // 吃
         internal void Chi()
         {
-            List<int> pais = new();
-            pais.Add(Chang.ShePai);
+            List<int> pais = new()
+            {
+                Chang.ShePai
+            };
             foreach (int w in chiPaiWei[Chang.TaJiaXuanZe])
             {
                 pais.Add(shouPai[w]);
@@ -1314,7 +1320,7 @@ namespace Assets.Source.Sikao
             int xuan = 0;
             foreach (int x in Pai.XuanShangPai)
             {
-                if ((Pai.XuanShangPaiDingYi[x & QIAO_PAI]) == p)
+                if (Pai.XuanShangPaiDingYi[x & QIAO_PAI] == p)
                 {
                     xuan++;
                 }
@@ -1723,20 +1729,20 @@ namespace Assets.Source.Sikao
                 {
                     case YaoDingYi.Wu:
                         // 暗刻
-                        fu += (yaoJiu ? 8 : 4);
+                        fu += yaoJiu ? 8 : 4;
                         break;
                     case YaoDingYi.Bing:
                         // 明刻
-                        fu += (yaoJiu ? 4 : 2);
+                        fu += yaoJiu ? 4 : 2;
                         break;
                     case YaoDingYi.AnGang:
                         // 暗槓
-                        fu += (yaoJiu ? 32 : 16);
+                        fu += yaoJiu ? 32 : 16;
                         break;
                     case YaoDingYi.JiaGang:
                     case YaoDingYi.DaMingGang:
                         // 加槓・大明槓
-                        fu += (yaoJiu ? 16 : 8);
+                        fu += yaoJiu ? 16 : 8;
                         break;
                 }
             }
@@ -1808,27 +1814,27 @@ namespace Assets.Source.Sikao
                 else if (fanShuJi == 5)
                 {
                     // 満貫
-                    heLeDian = (feng == 0x31 ? 12000 : 8000);
+                    heLeDian = feng == 0x31 ? 12000 : 8000;
                 }
                 else if (fanShuJi == 6 || fanShuJi == 7)
                 {
                     // 跳満
-                    heLeDian = (feng == 0x31 ? 18000 : 12000);
+                    heLeDian = feng == 0x31 ? 18000 : 12000;
                 }
                 else if (fanShuJi == 8 || fanShuJi == 9 || fanShuJi == 10)
                 {
                     // 倍満
-                    heLeDian = (feng == 0x31 ? 24000 : 16000);
+                    heLeDian = feng == 0x31 ? 24000 : 16000;
                 }
                 else if (fanShuJi == 11 || fanShuJi == 12)
                 {
                     // 三倍満
-                    heLeDian = (feng == 0x31 ? 36000 : 24000);
+                    heLeDian = feng == 0x31 ? 36000 : 24000;
                 }
                 else if (fanShuJi >= 13)
                 {
                     // 役満
-                    heLeDian = (feng == 0x31 ? 48000 : 32000);
+                    heLeDian = feng == 0x31 ? 48000 : 32000;
                 }
 
             }
@@ -4039,7 +4045,7 @@ namespace Assets.Source.Sikao
         {
             if (ziJiaXuanZe < 0)
             {
-                cuHeSheng = "打牌選択違い";
+                cuHeSheng = "打牌選択間違い";
                 return true;
             }
 
