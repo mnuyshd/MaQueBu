@@ -81,7 +81,7 @@ namespace Assets.Source.Maqiao
             // 局早送り
             FAST_FORWARD = 1,
             // ずっと早送り
-            FOREVER_FAST_FORWARD = 2
+            FOREVER_FAST_FORWARD = 2,
         }
         // 送りモード
         private ForwardMode forwardMode = ForwardMode.NORMAL;
@@ -420,6 +420,9 @@ namespace Assets.Source.Maqiao
 
             goBack = GameObject.Find("Back").GetComponent<Button>();
 
+            // デバッグボタン
+            DrawDebugOption();
+
             // 設定画面
             DrawSettingPanel();
             // 得点画面
@@ -461,6 +464,51 @@ namespace Assets.Source.Maqiao
             }
         }
 
+        // 【描画】デバッグボタン
+        private void DrawDebugOption()
+        {
+            // 早送り
+            Button goFast = GameObject.Find("Fast").GetComponent<Button>();
+            goFast.onClick.AddListener(delegate
+            {
+                forwardMode = (ForwardMode)(((int)forwardMode + 1) % Enum.GetValues(typeof(ForwardMode)).Length);
+                if (forwardMode == ForwardMode.NORMAL)
+                {
+                    forwardMode = ForwardMode.FAST_FORWARD;
+                }
+                Application.targetFrameRate = 0;
+                waitTime = 0;
+                if (keyPress == false)
+                {
+                    keyPress = true;
+                }
+                if (eventStatus == Event.FOLLOW_QIAO_SHI_XUAN_ZE)
+                {
+                    OnClickScreenFollowNone();
+                }
+            });
+            RectTransform rtFast = goFast.GetComponent<RectTransform>();
+            rtFast.localScale *= scale.x;
+            rtFast.anchorMin = new Vector2(0, 1);
+            rtFast.anchorMax = new Vector2(0, 1);
+            rtFast.pivot = new Vector2(0, 1);
+            rtFast.anchoredPosition = new Vector2(paiWidth * 3.2f, -paiHeight * 0.4f);
+            // 再生
+            Button goReproduction = GameObject.Find("Reproduction").GetComponent<Button>();
+            goReproduction.onClick.AddListener(delegate
+            {
+                forwardMode = ForwardMode.NORMAL;
+                Application.targetFrameRate = FRAME_RATE;
+                waitTime = WAIT_TIME;
+            });
+            RectTransform rtReproduction = goReproduction.GetComponent<RectTransform>();
+            rtReproduction.localScale *= scale.x;
+            rtReproduction.anchorMin = new Vector2(0, 1);
+            rtReproduction.anchorMax = new Vector2(0, 1);
+            rtReproduction.pivot = new Vector2(0, 1);
+            rtReproduction.anchoredPosition = new Vector2(paiWidth * 0.7f, -paiHeight * 0.4f);
+        }
+
         // 【描画】設定画面
         private void DrawSettingPanel()
         {
@@ -488,10 +536,23 @@ namespace Assets.Source.Maqiao
             rtSetting.anchorMin = new Vector2(1, 1);
             rtSetting.anchorMax = new Vector2(1, 1);
             rtSetting.pivot = new Vector2(1, 1);
-            rtSetting.anchoredPosition = new Vector2(-(paiWidth * 0.5f), -(paiHeight * 0.5f));
+            rtSetting.anchoredPosition = new Vector2(-(paiWidth * 0.5f), -(paiHeight * 0.2f));
 
-            // デバッグボタン
-            DrawDebugOption();
+            // リスタート
+            Button goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
+            goRestart.onClick.AddListener(delegate
+            {
+                Application.targetFrameRate = FRAME_RATE;
+                waitTime = WAIT_TIME;
+                SceneManager.LoadScene("GameScene");
+            });
+            RectTransform rtRestart = goRestart.GetComponent<RectTransform>();
+            rtRestart.localScale *= scale.x;
+            rtRestart.anchorMin = new Vector2(0, 1);
+            rtRestart.anchorMax = new Vector2(0, 1);
+            rtRestart.pivot = new Vector2(0, 1);
+            rtRestart.anchoredPosition = new Vector2(paiWidth, -(rtRestart.sizeDelta.y * scale.x));
+
             // オプションボタン
             DrawOption();
 
@@ -532,67 +593,6 @@ namespace Assets.Source.Maqiao
                 goSettingDialogPanel.SetActive(false);
             });
             DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
-        }
-
-        // 【描画】デバッグボタン
-        private void DrawDebugOption()
-        {
-            // 早送り
-            Button goFast = goSettingPanel.transform.Find("Fast").GetComponent<Button>();
-            goFast.onClick.AddListener(delegate
-            {
-                forwardMode = (ForwardMode)(((int)forwardMode + 1) % Enum.GetValues(typeof(ForwardMode)).Length);
-                if (forwardMode == ForwardMode.NORMAL)
-                {
-                    forwardMode = ForwardMode.FAST_FORWARD;
-                }
-                Application.targetFrameRate = 0;
-                waitTime = 0;
-                if (keyPress == false)
-                {
-                    keyPress = true;
-                }
-                goSettingPanel.SetActive(false);
-                if (eventStatus == Event.FOLLOW_QIAO_SHI_XUAN_ZE)
-                {
-                    OnClickScreenFollowNone();
-                }
-            });
-            RectTransform rtFast = goFast.GetComponent<RectTransform>();
-            rtFast.localScale *= scale.x;
-            rtFast.anchorMin = new Vector2(1, 1);
-            rtFast.anchorMax = new Vector2(1, 1);
-            rtFast.pivot = new Vector2(1, 1);
-            rtFast.anchoredPosition = new Vector2(-paiWidth, -(rtFast.sizeDelta.y * scale.x));
-            // 再生
-            Button goReproduction = goSettingPanel.transform.Find("Reproduction").GetComponent<Button>();
-            goReproduction.onClick.AddListener(delegate
-            {
-                forwardMode = ForwardMode.NORMAL;
-                Application.targetFrameRate = FRAME_RATE;
-                waitTime = WAIT_TIME;
-                goSettingPanel.SetActive(false);
-            });
-            RectTransform rtReproduction = goReproduction.GetComponent<RectTransform>();
-            rtReproduction.localScale *= scale.x;
-            rtReproduction.anchorMin = new Vector2(1, 1);
-            rtReproduction.anchorMax = new Vector2(1, 1);
-            rtReproduction.pivot = new Vector2(1, 1);
-            rtReproduction.anchoredPosition = new Vector2(-(rtReproduction.sizeDelta.x * scale.x + (paiWidth * 1.5f)), -(rtReproduction.sizeDelta.y * scale.x));
-            // リスタート
-            Button goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
-            goRestart.onClick.AddListener(delegate
-            {
-                Application.targetFrameRate = FRAME_RATE;
-                waitTime = WAIT_TIME;
-                SceneManager.LoadScene("GameScene");
-            });
-            RectTransform rtRestart = goRestart.GetComponent<RectTransform>();
-            rtRestart.localScale *= scale.x;
-            rtRestart.anchorMin = new Vector2(0, 1);
-            rtRestart.anchorMax = new Vector2(0, 1);
-            rtRestart.pivot = new Vector2(0, 1);
-            rtRestart.anchoredPosition = new Vector2(paiWidth, -(rtRestart.sizeDelta.y * scale.x));
         }
 
         // 【描画】オプションボタン
@@ -724,7 +724,7 @@ namespace Assets.Source.Maqiao
             rtScore.anchorMin = new Vector2(1, 1);
             rtScore.anchorMax = new Vector2(1, 1);
             rtScore.pivot = new Vector2(1, 1);
-            rtScore.anchoredPosition = new Vector2(-(paiWidth * 3f), -(paiHeight * 0.5f));
+            rtScore.anchoredPosition = new Vector2(-(paiWidth * 3f), -(paiHeight * 0.2f));
 
             goScoreQiaoShi = new Button[qiaoShiMingQian.Count + 1];
 
@@ -841,7 +841,7 @@ namespace Assets.Source.Maqiao
             rtBack.anchorMin = new Vector2(0, 1);
             rtBack.anchorMax = new Vector2(0, 1);
             rtBack.pivot = new Vector2(0, 1);
-            rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
+            rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 1.5f));
 
             goYiMing = new TextMeshProUGUI[QiaoShi.YiMing.Count];
             goYiShu = new TextMeshProUGUI[QiaoShi.YiMing.Count];
@@ -1121,7 +1121,7 @@ namespace Assets.Source.Maqiao
             rtGuiZe.anchorMin = new Vector2(1, 1);
             rtGuiZe.anchorMax = new Vector2(1, 1);
             rtGuiZe.pivot = new Vector2(1, 1);
-            rtGuiZe.anchoredPosition = new Vector2(-(paiWidth * 5.5f), -(paiHeight * 0.5f));
+            rtGuiZe.anchoredPosition = new Vector2(-(paiWidth * 5.5f), -(paiHeight * 0.2f));
 
             goGuiZeBackCanvas = GameObject.Find("GuiZeBackCanvas");
             goGuiZeBackCanvas.SetActive(false);
@@ -1138,7 +1138,7 @@ namespace Assets.Source.Maqiao
             rtBack.anchorMin = new Vector2(0, 1);
             rtBack.anchorMax = new Vector2(0, 1);
             rtBack.pivot = new Vector2(0, 1);
-            rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
+            rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 1.5f));
 
             DrawGuiZe();
 
@@ -1595,7 +1595,7 @@ namespace Assets.Source.Maqiao
         private IEnumerator Pause(ForwardMode mode)
         {
             keyPress = false;
-            if ((int)forwardMode > (int)mode)
+            if (forwardMode > mode)
             {
                 keyPress = true;
             }
@@ -1695,7 +1695,7 @@ namespace Assets.Source.Maqiao
             DrawFollowQiaoShiXuanZe();
 
             keyPress = false;
-            if (forwardMode > 0)
+            if (forwardMode > ForwardMode.NORMAL)
             {
                 keyPress = true;
                 OnClickScreenFollowNone();
@@ -1874,17 +1874,7 @@ namespace Assets.Source.Maqiao
                 }
                 xuanShangScalse = 1.0f;
             }
-            float x = X;
-            float y = Y;
-            for (int i = 0; i <= 4; i++)
-            {
-                Pai.goXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
-                Pai.goXuanShangPai[i].transform.SetSiblingIndex(3);
-                RectTransform rt = Pai.goXuanShangPai[i].GetComponent<RectTransform>();
-                rt.localScale *= xuanShangScalse;
-                DrawPai(ref Pai.goXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.XuanShangPai[i] : 0x00, new Vector2(x, y), 0);
-                x += paiWidth * xuanShangScalse;
-            }
+            float offsetY = paiHeight * xuanShangScalse * 0.5f;
 
             bool isLiXuanShangPai = false;
             if (Chang.HeleFan >= 0 && Chang.QiaoShis[Chang.HeleFan].LiZhi)
@@ -1900,6 +1890,26 @@ namespace Assets.Source.Maqiao
                     break;
                 }
             }
+
+            float x = X;
+            float y = Y;
+            for (int i = 0; i <= 4; i++)
+            {
+                Pai.goXuanShangPai[i] = Instantiate(goPai, goPai.transform.parent);
+                Pai.goXuanShangPai[i].transform.SetSiblingIndex(3);
+                RectTransform rt = Pai.goXuanShangPai[i].GetComponent<RectTransform>();
+                rt.localScale *= xuanShangScalse;
+                if (i < Pai.XuanShangPai.Count)
+                {
+                    DrawPai(ref Pai.goXuanShangPai[i], Pai.XuanShangPai[i], new Vector2(x, isLiXuanShangPai ? y + offsetY : y), 0);
+                }
+                else
+                {
+                    DrawPai(ref Pai.goXuanShangPai[i], 0x00, new Vector2(x, y), 0);
+                }
+                x += paiWidth * xuanShangScalse;
+            }
+
             if (isLiXuanShangPai)
             {
                 x = X;
@@ -1910,7 +1920,10 @@ namespace Assets.Source.Maqiao
                     Pai.goLiXuanShangPai[i].transform.SetSiblingIndex(3);
                     RectTransform rt = Pai.goLiXuanShangPai[i].GetComponent<RectTransform>();
                     rt.localScale *= xuanShangScalse;
-                    DrawPai(ref Pai.goLiXuanShangPai[i], i < Pai.XuanShangPai.Count ? Pai.LiXuanShangPai[i] : 0x00, new Vector2(x, y), 0);
+                    if (i < Pai.XuanShangPai.Count)
+                    {
+                        DrawPai(ref Pai.goLiXuanShangPai[i], Pai.LiXuanShangPai[i], new Vector2(x, y + offsetY), 0);
+                    }
                     x += paiWidth * xuanShangScalse;
                 }
             }
@@ -1985,7 +1998,7 @@ namespace Assets.Source.Maqiao
         // 【描画】雀士選択
         private void DrawQiaoShiXuanZe()
         {
-            if ((int)forwardMode > (int)ForwardMode.FAST_FORWARD)
+            if (forwardMode > ForwardMode.FAST_FORWARD)
             {
                 // ランダム自動選択
                 RandomQiaoShiXuanZe();
@@ -2313,7 +2326,7 @@ namespace Assets.Source.Maqiao
             int sai1 = 1;
             int sai2 = 1;
             System.Random r = new();
-            if (forwardMode > 0)
+            if (forwardMode > ForwardMode.NORMAL)
             {
                 keyPress = true;
             }
@@ -4077,7 +4090,7 @@ namespace Assets.Source.Maqiao
             rtBackDuiJuZhongLe.anchorMin = new Vector2(0, 1);
             rtBackDuiJuZhongLe.anchorMax = new Vector2(0, 1);
             rtBackDuiJuZhongLe.pivot = new Vector2(0, 1);
-            rtBackDuiJuZhongLe.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 0.5f));
+            rtBackDuiJuZhongLe.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 1.5f));
         }
 
         // 【描画】役
@@ -4147,25 +4160,27 @@ namespace Assets.Source.Maqiao
                             p = 0x00;
                         }
                         shi.goFuLuPai[i][j] = Instantiate(goPai, goPai.transform.parent);
+                        shi.goFuLuPai[i][j].transform.localScale *= PLAYER_PAI_SCALE;
                         if (zhong == QiaoShi.YaoDingYi.JiaGang && isMingPai)
                         {
                             shi.goFuLuPai[i][3] = Instantiate(goPai, goPai.transform.parent);
+                            shi.goFuLuPai[i][3].transform.localScale *= PLAYER_PAI_SCALE;
                         }
                         if (isMingPai)
                         {
-                            x -= paiHeight / 2;
-                            DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y - (paiHeight - paiWidth) / 2), 90);
+                            x -= ph / 2;
+                            DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y - (ph - pw) / 2), 90);
                             if (zhong == QiaoShi.YaoDingYi.JiaGang)
                             {
-                                DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (paiHeight - paiWidth) / 2 + paiWidth), 90);
+                                DrawPai(ref shi.goFuLuPai[i][3], p, new Vector2(x, y - (ph - pw) / 2 + pw), 90);
                             }
-                            x -= paiHeight / 2;
+                            x -= ph / 2;
                         }
                         else
                         {
-                            x -= paiWidth / 2;
+                            x -= pw / 2;
                             DrawPai(ref shi.goFuLuPai[i][j], p, new Vector2(x, y), 0);
-                            x -= paiWidth / 2;
+                            x -= pw / 2;
                         }
                     }
                 }
@@ -4272,7 +4287,7 @@ namespace Assets.Source.Maqiao
                     max = Math.Abs(shi.ShouQu);
                 }
             }
-            if (forwardMode > 0)
+            if (forwardMode > ForwardMode.NORMAL)
             {
                 keyPress = true;
             }

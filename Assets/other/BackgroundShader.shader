@@ -52,7 +52,7 @@ Shader "Unlit/BackgroundShader"
                 // 中心を薄くする効果
                 float2 center = float2(0.5, 0.5);
                 float distanceFromCenter = distance(i.uv, center);
-                float fadeFactor = smoothstep(0.0, 10, distanceFromCenter);
+                float fadeFactor = smoothstep(0.0, 5, distanceFromCenter);
 
                 // 中心色とグラデーション色をブレンド
                 fixed4 finalColor = lerp(_CenterColor, gradientColor, fadeFactor);
