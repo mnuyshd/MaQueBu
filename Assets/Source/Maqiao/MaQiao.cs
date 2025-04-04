@@ -85,8 +85,6 @@ namespace Assets.Source.Maqiao
         }
         // 送りモード
         private ForwardMode forwardMode = ForwardMode.NORMAL;
-        // 相手牌オープン
-        private bool shouPaiOpen = false;
         // プレイヤー有り
         private bool existsPlayer = true;
 
@@ -595,29 +593,6 @@ namespace Assets.Source.Maqiao
             rtRestart.anchorMax = new Vector2(0, 1);
             rtRestart.pivot = new Vector2(0, 1);
             rtRestart.anchoredPosition = new Vector2(paiWidth, -(rtRestart.sizeDelta.y * scale.x));
-            // 相手牌オープン
-            Button goShouPaiOpen = Instantiate(goPai, goSettingPanel.transform);
-            goShouPaiOpen.name = "ShouPaiOpen";
-            goShouPaiOpen.onClick.AddListener(delegate
-            {
-                shouPaiOpen = !shouPaiOpen;
-                goShouPaiOpen.image.sprite = goPais[shouPaiOpen ? 0x31 : 0x00].GetComponent<SpriteRenderer>().sprite;
-                switch (eventStatus)
-                {
-                    case Event.PEI_PAI:
-                    case Event.DUI_JU:
-                    case Event.DUI_JU_ZHONG_LE:
-                        DrawDuiJu();
-                        break;
-                }
-            });
-            goShouPaiOpen.image.sprite = goPais[shouPaiOpen ? 0x31 : 0x00].GetComponent<SpriteRenderer>().sprite;
-            RectTransform rtShouPaiOpen = goShouPaiOpen.GetComponent<RectTransform>();
-            rtShouPaiOpen.localScale *= scale.x * 0.7f;
-            rtShouPaiOpen.anchorMin = new Vector2(0, 0);
-            rtShouPaiOpen.anchorMax = new Vector2(0, 0);
-            rtShouPaiOpen.pivot = new Vector2(0, 0);
-            rtShouPaiOpen.anchoredPosition = new Vector2(paiWidth, paiHeight / 2f);
         }
 
         // 【描画】オプションボタン
@@ -629,15 +604,7 @@ namespace Assets.Source.Maqiao
             float offset = paiHeight * 1.6f;
             int len = 7;
 
-            string[] labelDaPaiFangFa = new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" };
-            Button goDaPaiFangFa = Instantiate(goButton, goSettingPanel.transform);
-            goDaPaiFangFa.onClick.AddListener(delegate
-            {
-                sheDing.daPaiFangFa = (SheDing.DaPaiFangFa)((int)(sheDing.daPaiFangFa + 1) % Enum.GetValues(typeof(SheDing.DaPaiFangFa)).Length);
-                goDaPaiFangFa.GetComponentInChildren<TextMeshProUGUI>().text = labelDaPaiFangFa[(int)sheDing.daPaiFangFa];
-                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
-            });
-            DrawButton(ref goDaPaiFangFa, labelDaPaiFangFa[(int)sheDing.daPaiFangFa], new Vector2(-x, y), len);
+            DrawToggleOption(() => sheDing.daPaiFangFa, v => sheDing.daPaiFangFa = v, new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" }, new Vector2(-x, y), len);
             DrawToggleOption(() => sheDing.liZhiAuto, v => sheDing.liZhiAuto = v, new string[] { "立直後自動打牌", "立直後手動打牌" }, new Vector2(x, y), len);
             y -= offset;
             DrawToggleOption(() => sheDing.xuanShangYin, v => sheDing.xuanShangYin = v, new string[] { "ドラマーク有り", "ドラマーク無し" }, new Vector2(-x, y), len);
@@ -647,6 +614,8 @@ namespace Assets.Source.Maqiao
             DrawToggleOption(() => sheDing.xiangTingShuBiaoShi, v => sheDing.xiangTingShuBiaoShi = v, new string[] { "向聴数表示有り", "向聴数表示無し" }, new Vector2(x, y), len);
             y -= offset;
             DrawToggleOption(() => sheDing.mingQuXiao, v => sheDing.mingQuXiao = v, new string[] { "鳴パスはボタン", "鳴パスはタップ" }, new Vector2(-x, y), len);
+            y -= offset;
+            DrawXiangShouPaiOpen(() => sheDing.xiangShouPaiOpen, v => sheDing.xiangShouPaiOpen = v, new string[] { "相手牌オープン", "相手牌クローズ" }, new Vector2(-x, y), len);
             DrawToggleOption(() => sheDing.shouPaiDianBiaoShi, v => sheDing.shouPaiDianBiaoShi = v, new string[] { "手牌点表示有り", "手牌点表示無し" }, new Vector2(x, y), len);
             y -= offset;
             // リセット
@@ -670,6 +639,42 @@ namespace Assets.Source.Maqiao
                 bool newValue = !getValue();
                 setValue(newValue);
                 text.text = newValue ? textOnOff[0] : textOnOff[1];
+                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
+            });
+        }
+        private void DrawToggleOption(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy, int len)
+        {
+            Button button = Instantiate(goButton, goSettingPanel.transform);
+            string displayText = textOnOff[getValue()];
+            DrawButton(ref button, displayText, xy, len);
+            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
+            button.onClick.AddListener(delegate
+            {
+                int newValue = (getValue() + 1) % textOnOff.Length;
+                setValue(newValue);
+                text.text = textOnOff[newValue];
+                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
+            });
+        }
+        private void DrawXiangShouPaiOpen(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
+        {
+            Button button = Instantiate(goButton, goSettingPanel.transform);
+            string displayText = getValue() ? textOnOff[0] : textOnOff[1];
+            DrawButton(ref button, displayText, xy, len);
+            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
+            button.onClick.AddListener(delegate
+            {
+                bool newValue = !getValue();
+                setValue(newValue);
+                text.text = newValue ? textOnOff[0] : textOnOff[1];
+                switch (eventStatus)
+                {
+                    case Event.PEI_PAI:
+                    case Event.DUI_JU:
+                    case Event.DUI_JU_ZHONG_LE:
+                        DrawDuiJu();
+                        break;
+                }
                 File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
             });
         }
@@ -1475,7 +1480,7 @@ namespace Assets.Source.Maqiao
                         }
                     }
                 }
-                if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
+                if (sheDing.daPaiFangFa == 0)
                 {
                     int x = shi.Follow ? shi.ZiJiaXuanZe : shi.ShouPai.Count - 1;
                     DrawSelectDaPai(i, shi, x);
@@ -2581,7 +2586,7 @@ namespace Assets.Source.Maqiao
             {
                 ziJiaShi.SiKaoZiJia();
                 DrawZiJiaYao(ziJiaShi, 0, ziJiaShi.ShouPai.Count - 1, true, false);
-                if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
+                if (sheDing.daPaiFangFa == 0)
                 {
                     int x = ziJiaShi.Follow ? ziJiaShi.ZiJiaXuanZe : ziJiaShi.ShouPai.Count - 1;
                     DrawSelectDaPai(Chang.ZiMoFan, ziJiaShi, x);
@@ -3261,7 +3266,7 @@ namespace Assets.Source.Maqiao
                 DrawZiJiaYao(shi, 0, 0, false, false);
                 DrawShouPai(jia, yao, -1, true, false);
                 DrawDaiPai(jia, -1);
-                if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
+                if (sheDing.daPaiFangFa == 0)
                 {
                     DrawSelectDaPai(jia, shi, shi.ShouPai.Count - 1);
                 }
@@ -3444,7 +3449,7 @@ namespace Assets.Source.Maqiao
                 shi.goShouPai[i] = Instantiate(goPai, goPai.transform.parent);
                 if (!shi.Player && yao != QiaoShi.YaoDingYi.TingPai && yao != QiaoShi.YaoDingYi.HeLe && yao != QiaoShi.YaoDingYi.JiuZhongJiuPai && yao != QiaoShi.YaoDingYi.CuHe && p != 0xff)
                 {
-                    if (!shouPaiOpen && !shi.KaiLiZhi)
+                    if (!sheDing.xiangShouPaiOpen && !shi.KaiLiZhi)
                     {
                         p = 0x00;
                     }
@@ -3712,7 +3717,7 @@ namespace Assets.Source.Maqiao
             }
             if (yao == QiaoShi.YaoDingYi.Wu)
             {
-                if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.TAP_1)
+                if (sheDing.daPaiFangFa == 1)
                 {
                     shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                     shi.ZiJiaXuanZe = xuanZe;
@@ -3721,7 +3726,7 @@ namespace Assets.Source.Maqiao
                 {
                     DrawShouPai(jia, QiaoShi.YaoDingYi.Select, xuanZe, true, true);
                     DrawDaiPai(jia, xuanZe);
-                    if (sheDing.daPaiFangFa == SheDing.DaPaiFangFa.SELECT)
+                    if (sheDing.daPaiFangFa == 0)
                     {
                         DrawSelectDaPai(jia, shi, xuanZe);
                     }

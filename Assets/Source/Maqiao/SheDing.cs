@@ -3,23 +3,12 @@ namespace Assets.Source.Maqiao
     // 設定
     public class SheDing
     {
-        // 打牌方法
-        public enum DaPaiFangFa
-        {
-            // 選択して打牌
-            SELECT = 0,
-            // １タップ打牌
-            TAP_1 = 1,
-            // ２タップ打牌
-            TAP_2 = 2,
-        }
-
         // 鳴無し
         public bool mingWu = false;
         // 立直後自動
         public bool liZhiAuto = true;
-        // 打牌方法
-        public DaPaiFangFa daPaiFangFa = DaPaiFangFa.TAP_2;
+        // 打牌方法(0:選択して打牌 1:１タップ打牌 2:２タップ打牌)
+        public int daPaiFangFa = 2;
         // ドラマーク表示
         public bool xuanShangYin = true;
         // ツモ切表示有り
@@ -32,5 +21,7 @@ namespace Assets.Source.Maqiao
         public bool mingQuXiao = true;
         // 手牌点表示無し
         public bool shouPaiDianBiaoShi = false;
+        // 相手牌オープン
+        public bool xiangShouPaiOpen = false;
     }
 }
