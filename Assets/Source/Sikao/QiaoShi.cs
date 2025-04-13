@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
@@ -375,6 +376,20 @@ namespace Assets.Source.Sikao
             get { return liPaiDongZuo; }
             set { liPaiDongZuo = value; }
         }
+        // 外部思考
+        private bool waiBuSikao = false;
+        internal bool WaiBuSikao
+        {
+            get { return waiBuSikao; }
+            set { waiBuSikao = value; }
+        }
+        // 非同期停止
+        private bool asyncStop = false;
+        internal bool AsyncStop
+        {
+            get { return asyncStop; }
+            set { asyncStop = value; }
+        }
         // フォロー
         private bool follow = false;
         internal bool Follow
@@ -471,7 +486,7 @@ namespace Assets.Source.Sikao
         {
             get { return shePai; }
         }
-        internal Button[] goShePai = new Button[0x50];
+        internal Button[] goShePai = new Button[0x30];
         // 立直位
         private int liZhiWei;
         internal int LiZhiWei
@@ -671,6 +686,86 @@ namespace Assets.Source.Sikao
             set { lianZhuangShu = value; }
         }
 
+        // 遷移(自家)
+        protected Transition transitionZiJia;
+        internal void SetTransitionZiJiaState(List<int> state)
+        {
+            XiangTingShuJiSuan();
+
+            transitionZiJia = new()
+            {
+                reward = 0,
+                state = state,
+                xiangTingShu = xiangTingShu,
+                liZhi = liZhi,
+            };
+        }
+        internal void SetTransitionZiJiaAction(List<int> action)
+        {
+            transitionZiJia.action = action;
+        }
+        internal void SetTransitionZiJiaNextState(List<int> nextState)
+        {
+            transitionZiJia.nextState = nextState;
+
+            transitionZiJiaList ??= new();
+            transitionZiJiaList.Add(transitionZiJia);
+        }
+        internal void SetTransitionZiJiaReward(int reward)
+        {
+            if (transitionZiJiaList == null)
+            {
+                return;
+            }
+
+            double score = Math.Round(reward / (double)1000, 3);
+            float gamma = 0.9f;
+            for (int i = transitionZiJiaList.Count - 1; i >= 0; i--)
+            {
+                Transition transition = transitionZiJiaList[i];
+
+                if (!transition.liZhi)
+                {
+                    // 立直前のみを評価する
+                    transition.reward += score;
+                }
+
+                if (score > 0)
+                {
+                    // 点数プラスの局は各順目に合わせて徐々に加点する
+                    score = Math.Round(score * gamma, 3);
+                    if (score < 0)
+                    {
+                        score = 0;
+                    }
+                }
+                else
+                {
+                    // 点数マイナスの場合、最後のみ減点する
+                    score = 0;
+                }
+
+                if (i + 1 < transitionZiJiaList.Count)
+                {
+                    // 向聴数が増減した場合、加減点
+                    if (transition.xiangTingShu > transitionZiJiaList[i + 1].xiangTingShu)
+                    {
+                        transition.reward += 3;
+                    }
+                    if (transition.xiangTingShu < transitionZiJiaList[i + 1].xiangTingShu)
+                    {
+                        transition.reward -= 3;
+                    }
+                }
+            }
+        }
+        private List<Transition> transitionZiJiaList;
+        internal List<Transition> TransitionZiJiaList
+        {
+            get { return transitionZiJiaList; }
+            set { transitionZiJiaList = value; }
+        }
+
         // コンストラクタ
         internal QiaoShi()
         {
@@ -689,11 +784,74 @@ namespace Assets.Source.Sikao
             this.mingQian = mingQian;
         }
 
+        // 状態
+        internal void ZhuangTai(List<int> state, bool ziJia)
+        {
+            if (ziJia)
+            {
+                // 手牌
+                List<int> shouPaiList = new();
+                for (int i = 0; i < 14; i++)
+                {
+                    shouPaiList.Add(i < shouPai.Count ? shouPai[i] : -1);
+                }
+                state.AddRange(shouPaiList);
+            }
+
+            // 副露牌
+            List<int> fuLuPaiList = new();
+            for (int i = 0; i < 4; i++)
+            {
+                if (i < fuLuPai.Count)
+                {
+                    (List<int> pais, int jia, YaoDingYi yao) = fuLuPai[i];
+                    fuLuPaiList.Add(jia);
+                    fuLuPaiList.Add((int)yao);
+                    for (int j = 0; j < 4; j++)
+                    {
+                        fuLuPaiList.Add(j < pais.Count ? pais[j] : -1);
+                    }
+                }
+                else
+                {
+                    fuLuPaiList.Add(-1);
+                    fuLuPaiList.Add(-1);
+                    for (int j = 0; j < 4; j++)
+                    {
+                        fuLuPaiList.Add(-1);
+                    }
+                }
+            }
+            state.AddRange(fuLuPaiList);
+
+            // 捨牌
+            List<int> shePaiList = new();
+            for (int i = 0; i < 0x30; i++)
+            {
+                if (i < shePai.Count)
+                {
+                    (int pai, YaoDingYi yao, bool ziMoQie) = shePai[i];
+                    shePaiList.Add((int)yao);
+                    shePaiList.Add(ziMoQie ? 1 : 0);
+                    shePaiList.Add(pai);
+                }
+                else
+                {
+                    shePaiList.Add(-1);
+                    shePaiList.Add(-1);
+                    shePaiList.Add(-1);
+                }
+            }
+            state.AddRange(shePaiList);
+        }
+
         // 思考自家
         internal abstract void SiKaoZiJia();
+        internal abstract IEnumerator SiKaoZiJiaCoroutine();
 
         // 思考他家
         internal abstract void SiKaoTaJia();
+        internal abstract IEnumerator SiKaoTaJiaCoroutine();
 
         // 初期化
         protected static void Init(int[] list, int value)

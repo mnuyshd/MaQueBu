@@ -23,5 +23,7 @@ namespace Assets.Source.Maqiao
         public bool shouPaiDianBiaoShi = false;
         // 相手牌オープン
         public bool xiangShouPaiOpen = false;
+        // 学習データ作成無し
+        public bool learningData = false;
     }
 }

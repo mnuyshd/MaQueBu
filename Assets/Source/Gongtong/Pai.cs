@@ -111,6 +111,15 @@ namespace Assets.Source.Gongtong
             goLiXuanShangPai = new Button[5];
         }
 
+        // 状態
+        internal static void ZhuangTai(List<int> state)
+        {
+            for (int i = 0; i <= 4; i++)
+            {
+                state.Add(i < xuanShangPai.Count ? xuanShangPai[i] : -1);
+            }
+        }
+
         // 洗牌
         internal static void XiPai()
         {

@@ -140,6 +140,17 @@ namespace Assets.Source.Gongtong
         // 九種九牌
         private static bool jiuZhongJiuPai;
 
+        // 状態
+        internal static void ZhuangTai(List<int> state)
+        {
+            state.Add(changFeng);
+            state.Add(ju);
+            state.Add(benChang);
+            state.Add(qin);
+            state.Add(qiaJia);
+            state.Add(gongTuo);
+        }
+
         // 切り上げ
         internal static int Ceil(int value, double p)
         {
@@ -154,9 +165,7 @@ namespace Assets.Source.Gongtong
             {
                 int n1 = r.Next(0, list.Count);
                 int n2 = r.Next(list.Count);
-                int tmp = list[n1];
-                list[n1] = list[n2];
-                list[n2] = tmp;
+                (list[n2], list[n1]) = (list[n1], list[n2]);
             }
         }
         internal static void Shuffle(int[] list, int num)
@@ -166,9 +175,7 @@ namespace Assets.Source.Gongtong
             {
                 int n1 = r.Next(0, list.Length);
                 int n2 = r.Next(list.Length);
-                int tmp = list[n1];
-                list[n1] = list[n2];
-                list[n2] = tmp;
+                (list[n2], list[n1]) = (list[n1], list[n2]);
             }
         }
 

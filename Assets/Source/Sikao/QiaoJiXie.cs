@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Assets.Source.Gongtong;
@@ -69,7 +70,6 @@ namespace Assets.Source.Sikao
             // 点差
             return zuiGaoDingBang - DianBang;
         }
-
 
         // 思考自家
         internal override void SiKaoZiJia()
@@ -1142,6 +1142,16 @@ namespace Assets.Source.Sikao
                     shouPaiDian[i] += dian;
                 }
             }
+        }
+
+        internal override IEnumerator SiKaoZiJiaCoroutine()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override IEnumerator SiKaoTaJiaCoroutine()
+        {
+            throw new NotImplementedException();
         }
     }
 }
