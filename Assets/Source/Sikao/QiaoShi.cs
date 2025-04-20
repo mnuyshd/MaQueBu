@@ -690,8 +690,6 @@ namespace Assets.Source.Sikao
         protected Transition transitionZiJia;
         internal void SetTransitionZiJiaState(List<int> state)
         {
-            XiangTingShuJiSuan();
-
             transitionZiJia = new()
             {
                 reward = 0,
@@ -940,6 +938,9 @@ namespace Assets.Source.Sikao
                 // 加槓判定
                 JiaGangPanDing();
             }
+
+            // 向聴数計算
+            XiangTingShuJiSuan();
         }
 
         // 思考他家判定

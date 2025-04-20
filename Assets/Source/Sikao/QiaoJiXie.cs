@@ -374,7 +374,6 @@ namespace Assets.Source.Sikao
             ShouPaiDianShuJiSuan();
 
             // 危険度
-            XiangTingShuJiSuan();
             int weiXian = 0;
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
@@ -589,8 +588,6 @@ namespace Assets.Source.Sikao
         // 手牌点数計算
         private void ShouPaiDianShuJiSuan()
         {
-            // シャンテン数計算
-            XiangTingShuJiSuan();
             // 手牌数計算
             ShouPaiShuJiSuan();
             // 副露牌数計算
