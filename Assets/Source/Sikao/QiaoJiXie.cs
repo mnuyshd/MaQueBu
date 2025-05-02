@@ -365,7 +365,7 @@ namespace Assets.Source.Sikao
             // 手牌数計算
             ShouPaiShuJiSuan();
             // 副露牌数計算
-            FuLuPaiShuSuan();
+            FuLuPaiShuJiSuan();
             // 色
             int se = SeSuan().se;
             // 点差
@@ -591,7 +591,7 @@ namespace Assets.Source.Sikao
             // 手牌数計算
             ShouPaiShuJiSuan();
             // 副露牌数計算
-            FuLuPaiShuSuan();
+            FuLuPaiShuJiSuan();
             // 公開牌数計算
             GongKaiPaiShuJiSuan();
             // 色

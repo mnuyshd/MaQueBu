@@ -11,22 +11,24 @@ namespace Assets.Source.Sikao.Shi
     // 学習雀士
     internal class QiaoXueXi : QiaoJiXie
     {
-        private const string HOST_URL = "http://localhost:5050/";
+        private const string HOST_URL = "http://127.0.0.1:5000/";
         internal const string MING_QIAN = "学習雀士";
         internal QiaoXueXi() : base(MING_QIAN)
         {
             WaiBuSikao = true;
         }
 
-        private IEnumerator RequestSikao(string sikao, List<int> state)
+        private IEnumerator RequestSikao(string sikao, State state)
         {
             AsyncStop = true;
 
             string json = JsonConvert.SerializeObject(state);
-            UnityWebRequest request = new(HOST_URL + sikao, "POST");
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
+            byte[] raw = Encoding.UTF8.GetBytes(json);
+            UnityWebRequest request = new(HOST_URL + sikao, "POST")
+            {
+                uploadHandler = new UploadHandlerRaw(raw),
+                downloadHandler = new DownloadHandlerBuffer()
+            };
             request.SetRequestHeader("Content-Type", "application/json");
 
             yield return request.SendWebRequest();
@@ -34,16 +36,26 @@ namespace Assets.Source.Sikao.Shi
             if (request.result == UnityWebRequest.Result.Success)
             {
                 ActionResponse response = JsonUtility.FromJson<ActionResponse>(request.downloadHandler.text);
-                Debug.Log("(YaoDingYi)response.yao=" + (YaoDingYi)response.yao + " response.xuanZe=" + response.xuanZe);
+                Debug.Log("action: yao=" + response.action[0] + " pai=0x" + response.action[1].ToString("x2"));
+                YaoDingYi yao = (YaoDingYi)response.action[0];
+                int pai = response.action[1];
                 if (sikao == "SiKaoZiJia")
                 {
-                    ZiJiaYao = (YaoDingYi)response.yao;
-                    ZiJiaXuanZe = response.xuanZe;
+                    ZiJiaYao = YaoDingYi.Wu;
+                    ZiJiaXuanZe = ShouPai.Count - 1;
+                    for (int i = 0; i < ShouPai.Count; i++)
+                    {
+                        if ((ShouPai[i] & QIAO_PAI) == pai)
+                        {
+                            ZiJiaXuanZe = i;
+                            break;
+                        }
+                    }
                 }
                 else
                 {
-                    TaJiaYao = (YaoDingYi)response.yao;
-                    TaJiaXuanZe = response.xuanZe;
+                    TaJiaYao = yao;
+                    TaJiaXuanZe = pai;
                 }
             }
             else
@@ -86,7 +98,6 @@ namespace Assets.Source.Sikao.Shi
     [Serializable]
     public class ActionResponse
     {
-        public int yao;
-        public int xuanZe;
+        public List<int> action;
     }
 }

@@ -688,74 +688,19 @@ namespace Assets.Source.Sikao
 
         // 遷移(自家)
         protected Transition transitionZiJia;
-        internal void SetTransitionZiJiaState(List<int> state)
+        internal void SetTransitionZiJiaState(State state)
         {
             transitionZiJia = new()
             {
-                reward = 0,
+                mingQian = mingQian,
                 state = state,
-                xiangTingShu = xiangTingShu,
-                liZhi = liZhi,
             };
         }
         internal void SetTransitionZiJiaAction(List<int> action)
         {
             transitionZiJia.action = action;
-        }
-        internal void SetTransitionZiJiaNextState(List<int> nextState)
-        {
-            transitionZiJia.nextState = nextState;
-
             transitionZiJiaList ??= new();
             transitionZiJiaList.Add(transitionZiJia);
-        }
-        internal void SetTransitionZiJiaReward(int reward)
-        {
-            if (transitionZiJiaList == null)
-            {
-                return;
-            }
-
-            double score = Math.Round(reward / (double)1000, 3);
-            float gamma = 0.9f;
-            for (int i = transitionZiJiaList.Count - 1; i >= 0; i--)
-            {
-                Transition transition = transitionZiJiaList[i];
-
-                if (!transition.liZhi)
-                {
-                    // 立直前のみを評価する
-                    transition.reward += score;
-                }
-
-                if (score > 0)
-                {
-                    // 点数プラスの局は各順目に合わせて徐々に加点する
-                    score = Math.Round(score * gamma, 3);
-                    if (score < 0)
-                    {
-                        score = 0;
-                    }
-                }
-                else
-                {
-                    // 点数マイナスの場合、最後のみ減点する
-                    score = 0;
-                }
-
-                if (i + 1 < transitionZiJiaList.Count)
-                {
-                    // 向聴数が増減した場合、加減点
-                    if (transition.xiangTingShu > transitionZiJiaList[i + 1].xiangTingShu)
-                    {
-                        transition.reward += 3;
-                    }
-                    if (transition.xiangTingShu < transitionZiJiaList[i + 1].xiangTingShu)
-                    {
-                        transition.reward -= 3;
-                    }
-                }
-            }
         }
         private List<Transition> transitionZiJiaList;
         internal List<Transition> TransitionZiJiaList
@@ -783,64 +728,41 @@ namespace Assets.Source.Sikao
         }
 
         // 状態
-        internal void ZhuangTai(List<int> state, bool ziJia)
+        internal void ZhuangTai(State state, bool ziJia)
         {
             if (ziJia)
             {
-                // 手牌
-                List<int> shouPaiList = new();
-                for (int i = 0; i < 14; i++)
-                {
-                    shouPaiList.Add(i < shouPai.Count ? shouPai[i] : -1);
-                }
-                state.AddRange(shouPaiList);
+                // 手牌数
+                ShouPaiShuJiSuan();
+                state.shouPaiShu = new(shouPaiShu);
+                // 副露牌
+                FuLuPaiShuJiSuan();
+                state.fuLuPaiShu = new(fuLuPaiShu);
+                // 立直
+                state.liZhi = liZhi;
             }
-
-            // 副露牌
-            List<int> fuLuPaiList = new();
-            for (int i = 0; i < 4; i++)
-            {
-                if (i < fuLuPai.Count)
-                {
-                    (List<int> pais, int jia, YaoDingYi yao) = fuLuPai[i];
-                    fuLuPaiList.Add(jia);
-                    fuLuPaiList.Add((int)yao);
-                    for (int j = 0; j < 4; j++)
-                    {
-                        fuLuPaiList.Add(j < pais.Count ? pais[j] : -1);
-                    }
-                }
-                else
-                {
-                    fuLuPaiList.Add(-1);
-                    fuLuPaiList.Add(-1);
-                    for (int j = 0; j < 4; j++)
-                    {
-                        fuLuPaiList.Add(-1);
-                    }
-                }
-            }
-            state.AddRange(fuLuPaiList);
-
             // 捨牌
-            List<int> shePaiList = new();
+            List<int> sp = new();
             for (int i = 0; i < 0x30; i++)
             {
                 if (i < shePai.Count)
                 {
-                    (int pai, YaoDingYi yao, bool ziMoQie) = shePai[i];
-                    shePaiList.Add((int)yao);
-                    shePaiList.Add(ziMoQie ? 1 : 0);
-                    shePaiList.Add(pai);
+                    (int pai, YaoDingYi _, bool _) = shePai[i];
+                    sp.Add(pai);
                 }
                 else
                 {
-                    shePaiList.Add(-1);
-                    shePaiList.Add(-1);
-                    shePaiList.Add(-1);
+                    sp.Add(0);
                 }
             }
-            state.AddRange(shePaiList);
+            if (ziJia)
+            {
+                state.shePai = sp;
+            }
+            else
+            {
+                state.taJiaShePai.Add(sp);
+            }
         }
 
         // 思考自家
@@ -4187,7 +4109,7 @@ namespace Assets.Source.Sikao
         }
 
         // 副露牌数計算
-        protected void FuLuPaiShuSuan()
+        protected void FuLuPaiShuJiSuan()
         {
             Init(fuLuPaiShu, 0);
             foreach ((List<int> pais, _, _) in fuLuPai)

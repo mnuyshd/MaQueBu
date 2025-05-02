@@ -112,11 +112,12 @@ namespace Assets.Source.Gongtong
         }
 
         // 状態
-        internal static void ZhuangTai(List<int> state)
+        internal static void ZhuangTai(State state)
         {
+            state.xuanShangPai = new();
             for (int i = 0; i <= 4; i++)
             {
-                state.Add(i < xuanShangPai.Count ? xuanShangPai[i] : -1);
+                state.xuanShangPai.Add(i < xuanShangPai.Count ? xuanShangPai[i] : 0);
             }
         }
 

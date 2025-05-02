@@ -141,14 +141,10 @@ namespace Assets.Source.Gongtong
         private static bool jiuZhongJiuPai;
 
         // 状態
-        internal static void ZhuangTai(List<int> state)
+        internal static void ZhuangTai(State state)
         {
-            state.Add(changFeng);
-            state.Add(ju);
-            state.Add(benChang);
-            state.Add(qin);
-            state.Add(qiaJia);
-            state.Add(gongTuo);
+            state.changFeng = changFeng;
+            state.ju = ju;
         }
 
         // 切り上げ
