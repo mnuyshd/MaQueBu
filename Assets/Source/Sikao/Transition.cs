@@ -11,6 +11,10 @@ namespace Assets.Source.Sikao
         public State state;
         // 行動
         public List<int> action;
+        // 次状態
+        public State nextState;
+        // 報酬
+        public double reward;
     }
 
     // 状態
@@ -33,6 +37,11 @@ namespace Assets.Source.Sikao
         public List<int> shePai;
         // 立直
         public bool liZhi;
+        // 向聴数
+        public int xiangTingShu;
+
+        // 場捨牌
+        public int changShePai;
 
         // 他家捨牌
         public List<List<int>> taJiaShePai = new();

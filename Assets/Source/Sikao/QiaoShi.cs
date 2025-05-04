@@ -699,14 +699,56 @@ namespace Assets.Source.Sikao
         internal void SetTransitionZiJiaAction(List<int> action)
         {
             transitionZiJia.action = action;
+        }
+        internal void SetTransitionZiJiaNextState(State state)
+        {
+            transitionZiJia.nextState = state;
             transitionZiJiaList ??= new();
             transitionZiJiaList.Add(transitionZiJia);
+        }
+        internal void SetTransitionZiJiaReward(int score)
+        {
+            double gamma = 0.9;
+            double reward = score;
+            for (int i = transitionZiJiaList.Count - 1; i >= 0; i--)
+            {
+                Transition transitionZiJia = transitionZiJiaList[i];
+                transitionZiJia.reward = reward;
+                reward = Math.Round(reward * gamma, 2);
+            }
         }
         private List<Transition> transitionZiJiaList;
         internal List<Transition> TransitionZiJiaList
         {
             get { return transitionZiJiaList; }
             set { transitionZiJiaList = value; }
+        }
+        // 遷移(他家)
+        protected Transition transitionTaJia;
+        internal void SetTransitionTaJiaState(State state)
+        {
+            transitionTaJia = new()
+            {
+                mingQian = mingQian,
+                state = state,
+                action = new() { (int)YaoDingYi.Wu, 0 },
+            };
+        }
+        internal void SetTransitionTaJiaAction(List<int> action)
+        {
+            if (transitionTaJia == null)
+            {
+                return;
+            }
+            transitionTaJia.action = action;
+            transitionTaJiaList ??= new();
+            transitionTaJiaList.Add(transitionTaJia);
+        }
+        private List<Transition> transitionTaJiaList;
+        internal List<Transition> TransitionTaJiaList
+        {
+            get { return transitionTaJiaList; }
+            set { transitionTaJiaList = value; }
         }
 
         // コンストラクタ
@@ -740,6 +782,8 @@ namespace Assets.Source.Sikao
                 state.fuLuPaiShu = new(fuLuPaiShu);
                 // 立直
                 state.liZhi = liZhi;
+                // 向聴数
+                state.xiangTingShu = xiangTingShu;
             }
             // 捨牌
             List<int> sp = new();

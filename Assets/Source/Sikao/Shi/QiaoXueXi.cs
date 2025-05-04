@@ -11,20 +11,39 @@ namespace Assets.Source.Sikao.Shi
     // 学習雀士
     internal class QiaoXueXi : QiaoJiXie
     {
-        private const string HOST_URL = "http://127.0.0.1:5000/";
+        private const string HOST_URL = "http://127.0.0.1:10000/";
         internal const string MING_QIAN = "学習雀士";
         internal QiaoXueXi() : base(MING_QIAN)
         {
             WaiBuSikao = true;
         }
 
-        private IEnumerator RequestSikao(string sikao, State state)
+        // 思考自家
+        internal override IEnumerator SiKaoZiJiaCoroutine()
+        {
+            yield return RequestSiKao(true, transitionZiJia.state);
+        }
+
+        // 思考他家
+        internal override IEnumerator SiKaoTaJiaCoroutine()
+        {
+            if (transitionTaJia == null)
+            {
+                TaJiaYao = YaoDingYi.Wu;
+                TaJiaXuanZe = 0;
+                yield break;
+            }
+            yield return RequestSiKao(false, transitionTaJia.state);
+        }
+
+        // 思考リクエスト
+        private IEnumerator RequestSiKao(bool isZiJia, State state)
         {
             AsyncStop = true;
 
             string json = JsonConvert.SerializeObject(state);
             byte[] raw = Encoding.UTF8.GetBytes(json);
-            UnityWebRequest request = new(HOST_URL + sikao, "POST")
+            UnityWebRequest request = new(HOST_URL + (isZiJia ? "SiKaoZiJia" : "SiKaoTaJia"), "POST")
             {
                 uploadHandler = new UploadHandlerRaw(raw),
                 downloadHandler = new DownloadHandlerBuffer()
@@ -36,32 +55,23 @@ namespace Assets.Source.Sikao.Shi
             if (request.result == UnityWebRequest.Result.Success)
             {
                 ActionResponse response = JsonUtility.FromJson<ActionResponse>(request.downloadHandler.text);
-                Debug.Log("action: yao=" + response.action[0] + " pai=0x" + response.action[1].ToString("x2"));
                 YaoDingYi yao = (YaoDingYi)response.action[0];
-                int pai = response.action[1];
-                if (sikao == "SiKaoZiJia")
+                int paiOrIndex = response.action[1];
+                Debug.Log("action: yao=" + yao + " paiOrIndex=0x" + paiOrIndex.ToString("x2"));
+
+                if (isZiJia)
                 {
-                    ZiJiaYao = YaoDingYi.Wu;
-                    ZiJiaXuanZe = ShouPai.Count - 1;
-                    for (int i = 0; i < ShouPai.Count; i++)
-                    {
-                        if ((ShouPai[i] & QIAO_PAI) == pai)
-                        {
-                            ZiJiaXuanZe = i;
-                            break;
-                        }
-                    }
+                    SiKaoZiJiaResponse(yao, paiOrIndex);
                 }
                 else
                 {
-                    TaJiaYao = yao;
-                    TaJiaXuanZe = pai;
+                    SiKaoTaJiaResponse(yao, paiOrIndex);
                 }
             }
             else
             {
-                // Debug.Log(request.error);
-                if (sikao == "SiKaoZiJia")
+                Debug.Log("リクエスト失敗:" + request.error);
+                if (isZiJia)
                 {
                     SiKaoZiJia();
                 }
@@ -74,24 +84,85 @@ namespace Assets.Source.Sikao.Shi
             AsyncStop = false;
         }
 
-        // 思考自家
-        internal override IEnumerator SiKaoZiJiaCoroutine()
+        private void SiKaoZiJiaResponse(YaoDingYi yao, int paiOrIndex)
         {
+            if ((yao == YaoDingYi.ZiMo && !HeLe)
+                || (yao == YaoDingYi.LiZhi && LiZhiPaiWei.Count == 0)
+                || (yao == YaoDingYi.AnGang && AnGangPaiWei.Count == 0)
+                || (yao == YaoDingYi.JiaGang && JiaGangPaiWei.Count == 0))
+            {
+                Debug.Log("SikaoZiJia エラー");
+                ZiJiaYao = YaoDingYi.Wu;
+                ZiJiaXuanZe = ShouPai.Count - 1;
+                return;
+            }
+
+            // 和了判定
+            if (HeLe)
+            {
+                // 自摸
+                ZiJiaYao = YaoDingYi.ZiMo;
+                ZiJiaXuanZe = ShouPai.Count - 1;
+                return;
+            }
+
             if (LiZhi)
             {
+                if (yao == YaoDingYi.AnGang)
+                {
+                    // 立直後暗槓
+                    ZiJiaYao = yao;
+                    ZiJiaXuanZe = paiOrIndex;
+                    return;
+                }
                 // 立直後自摸切
                 ZiJiaYao = YaoDingYi.Wu;
                 ZiJiaXuanZe = ShouPai.Count - 1;
-                yield break;
+                return;
             }
 
-            yield return RequestSikao("SiKaoZiJia", transitionZiJia.state);
+            ZiJiaYao = yao;
+            if (yao == YaoDingYi.Wu)
+            {
+                ZiJiaXuanZe = ShouPai.Count - 1;
+                for (int i = 0; i < ShouPai.Count; i++)
+                {
+                    if ((ShouPai[i] & QIAO_PAI) == paiOrIndex)
+                    {
+                        ZiJiaXuanZe = PaiXuanZe(i);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                ZiJiaXuanZe = paiOrIndex;
+            }
         }
 
-        // 思考他家
-        internal override IEnumerator SiKaoTaJiaCoroutine()
+        private void SiKaoTaJiaResponse(YaoDingYi yao, int pai)
         {
-            yield return RequestSikao("SiKaoTaJia", null);//transitionTaJia.state);
+            if ((yao == YaoDingYi.DaMingGang && DaMingGangPaiWei.Count == 0)
+                || (yao == YaoDingYi.Bing && BingPaiWei.Count == 0)
+                || (yao == YaoDingYi.Chi && ChiPaiWei.Count == 0))
+            {
+                Debug.Log("SikaoTaJia エラー");
+                TaJiaYao = YaoDingYi.Wu;
+                TaJiaXuanZe = 0;
+                return;
+            }
+
+            // 和了判定
+            if (HeLe)
+            {
+                // 栄和
+                TaJiaYao = YaoDingYi.RongHe;
+                TaJiaXuanZe = 0;
+                return;
+            }
+
+            TaJiaYao = yao;
+            TaJiaXuanZe = pai;
         }
     }
 

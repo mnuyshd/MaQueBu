@@ -237,15 +237,15 @@ namespace Assets.Source.Maqiao
         {
             { "機械雀士", true },
             { QiaoXiaoLu.MING_QIAN, true },
-            { QiaoXueXi.MING_QIAN, true },
-            { HikitaMamoru.MING_QIAN, false },
-            { UchidaKou.MING_QIAN, false },
+            { UchidaKou.MING_QIAN, true },
+            { TakamiNozomu.MING_QIAN, false },
             { SomeyaMei.MING_QIAN, false },
             { KouzuNaruto.MING_QIAN, false },
             { KouzuTorako.MING_QIAN, false },
             { YakudaJunji.MING_QIAN, false },
             { MenzenJunko.MING_QIAN, false },
-            { TakamiNozomu.MING_QIAN, false },
+            { HikitaMamoru.MING_QIAN, false },
+            { QiaoXueXi.MING_QIAN, false },
         };
         // 雀士取得
         private QiaoShi GetQiaoShi(string mingQian, bool isNew)
@@ -2568,7 +2568,7 @@ namespace Assets.Source.Maqiao
             eventStatus = Event.PEI_PAI;
         }
 
-        private State GetState(int jia)
+        private State GetState(int jia, bool isZiJia)
         {
             // 状態
             State state = new();
@@ -2582,7 +2582,7 @@ namespace Assets.Source.Maqiao
                 taJiaShi.ZhuangTai(state, false);
             }
             Pai.ZhuangTai(state);
-            Chang.ZhuangTai(state);
+            Chang.ZhuangTai(state, isZiJia);
 
             return state;
         }
@@ -2621,7 +2621,7 @@ namespace Assets.Source.Maqiao
             DrawDaiPai(Chang.ZiMoFan, -1);
 
             // 学習(自家 状態)
-            ziJiaShi.SetTransitionZiJiaState(GetState(Chang.ZiMoFan));
+            ziJiaShi.SetTransitionZiJiaState(GetState(Chang.ZiMoFan, true));
 
             // 思考自家
             if (ziJiaShi.Player)
@@ -2691,11 +2691,8 @@ namespace Assets.Source.Maqiao
             }
 
             // 学習(自家 行動)
-            ziJiaShi.SetTransitionZiJiaAction(new()
-            {
-                (int)ziJiaShi.ZiJiaYao,
-                ziJiaShi.ShouPai[ziJiaShi.ZiJiaXuanZe] & QiaoShi.QIAO_PAI
-            });
+            int paiOrIndex = ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.Wu ? ziJiaShi.ShouPai[ziJiaShi.ZiJiaXuanZe] & QiaoShi.QIAO_PAI : ziJiaShi.ZiJiaXuanZe;
+            ziJiaShi.SetTransitionZiJiaAction(new() { (int)ziJiaShi.ZiJiaYao, paiOrIndex });
 
             // 錯和自家判定
             if (ziJiaShi.CuHeZiJiaPanDing())
@@ -2723,6 +2720,8 @@ namespace Assets.Source.Maqiao
                     DrawShouPai(Chang.ZiMoFan, QiaoShi.YaoDingYi.HeLe, -1);
                     DrawJuFrame();
                     tingPaiLianZhuang = Chang.ZiMoFan == Chang.Qin ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                    // 学習(自家 次状態)
+                    ziJiaShi.SetTransitionZiJiaNextState(GetState(Chang.ZiMoFan, true));
                     yield return Pause(ForwardMode.FAST_FORWARD);
                     eventStatus = Event.YI_BIAO_SHI;
                     yield break;
@@ -2734,6 +2733,8 @@ namespace Assets.Source.Maqiao
                     DrawJiuZhongJiuPai(Chang.ZiMoFan);
                     tingPaiLianZhuang = Chang.guiZe.jiuZhongJiuPaiLianZhuang == 1 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
                     DrawShouPai(Chang.ZiMoFan, Chang.ZiJiaYao, 0);
+                    // 学習(自家 次状態)
+                    ziJiaShi.SetTransitionZiJiaNextState(GetState(Chang.ZiMoFan, true));
                     yield return Pause(ForwardMode.FAST_FORWARD);
                     eventStatus = Event.DIAN_BIAO_SHI;
                     yield break;
@@ -2769,12 +2770,17 @@ namespace Assets.Source.Maqiao
                         // 描画
                         DrawSiKaiGangPanDing(Chang.ZiMoFan);
                         tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                        // 学習(自家 次状態)
+                        ziJiaShi.SetTransitionZiJiaNextState(GetState(Chang.ZiMoFan, true));
+                        isDuiJuCoroutine = false;
                         yield return Pause(ForwardMode.FAST_FORWARD);
                         eventStatus = Event.DIAN_BIAO_SHI;
                         yield break;
                     }
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
+                    // 学習(自家 次状態)
+                    ziJiaShi.SetTransitionZiJiaNextState(GetState(Chang.ZiMoFan, true));
                     isDuiJuCoroutine = false;
                     eventStatus = Event.DUI_JU;
                     yield break;
@@ -2802,6 +2808,8 @@ namespace Assets.Source.Maqiao
                     Pai.LingShanChuLi();
                     break;
             }
+            // 学習(自家 次状態)
+            ziJiaShi.SetTransitionZiJiaNextState(GetState(Chang.ZiMoFan, true));
 
             if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.Wu || Chang.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi)
             {
@@ -2836,28 +2844,23 @@ namespace Assets.Source.Maqiao
                 }
             }
 
-            switch (Chang.TaJiaYao)
+            if (Chang.TaJiaYao == QiaoShi.YaoDingYi.DaMingGang)
             {
-                case QiaoShi.YaoDingYi.DaMingGang:
-                    // 大明槓成立
-                    // 嶺上牌処理
-                    Pai.LingShangPaiChuLi();
+                // 大明槓成立
+                // 嶺上牌処理
+                Pai.LingShangPaiChuLi();
+                // 描画
+                DrawJuFrame();
+                // 四開槓判定
+                if (Pai.SiKaiGangPanDing())
+                {
                     // 描画
-                    DrawJuFrame();
-                    // 四開槓判定
-                    if (Pai.SiKaiGangPanDing())
-                    {
-                        // 描画
-                        DrawSiKaiGangPanDing(Chang.ZiMoFan);
-                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
-                        yield return Pause(ForwardMode.FAST_FORWARD);
-                        eventStatus = Event.DIAN_BIAO_SHI;
-                        yield break;
-                    }
-                    break;
-
-                default:
-                    break;
+                    DrawSiKaiGangPanDing(Chang.ZiMoFan);
+                    tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                    yield return Pause(ForwardMode.FAST_FORWARD);
+                    eventStatus = Event.DIAN_BIAO_SHI;
+                    yield break;
+                }
             }
 
             // 副露判定初期化
@@ -2871,6 +2874,11 @@ namespace Assets.Source.Maqiao
                 taJiaShi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 taJiaShi.ZiJiaXuanZe = 0;
                 taJiaShi.SiKaoTaJiaPanDing(i - Chang.ZiMoFan);
+                if (taJiaShi.HeLe || taJiaShi.ChiPaiWei.Count > 0 || taJiaShi.BingPaiWei.Count > 0 || taJiaShi.DaMingGangPaiWei.Count > 0)
+                {
+                    // 学習(他家 状態)
+                    taJiaShi.SetTransitionTaJiaState(GetState(Chang.MingFan, false));
+                }
                 // 思考他家
                 if (taJiaShi.Player)
                 {
@@ -3084,11 +3092,15 @@ namespace Assets.Source.Maqiao
                     break;
             }
 
+            QiaoShi mingShi = Chang.QiaoShis[Chang.MingFan];
+            // 学習(他家 行動)
+            mingShi.SetTransitionTaJiaAction(new() { (int)mingShi.TaJiaYao, mingShi.TaJiaXuanZe });
+
             switch (Chang.TaJiaYao)
             {
                 case QiaoShi.YaoDingYi.DaMingGang:
                     // 大明槓
-                    Chang.QiaoShis[Chang.MingFan].DaMingGang();
+                    mingShi.DaMingGang();
                     // 描画
                     DrawDaMingGang(Chang.MingFan);
                     // 捨牌処理
@@ -3112,7 +3124,7 @@ namespace Assets.Source.Maqiao
 
                 case QiaoShi.YaoDingYi.Bing:
                     // 石並
-                    Chang.QiaoShis[Chang.MingFan].Bing();
+                    mingShi.Bing();
                     // 描画
                     DrawBing(Chang.MingFan);
                     // 捨牌処理
@@ -3135,7 +3147,7 @@ namespace Assets.Source.Maqiao
 
                 case QiaoShi.YaoDingYi.Chi:
                     // 吃
-                    Chang.QiaoShis[Chang.MingFan].Chi();
+                    mingShi.Chi();
                     // 描画
                     DrawChi(Chang.MingFan);
                     // 捨牌処理
@@ -4336,6 +4348,7 @@ namespace Assets.Source.Maqiao
             float y = -(paiHeight * 4);
             int max = 0;
             List<Transition> ziJiaList = new();
+            List<Transition> taJiaList = new();
             for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
                 int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
@@ -4343,9 +4356,17 @@ namespace Assets.Source.Maqiao
                 // 受取
                 string shouQuGongTuo = (shi.ShouQuGongTuo > 0 ? "+" : "") + (shi.ShouQuGongTuo == 0 ? "" : shi.ShouQuGongTuo.ToString());
                 string shouQu = (shi.ShouQu - shi.ShouQuGongTuo > 0 ? "+" : "") + (shi.ShouQu - shi.ShouQuGongTuo == 0 ? "" : (shi.ShouQu - shi.ShouQuGongTuo).ToString());
-                if (shi.ShouQu > 0 && shi.TransitionZiJiaList != null)
+                if (shi.ShouQu > 0)
                 {
-                    ziJiaList.AddRange(shi.TransitionZiJiaList);
+                    if (shi.TransitionZiJiaList != null)
+                    {
+                        shi.SetTransitionZiJiaReward(shi.ShouQu);
+                        ziJiaList.AddRange(shi.TransitionZiJiaList);
+                    }
+                    if (shi.TransitionTaJiaList != null)
+                    {
+                        taJiaList.AddRange(shi.TransitionTaJiaList);
+                    }
                 }
 
                 int len = shouQuGongTuo.Length;
@@ -4364,7 +4385,7 @@ namespace Assets.Source.Maqiao
             }
 
             // 学習データ保存
-            if (sheDing.learningData && ziJiaList != null && ziJiaList.Count > 0)
+            if (sheDing.learningData)
             {
                 string dirPath = Path.Combine(Application.persistentDataPath, "Transition");
                 if (!Directory.Exists(dirPath))
@@ -4372,13 +4393,33 @@ namespace Assets.Source.Maqiao
                     Directory.CreateDirectory(dirPath);
                 }
                 string timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-                File.WriteAllText(dirPath + "/" + $"ZiJia_{timestamp}.json", JsonConvert.SerializeObject(ziJiaList, Formatting.None));
+
+                string dirPathZiJia = Path.Combine(dirPath, "ZiJia");
+                if (!Directory.Exists(dirPathZiJia))
+                {
+                    Directory.CreateDirectory(dirPathZiJia);
+                }
+                if (ziJiaList.Count > 0)
+                {
+                    File.WriteAllText(dirPathZiJia + "/" + $"ZiJia_{timestamp}.json", JsonConvert.SerializeObject(ziJiaList, Formatting.None));
+                }
+
+                string dirPathTaJia = Path.Combine(dirPath, "TaJia");
+                if (!Directory.Exists(dirPathTaJia))
+                {
+                    Directory.CreateDirectory(dirPathTaJia);
+                }
+                if (taJiaList.Count > 0)
+                {
+                    File.WriteAllText(dirPathTaJia + "/" + $"TaJia_{timestamp}.json", JsonConvert.SerializeObject(taJiaList, Formatting.None));
+                }
             }
             for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
                 int jia = (Chang.Qin + i) % Chang.QiaoShis.Count;
                 QiaoShi shi = Chang.QiaoShis[jia];
                 shi.TransitionZiJiaList = null;
+                shi.TransitionTaJiaList = null;
             }
 
             if (forwardMode > ForwardMode.NORMAL)

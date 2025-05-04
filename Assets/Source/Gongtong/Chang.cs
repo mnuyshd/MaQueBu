@@ -141,10 +141,11 @@ namespace Assets.Source.Gongtong
         private static bool jiuZhongJiuPai;
 
         // 状態
-        internal static void ZhuangTai(State state)
+        internal static void ZhuangTai(State state, bool isZiJia)
         {
             state.changFeng = changFeng;
             state.ju = ju;
+            state.changShePai = isZiJia ? 0 : shePai;
         }
 
         // 切り上げ

@@ -568,7 +568,7 @@ namespace Assets.Source.Sikao
         }
 
         // 牌選択(赤牌以外を優先)
-        private int PaiXuanZe(int wei)
+        protected int PaiXuanZe(int wei)
         {
             if (ShouPai[wei] < CHI_PAI)
             {
