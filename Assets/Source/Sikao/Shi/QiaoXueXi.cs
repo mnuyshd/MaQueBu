@@ -11,7 +11,11 @@ namespace Assets.Source.Sikao.Shi
     // 学習雀士
     internal class QiaoXueXi : QiaoJiXie
     {
+#if DEV
         private const string HOST_URL = "http://127.0.0.1:10000/";
+#else
+        private const string HOST_URL = "https://maquiaobu-api.onrender.com/";
+#endif
         internal const string MING_QIAN = "学習雀士";
         internal QiaoXueXi() : base(MING_QIAN)
         {
@@ -40,7 +44,6 @@ namespace Assets.Source.Sikao.Shi
         private IEnumerator RequestSiKao(bool isZiJia, State state)
         {
             AsyncStop = true;
-
             string json = JsonConvert.SerializeObject(state);
             byte[] raw = Encoding.UTF8.GetBytes(json);
             UnityWebRequest request = new(HOST_URL + (isZiJia ? "SiKaoZiJia" : "SiKaoTaJia"), "POST")
