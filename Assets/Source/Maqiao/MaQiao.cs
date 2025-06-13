@@ -1582,7 +1582,7 @@ namespace Assets.Source.Maqiao
                     selectedCount++;
                 }
             }
-            if ((!existsPlayer && selectedCount == 4) || selectedCount == 3 || selectedCount == 2 || selectedCount == 1)
+            if ((!existsPlayer && selectedCount == 4) || selectedCount == 3 || selectedCount == 2 || (existsPlayer && selectedCount == 1))
             {
                 keyPress = true;
             }
