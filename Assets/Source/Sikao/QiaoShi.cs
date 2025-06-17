@@ -594,6 +594,13 @@ namespace Assets.Source.Sikao
         {
             get { return xingTing; }
         }
+        // 終了
+        private bool zhongLiao;
+        internal bool ZhongLiao
+        {
+            get { return zhongLiao; }
+            set { zhongLiao = value; }
+        }
         // 自家
         private bool jiJia;
         internal bool JiJia
@@ -684,6 +691,29 @@ namespace Assets.Source.Sikao
         {
             get { return lianZhuangShu; }
             set { lianZhuangShu = value; }
+        }
+
+        // 打牌後
+        private bool daPaiHou;
+        internal bool DaPaiHou
+        {
+            get { return daPaiHou; }
+            set { daPaiHou = value; }
+        }
+
+        // 流し満貫
+        private bool liuShiManGuan;
+        internal bool LiuShiManGuan
+        {
+            get { return liuShiManGuan; }
+            set { liuShiManGuan = value; }
+        }
+        // 点数（表示用）
+        private int shuBiao;
+        internal int ShuBiao
+        {
+            get { return shuBiao; }
+            set { shuBiao = value; }
         }
 
         // 遷移(自家)
@@ -849,6 +879,7 @@ namespace Assets.Source.Sikao
             daiPai = new();
             youXiaoPaiShu = new();
             xiangTingShu = 0;
+            heLePai = new();
 
             liZhi = false;
             kaiLiZhi = false;
@@ -860,6 +891,12 @@ namespace Assets.Source.Sikao
             shouQu = 0;
             shouQuGongTuo = 0;
             cuHeSheng = "";
+            daPaiHou = true;
+            liuShiManGuan = false;
+            zhongLiao = false;
+
+            ziJiaYao = YaoDingYi.Wu;
+            taJiaYao = YaoDingYi.Wu;
         }
 
         // 思考自家判定
@@ -869,6 +906,7 @@ namespace Assets.Source.Sikao
 
             ziJiaYao = YaoDingYi.Wu;
             ziJiaXuanZe = shouPai.Count - 1;
+            daPaiHou = false;
 
             // 初期化
             SiKaoQianChuQiHua();
@@ -1021,6 +1059,7 @@ namespace Assets.Source.Sikao
             tongShunPai = new List<int>();
 
             fuLuShun = false;
+            daPaiHou = true;
         }
 
         // 待牌計算
@@ -1358,7 +1397,7 @@ namespace Assets.Source.Sikao
                 {
                     xingTing = true;
                     shouPai.RemoveAt(shouPai.Count - 1);
-                    break;
+                    return;
                 }
                 shouPai.RemoveAt(shouPai.Count - 1);
             }
@@ -1389,7 +1428,7 @@ namespace Assets.Source.Sikao
         }
 
         // 思考前初期化
-        private void SiKaoQianChuQiHua()
+        internal void SiKaoQianChuQiHua()
         {
             heLe = false;
             heLePai = new();
