@@ -7,8 +7,8 @@ namespace Assets.Source.Maqiao
         public bool mingWu = false;
         // 立直後自動
         public bool liZhiAuto = true;
-        // 打牌方法(0:選択して打牌 1:１タップ打牌 2:２タップ打牌)
-        public int daPaiFangFa = 2;
+        // 打牌方法(0:１タップ打牌 1:２タップ打牌)
+        public int daPaiFangFa = 1;
         // ドラマーク表示
         public bool xuanShangYin = true;
         // ツモ切表示有り

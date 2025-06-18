@@ -631,7 +631,7 @@ namespace Assets.Source.Maqiao
             float offset = paiHeight * 1.6f;
             int len = 7;
 
-            DrawToggleOption(() => sheDing.daPaiFangFa, v => sheDing.daPaiFangFa = v, new string[] { "選択して打牌", "１タップ打牌", "２タップ打牌" }, new Vector2(-x, y), len);
+            DrawToggleOption(() => sheDing.daPaiFangFa, v => sheDing.daPaiFangFa = v, new string[] { "１タップ打牌", "２タップ打牌" }, new Vector2(-x, y), len);
             DrawToggleOption(() => sheDing.liZhiAuto, v => sheDing.liZhiAuto = v, new string[] { "立直後自動打牌", "立直後手動打牌" }, new Vector2(x, y), len);
             y -= offset;
             DrawToggleOption(() => sheDing.xuanShangYin, v => sheDing.xuanShangYin = v, new string[] { "ドラマーク有り", "ドラマーク無し" }, new Vector2(-x, y), len);
@@ -2669,12 +2669,6 @@ namespace Assets.Source.Maqiao
                     ziJiaShi.SiKaoZiJia();
                 }
                 isZiJiaYaoDraw = true;
-                if (sheDing.daPaiFangFa == 0)
-                {
-                    ziJiaShi.DaiPaiJiSuan(ziJiaShi.ZiJiaXuanZe);
-                    ziJiaShi.GongKaiPaiShuJiSuan();
-
-                }
                 if (!(sheDing.liZhiAuto && (ziJiaShi.LiZhi || ziJiaShi.KaiLiZhi)) || ziJiaShi.HeLe || ziJiaShi.AnGangPaiWei.Count > 0 || ziJiaShi.JiaGangPaiWei.Count > 0)
                 {
                     if (ziJiaShi.Follow && ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.Wu)
@@ -3265,12 +3259,6 @@ namespace Assets.Source.Maqiao
                     {
                         DrawShouPai(jia, QiaoShi.YaoDingYi.Wu, -1, shi.Player, false);
                     }
-                    else if (sheDing.daPaiFangFa == 0)
-                    {
-                        int x = shi.Follow ? shi.ZiJiaXuanZe : shi.ShouPai.Count - 1;
-                        DrawSelectDaPai(jia, shi, x);
-                        DrawShouPai(jia, yao, x, shi.Player, isZiJiaYaoDraw);
-                    }
                     else
                     {
                         DrawShouPai(jia, yao, xuanZe, shi.Player, isZiJiaYaoDraw && shi.Follow);
@@ -3509,11 +3497,6 @@ namespace Assets.Source.Maqiao
                 DrawZiJiaYao(shi, 0, 0, false, false);
                 DrawShouPai(jia, yao, -1, shi.Player, false);
                 DrawDaiPai(jia, -1);
-                if (sheDing.daPaiFangFa == 0)
-                {
-                    DrawSelectDaPai(jia, shi, shi.ShouPai.Count - 1);
-                    DrawShouPai(jia, QiaoShi.YaoDingYi.Select, shi.ShouPai.Count - 1, shi.Player, true);
-                }
             }
             else if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi)
             {
@@ -3881,81 +3864,6 @@ namespace Assets.Source.Maqiao
             }
         }
 
-        // 【描画】牌選択ボタン
-        private void DrawSelectDaPai(int jia, QiaoShi shi, int xuanZe)
-        {
-            ClearGameObject(ref goLeft);
-            ClearGameObject(ref goRight);
-            ClearGameObject(ref goSelect);
-
-            goLeft = Instantiate(goButton, goButton.transform.parent);
-            int leftWei = xuanZe - 1;
-            if (leftWei < 0)
-            {
-                leftWei = shi.ShouPai.Count - 1;
-            }
-            goLeft.onClick.AddListener(delegate
-            {
-                DrawSelectDaPai(jia, shi, leftWei);
-                DrawShouPai(jia, QiaoShi.YaoDingYi.Select, leftWei, shi.Player, true);
-                DrawDaiPai(jia, leftWei);
-            });
-
-            goRight = Instantiate(goButton, goButton.transform.parent);
-            int rightWei = xuanZe + 1;
-            if (rightWei > shi.ShouPai.Count - 1)
-            {
-                rightWei = 0;
-            }
-            goRight.onClick.AddListener(delegate
-            {
-                DrawSelectDaPai(jia, shi, rightWei);
-                DrawShouPai(jia, QiaoShi.YaoDingYi.Select, rightWei, shi.Player, true);
-                DrawDaiPai(jia, rightWei);
-            });
-
-            goSelect = Instantiate(goButton, goButton.transform.parent);
-            goSelect.onClick.AddListener(delegate
-            {
-                shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
-                shi.ZiJiaXuanZe = xuanZe;
-                shi.DaPaiHou = true;
-                keyPress = true;
-            });
-
-            OrientationSelectDaPai();
-        }
-
-        private void OrientationSelectDaPai()
-        {
-            float x = -(paiWidth * 8.5f);
-            float y = -(paiHeight * 9.3f);
-            if (orientation != ScreenOrientation.Portrait)
-            {
-                x = -(paiWidth * 14.5f);
-                y = -(paiHeight * 4f);
-            }
-            if (goLeft != null)
-            {
-                DrawButton(ref goLeft, "◀", new Vector2(x, y));
-            }
-            if (goRight != null)
-            {
-                DrawButton(ref goRight, "▶", new Vector2(x + paiWidth * 2.5f, y));
-            }
-
-            x = -(paiWidth * 3f);
-            if (orientation != ScreenOrientation.Portrait)
-            {
-                x = -paiWidth * 13.2f;
-                y += paiHeight * 1.5f;
-            }
-            if (goSelect != null)
-            {
-                DrawButton(ref goSelect, "打牌", new Vector2(x, y));
-            }
-        }
-
         // 牌クリック
         private void OnClickShouPai(int jia, QiaoShi shi, QiaoShi.YaoDingYi yao, int xuanZe)
         {
@@ -3971,7 +3879,7 @@ namespace Assets.Source.Maqiao
             }
             if (yao == QiaoShi.YaoDingYi.Wu)
             {
-                if (sheDing.daPaiFangFa == 1)
+                if (sheDing.daPaiFangFa == 0)
                 {
                     shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                     shi.ZiJiaXuanZe = xuanZe;
@@ -3980,10 +3888,6 @@ namespace Assets.Source.Maqiao
                 {
                     DrawShouPai(jia, QiaoShi.YaoDingYi.Select, xuanZe, shi.Player, true);
                     DrawDaiPai(jia, xuanZe);
-                    if (sheDing.daPaiFangFa == 0)
-                    {
-                        DrawSelectDaPai(jia, shi, xuanZe);
-                    }
                     return;
                 }
             }
