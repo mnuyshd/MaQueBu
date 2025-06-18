@@ -2634,7 +2634,6 @@ namespace Assets.Source.Maqiao
 
             if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.AnGang || Chang.ZiJiaYao == QiaoShi.YaoDingYi.JiaGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.DaMingGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.Chi || Chang.TaJiaYao == QiaoShi.YaoDingYi.Bing)
             {
-                isDuiJuDraw = true;
                 yield return new WaitForSeconds(waitTime);
             }
 
@@ -2647,11 +2646,6 @@ namespace Assets.Source.Maqiao
             ziJiaShi.SiKaoZiJiaPanDing();
 
             yield return new WaitForSeconds(waitTime);
-            if (Chang.TaJiaYao != QiaoShi.YaoDingYi.Wu)
-            {
-                isDuiJuDraw = true;
-                yield return new WaitForSeconds(waitTime);
-            }
 
             // 学習(自家 状態)
             ziJiaShi.SetTransitionZiJiaState(GetState(Chang.ZiMoFan, true));
@@ -2827,7 +2821,7 @@ namespace Assets.Source.Maqiao
                 // 打牌前
                 int dp = ziJiaShi.DaPaiQian();
                 isDuiJuDraw = true;
-                yield return new WaitForSeconds(waitTime / 2);
+                yield return new WaitForSeconds(waitTime);
                 // 打牌
                 ziJiaShi.DaPai(dp);
                 ziJiaShi.ShePaiChuLi(Chang.ZiJiaYao);
@@ -2836,9 +2830,9 @@ namespace Assets.Source.Maqiao
                 ziJiaShi.TaJiaXuanZe = 0;
                 ziJiaShi.SiKaoQianChuQiHua();
 
+                ziJiaShi.LiPai();
                 isDuiJuDraw = true;
                 yield return new WaitForSeconds(waitTime);
-                ziJiaShi.LiPai();
                 // 四風子連打処理
                 Chang.SiFengZiLianDaChuLi(Chang.ShePai);
                 // 四風子連打判定
@@ -2989,7 +2983,6 @@ namespace Assets.Source.Maqiao
                 Chang.MingFan = Chang.RongHeFan[0].fan;
 
                 // 捨牌処理
-                Chang.QiaoShis[Chang.ZiMoFan].ShePaiChuLi(QiaoShi.YaoDingYi.RongHe);
                 foreach ((int fan, _) in Chang.RongHeFan)
                 {
                     Chang.QiaoShis[fan].ZiMo(Chang.ShePai);
