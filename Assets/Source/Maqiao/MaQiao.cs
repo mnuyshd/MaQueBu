@@ -656,46 +656,35 @@ namespace Assets.Source.Maqiao
             DrawButton(ref resetButton, "リセット", new Vector2(0, y));
         }
 
-        // オプションボタン
-        private void DrawToggleOption(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
+        // トグルボタン描画メソッド
+        private void DrawToggleButton<T>(Func<T> getValue, Action<T> setValue, Func<T, string> getText, Func<T, T> toggleValue, Vector2 xy, int len, Action onToggle = null)
         {
             Button button = Instantiate(goButton, goSettingPanel.transform);
-            string displayText = getValue() ? textOnOff[0] : textOnOff[1];
+            string displayText = getText(getValue());
             DrawButton(ref button, displayText, xy, len);
             TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
             button.onClick.AddListener(delegate
             {
-                bool newValue = !getValue();
+                T newValue = toggleValue(getValue());
                 setValue(newValue);
-                text.text = newValue ? textOnOff[0] : textOnOff[1];
+                text.text = getText(newValue);
+                onToggle?.Invoke();
                 File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
             });
+        }
+
+        private void DrawToggleOption(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
+        {
+            DrawToggleButton(getValue, setValue, v => v ? textOnOff[0] : textOnOff[1], v => !v, xy, len);
         }
         private void DrawToggleOption(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy, int len)
         {
-            Button button = Instantiate(goButton, goSettingPanel.transform);
-            string displayText = textOnOff[getValue()];
-            DrawButton(ref button, displayText, xy, len);
-            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            button.onClick.AddListener(delegate
-            {
-                int newValue = (getValue() + 1) % textOnOff.Length;
-                setValue(newValue);
-                text.text = textOnOff[newValue];
-                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
-            });
+            DrawToggleButton(getValue, setValue, v => textOnOff[v], v => (v + 1) % textOnOff.Length, xy, len);
         }
         private void DrawXiangShouPaiOpen(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
         {
-            Button button = Instantiate(goButton, goSettingPanel.transform);
-            string displayText = getValue() ? textOnOff[0] : textOnOff[1];
-            DrawButton(ref button, displayText, xy, len);
-            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            button.onClick.AddListener(delegate
+            DrawToggleButton(getValue, setValue, v => v ? textOnOff[0] : textOnOff[1], v => !v, xy, len, () =>
             {
-                bool newValue = !getValue();
-                setValue(newValue);
-                text.text = newValue ? textOnOff[0] : textOnOff[1];
                 switch (eventStatus)
                 {
                     case Event.PEI_PAI:
@@ -704,7 +693,6 @@ namespace Assets.Source.Maqiao
                         DrawDuiJu();
                         break;
                 }
-                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
             });
         }
 
@@ -3624,11 +3612,7 @@ namespace Assets.Source.Maqiao
         }
 
         // 【描画】手牌
-        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei)
-        {
-            DrawShouPai(jia, yao, mingWei, false, false);
-        }
-        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei, bool isPlayerZiMo, bool isFollow)
+        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei, bool isPlayerZiMo = false, bool isFollow = false)
         {
             QiaoShi shi = Chang.QiaoShis[jia];
             ClearGameObject(ref shi.goShouPai);
@@ -4754,11 +4738,7 @@ namespace Assets.Source.Maqiao
         }
 
         // 【描画】テキスト
-        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize)
-        {
-            DrawText(ref obj, value, xy, quaternion, fontSize, TextAlignmentOptions.Center, -1);
-        }
-        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize, TextAlignmentOptions align, int len)
+        private void DrawText(ref TextMeshProUGUI obj, string value, Vector2 xy, int quaternion, int fontSize, TextAlignmentOptions align = TextAlignmentOptions.Center, int len = -1)
         {
             if (obj == null)
             {
@@ -4786,11 +4766,7 @@ namespace Assets.Source.Maqiao
         }
 
         // 【描画】フレームテキスト
-        void DrawFrame(ref Image obj, string value, Vector2 xy, float quaternion, int fontSize, Color backgroundColor, Color foreColor)
-        {
-            DrawFrame(ref obj, value, xy, quaternion, fontSize, backgroundColor, foreColor, -1);
-        }
-        void DrawFrame(ref Image obj, string value, Vector2 xy, float quaternion, int fontSize, Color backgroundColor, Color foreColor, int len)
+        void DrawFrame(ref Image obj, string value, Vector2 xy, float quaternion, int fontSize, Color backgroundColor, Color foreColor, int len = -1)
         {
             if (obj == null)
             {
@@ -4815,11 +4791,7 @@ namespace Assets.Source.Maqiao
         }
 
         // 【描画】ボタン
-        private void DrawButton(ref Button obj, string value, Vector2 xy)
-        {
-            DrawButton(ref obj, value, xy, -1);
-        }
-        private void DrawButton(ref Button obj, string value, Vector2 xy, int len)
+        private void DrawButton(ref Button obj, string value, Vector2 xy, int len = -1)
         {
             if (obj == null)
             {
