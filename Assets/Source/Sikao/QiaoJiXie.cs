@@ -140,7 +140,7 @@ namespace Assets.Source.Sikao
                         dian += yuXiangDian[i] * Pai.CanShu(GongKaiPaiShu[i]);
                     }
                 }
-                shouPaiDian[w] -= dian / (nao[XingGe.TAO] == 0 ? 1 : nao[XingGe.TAO]);
+                ShouPaiDian[w] -= dian / (nao[XingGe.TAO] == 0 ? 1 : nao[XingGe.TAO]);
             }
 
             // 手牌点数計算
@@ -175,13 +175,13 @@ namespace Assets.Source.Sikao
             for (int i = 0; i < ShouPai.Count; i++)
             {
                 int sp = ShouPai[i];
-                if (minDian > shouPaiDian[i])
+                if (minDian > ShouPaiDian[i])
                 {
-                    minDian = shouPaiDian[i];
+                    minDian = ShouPaiDian[i];
                     maxShu = Math.Abs(5 - (sp & SHU_PAI));
                     wei = i;
                 }
-                else if (minDian == shouPaiDian[i])
+                else if (minDian == ShouPaiDian[i])
                 {
                     int p = sp & QIAO_PAI;
                     int s = Math.Abs(5 - (sp & SHU_PAI));
@@ -251,9 +251,9 @@ namespace Assets.Source.Sikao
                 int dian = 999;
                 foreach (int w in weis)
                 {
-                    if (dian > shouPaiDian[w])
+                    if (dian > ShouPaiDian[w])
                     {
-                        dian = shouPaiDian[w];
+                        dian = ShouPaiDian[w];
                         wei = i;
                     }
                 }
@@ -271,7 +271,7 @@ namespace Assets.Source.Sikao
                     {
                         for (int i = 0; i < ShouPai.Count; i++)
                         {
-                            if (minDian > shouPaiDian[i])
+                            if (minDian > ShouPaiDian[i])
                             {
                                 return -1;
                             }
@@ -295,7 +295,7 @@ namespace Assets.Source.Sikao
                 int dian = 0;
                 foreach (int w in weis)
                 {
-                    dian += shouPaiDian[w];
+                    dian += ShouPaiDian[w];
                 }
                 if (minDian > dian)
                 {
@@ -311,7 +311,7 @@ namespace Assets.Source.Sikao
                     {
                         for (int i = 0; i < ShouPai.Count; i++)
                         {
-                            if (minDian > shouPaiDian[i])
+                            if (minDian > ShouPaiDian[i])
                             {
                                 return -1;
                             }
@@ -405,7 +405,7 @@ namespace Assets.Source.Sikao
                 int dian = weiXian;
                 foreach (int w in DaMingGangPaiWei[i])
                 {
-                    dian += shouPaiDian[w];
+                    dian += ShouPaiDian[w];
                 }
                 if (maxDian < dian)
                 {
@@ -441,7 +441,7 @@ namespace Assets.Source.Sikao
                 int dian = weiXian;
                 foreach (int w in BingPaiWei[i])
                 {
-                    dian += shouPaiDian[w];
+                    dian += ShouPaiDian[w];
                 }
                 if (maxDian < dian)
                 {
@@ -501,7 +501,7 @@ namespace Assets.Source.Sikao
                 int dian = weiXian;
                 foreach (int w in ChiPaiWei[i])
                 {
-                    dian += shouPaiDian[w];
+                    dian += ShouPaiDian[w];
                 }
                 if (minDian > dian)
                 {
@@ -618,7 +618,7 @@ namespace Assets.Source.Sikao
                             int sp = ShouPai[k] & QIAO_PAI;
                             if (dp == sp)
                             {
-                                shouPaiDian[k] += 2000;
+                                ShouPaiDian[k] += 2000;
                             }
                         }
                     }
@@ -686,10 +686,10 @@ namespace Assets.Source.Sikao
                                     }
                                 }
                             }
-                            shouPaiDian[j] -= anQuanDian;
+                            ShouPaiDian[j] -= anQuanDian;
                             if (anQuanDian == 0)
                             {
-                                shouPaiDian[j] += nao[XingGe.TAO];
+                                ShouPaiDian[j] += nao[XingGe.TAO];
                             }
                         }
                     }
@@ -705,51 +705,51 @@ namespace Assets.Source.Sikao
                     if (p == stp)
                     {
                         // 食替牌
-                        shouPaiDian[i] += 1000;
+                        ShouPaiDian[i] += 1000;
                     }
                 }
 
                 // 懸賞牌
-                shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 4 * ShouPaiShu[p] * XuanShangPaiPanDing(sp);
+                ShouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 4 * ShouPaiShu[p] * XuanShangPaiPanDing(sp);
                 int s = p & SHU_PAI;
                 if (p < ZI_PAI)
                 {
                     if (s >= 2)
                     {
-                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 5 * XuanShangPaiPanDing(p - 1);
+                        ShouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 5 * XuanShangPaiPanDing(p - 1);
                     }
                     if (s <= 8)
                     {
-                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 5 * XuanShangPaiPanDing(p + 1);
+                        ShouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 5 * XuanShangPaiPanDing(p + 1);
                     }
                     if (s >= 3)
                     {
-                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p - 2);
+                        ShouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p - 2);
                     }
                     if (s <= 7)
                     {
-                        shouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p + 2);
+                        ShouPaiDian[i] += nao[XingGe.XUAN_SHANG] / 10 * XuanShangPaiPanDing(p + 2);
                     }
                 }
                 // 役牌・風牌
                 int yiPai = YiPaiPanDing(p);
                 if (yiPai > 0)
                 {
-                    shouPaiDian[i] += nao[XingGe.YI_PAI] / 15 * YiPaiPanDing(p);
+                    ShouPaiDian[i] += nao[XingGe.YI_PAI] / 15 * YiPaiPanDing(p);
                     if (p >= 0x35 && p <= 0x37)
                     {
-                        shouPaiDian[i] += 1;
+                        ShouPaiDian[i] += 1;
                     }
                 }
                 // 染め
                 if ((16 - maxShu <= nao[XingGe.RAN] / 10) && ((p & SE_PAI) == se || (p & ZI_PAI) == ZI_PAI))
                 {
-                    shouPaiDian[i] += nao[XingGe.RAN] / 5;
+                    ShouPaiDian[i] += nao[XingGe.RAN] / 5;
                 }
                 // 字牌
                 if ((p & ZI_PAI) == ZI_PAI)
                 {
-                    shouPaiDian[i] -= nao[XingGe.YI_PAI] / 10 * (GongKaiPaiShu[p] - ShouPaiShu[p]);
+                    ShouPaiDian[i] -= nao[XingGe.YI_PAI] / 10 * (GongKaiPaiShu[p] - ShouPaiShu[p]);
                 }
             }
 
@@ -769,7 +769,7 @@ namespace Assets.Source.Sikao
                         {
                             if (k > 0)
                             {
-                                shouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
+                                ShouPaiDian[j] += nao[XingGe.KE_ZI] * 2;
                                 ShouPaiShu[i]--;
                                 k--;
                             }
@@ -782,19 +782,19 @@ namespace Assets.Source.Sikao
                                 int s = p & SHU_PAI;
                                 if ((s >= 3 && ShouPaiShu[i - 2] > 0 && ShouPaiShu[i - 1] > 0) || (s <= 7 && ShouPaiShu[i + 1] > 0 && ShouPaiShu[i + 2] > 0) || (s >= 2 && s <= 8 && ShouPaiShu[i - 1] > 0 && ShouPaiShu[i + 1] > 0))
                                 {
-                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2;
+                                    ShouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2;
                                 }
                                 if ((s >= 3 && ShouPaiShu[i - 1] > 0) || (s <= 7 && ShouPaiShu[i + 1] > 0))
                                 {
-                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 3;
+                                    ShouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 3;
                                 }
                                 if ((s >= 3 && ShouPaiShu[i - 2] > 0) || (s <= 7 && ShouPaiShu[i + 2] > 0))
                                 {
-                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 4;
+                                    ShouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 4;
                                 }
                                 if ((s == 1 && ShouPaiShu[i + 1] > 0) || (s == 2 && ShouPaiShu[i - 1] > 0) || (s == 8 && ShouPaiShu[i + 1] > 0) || (s == 9 && ShouPaiShu[i - 1] > 0))
                                 {
-                                    shouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 5;
+                                    ShouPaiDian[j] += nao[XingGe.SHUN_ZI] * 2 / 5;
                                 }
                             }
                         }
@@ -812,7 +812,7 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && k > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.KE_ZI] / 3;
+                            ShouPaiDian[j] += nao[XingGe.KE_ZI] / 3;
                             ShouPaiShu[i]--;
                             k--;
                         }
@@ -841,21 +841,21 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI];
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI];
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i + 1 && s1 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI];
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI];
                             shouPaiDianShu[j]--;
                             s1--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i + 2 && s2 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI];
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI];
                             shouPaiDianShu[j]--;
                             s2--;
                             ShouPaiShu[p]--;
@@ -885,14 +885,14 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i + 1 && s1 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
                             shouPaiDianShu[j]--;
                             s1--;
                             ShouPaiShu[p]--;
@@ -917,14 +917,14 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i + 2 && s2 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
                             shouPaiDianShu[j]--;
                             s2--;
                             ShouPaiShu[p]--;
@@ -950,14 +950,14 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i + 1 && s1 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
                             shouPaiDianShu[j]--;
                             s1--;
                             ShouPaiShu[p]--;
@@ -987,21 +987,21 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI];
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI];
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i - 1 && s1 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI];
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI];
                             shouPaiDianShu[j]--;
                             s1--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i - 2 && s2 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI];
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI];
                             shouPaiDianShu[j]--;
                             s2--;
                             ShouPaiShu[p]--;
@@ -1031,14 +1031,14 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i - 1 && s1 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 3;
                             shouPaiDianShu[j]--;
                             s1--;
                             ShouPaiShu[p]--;
@@ -1063,14 +1063,14 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i - 2 && s2 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 4;
                             shouPaiDianShu[j]--;
                             s2--;
                             ShouPaiShu[p]--;
@@ -1096,14 +1096,14 @@ namespace Assets.Source.Sikao
                         int p = ShouPai[j] & QIAO_PAI;
                         if (p == i && s0 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
                             shouPaiDianShu[j]--;
                             s0--;
                             ShouPaiShu[p]--;
                         }
                         if (p == i - 1 && s1 > 0)
                         {
-                            shouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
+                            ShouPaiDian[j] += nao[XingGe.SHUN_ZI] / 5;
                             shouPaiDianShu[j]--;
                             s1--;
                             ShouPaiShu[p]--;
@@ -1119,7 +1119,7 @@ namespace Assets.Source.Sikao
             for (int i = 0; i < ShouPai.Count; i++)
             {
                 int p = ShouPai[i] & QIAO_PAI;
-                if (p >= ZI_PAI || shouPaiDian[i] > 0)
+                if (p >= ZI_PAI || ShouPaiDian[i] > 0)
                 {
                     continue;
                 }
@@ -1127,16 +1127,16 @@ namespace Assets.Source.Sikao
                 int dian = nao[XingGe.SHUN_ZI] / 25 * (5 - Math.Abs(s - 5));
                 if (s <= 2 && ShouPaiShu[p] > 0 && ShouPaiShu[p + 1] == 0 && ShouPaiShu[p + 2] == 0 && ShouPaiShu[p + 3] > 0)
                 {
-                    shouPaiDian[i] -= dian;
+                    ShouPaiDian[i] -= dian;
                 }
                 if (s >= 8 && ShouPaiShu[p] > 0 && ShouPaiShu[p - 1] == 0 && ShouPaiShu[p - 2] == 0 && ShouPaiShu[p - 3] > 0)
                 {
-                    shouPaiDian[i] -= dian;
+                    ShouPaiDian[i] -= dian;
                 }
                 // 数牌
                 if (s >= 2 && s <= 8)
                 {
-                    shouPaiDian[i] += dian;
+                    ShouPaiDian[i] += dian;
                 }
             }
         }

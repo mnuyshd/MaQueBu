@@ -21,76 +21,36 @@ namespace Assets.Source.Gongtong
             0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
             0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37
         };
-        private static int[] qiaoPai = Pai4DingYi;
-        internal static int[] QiaoPai
-        {
-            get { return qiaoPai; }
-        }
+        internal static int[] QiaoPai { get; set; } = Pai4DingYi;
 
         // 赤牌定義
-        private static readonly int[] chiPaiDingYi = new int[] { 0x05, 0x15, 0x25 };
-        internal static int[] ChiPaiDingYi
-        {
-            get { return chiPaiDingYi; }
-        }
+        internal static int[] ChiPaiDingYi { get; set; } = new int[] { 0x05, 0x15, 0x25 };
         // 幺九牌定義
-        private static readonly int[] yaoJiuPaiDingYi = new int[] { 0x01, 0x09, 0x11, 0x19, 0x21, 0x29, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
-        internal static int[] YaoJiuPaiDingYi
-        {
-            get { return yaoJiuPaiDingYi; }
-        }
+        internal static int[] YaoJiuPaiDingYi { get; set; } = new int[] { 0x01, 0x09, 0x11, 0x19, 0x21, 0x29, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
         // 緑一色牌定義
-        private static readonly int[] luYiSePaiDingYi = new int[] { 0x22, 0x23, 0x24, 0x26, 0x28, 0x36 };
-        internal static int[] LuYiSePaiDingYi
-        {
-            get { return luYiSePaiDingYi; }
-        }
+        internal static int[] LuYiSePaiDingYi { get; set; } = new int[] { 0x22, 0x23, 0x24, 0x26, 0x28, 0x36 };
         // 紅孔雀牌定義
-        private static readonly int[] gongKongQiaoPaiDingYi = new int[] { 0x21, 0x25, 0x27, 0x29, 0x37 };
-        internal static int[] GongKongQiaoPaiDingYi
-        {
-            get { return gongKongQiaoPaiDingYi; }
-        }
+        internal static int[] GongKongQiaoPaiDingYi { get; set; } = new int[] { 0x21, 0x25, 0x27, 0x29, 0x37 };
         // 風牌定義
-        private static readonly int[] fengPaiDingYi = new int[] { 0x31, 0x32, 0x33, 0x34 };
-        internal static int[] FengPaiDingYi
-        {
-            get { return fengPaiDingYi; }
-        }
+        internal static int[] FengPaiDingYi { get; set; } = new int[] { 0x31, 0x32, 0x33, 0x34 };
         // 懸賞牌定義
-        private static readonly int[] xuanShangPaiDingYi = new int[] {
+        internal static int[] XuanShangPaiDingYi { get; set; } = new int[] {
             -1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x01, -1, -1, -1, -1, -1, -1,
             -1, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x11, -1, -1, -1, -1, -1, -1,
             -1, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x21, -1, -1, -1, -1, -1, -1,
             -1, 0x32, 0x33, 0x34, 0x31, 0x36, 0x37, 0x35
         };
-        internal static int[] XuanShangPaiDingYi
-        {
-            get { return xuanShangPaiDingYi; }
-        }
         // 風牌名定義
-        private static readonly string[] fengPaiMing = new string[] { "東", "南", "西", "北" };
-        internal static string[] FengPaiMing
-        {
-            get { return fengPaiMing; }
-        }
+        internal static string[] FengPaiMing { get; set; } = new string[] { "東", "南", "西", "北" };
 
         // 山牌自摸位
         private static readonly int[] ShanPaiZiMoWei = new int[] { 0, 1, 2, 3, 16, 17, 18, 19, 32, 33, 34, 35, 48, 52 };
 
         // 懸賞牌
-        private static List<int> xuanShangPai;
-        internal static List<int> XuanShangPai
-        {
-            get { return xuanShangPai; }
-        }
+        internal static List<int> XuanShangPai { get; set; }
         internal static Button[] goXuanShangPai;
         // 裏懸賞牌
-        private static List<int> liXuanShangPai;
-        internal static List<int> LiXuanShangPai
-        {
-            get { return liXuanShangPai; }
-        }
+        internal static List<int> LiXuanShangPai { get; set; }
         internal static Button[] goLiXuanShangPai;
 
         // 山牌
@@ -117,19 +77,19 @@ namespace Assets.Source.Gongtong
             state.xuanShangPai = new();
             for (int i = 0; i <= 4; i++)
             {
-                state.xuanShangPai.Add(i < xuanShangPai.Count ? xuanShangPai[i] : 0);
+                state.xuanShangPai.Add(i < XuanShangPai.Count ? XuanShangPai[i] : 0);
             }
         }
 
         // 洗牌
         internal static void XiPai()
         {
-            qiaoPai = Chang.QiaoShis.Count == 3 ? Pai3DingYi : Pai4DingYi;
+            QiaoPai = Chang.QiaoShis.Count == 3 ? Pai3DingYi : Pai4DingYi;
             shanPai = new();
             // 山牌
             for (int i = 0; i < 4; i++)
             {
-                foreach (int p in qiaoPai)
+                foreach (int p in QiaoPai)
                 {
                     shanPai.Add(p);
                 }
@@ -159,8 +119,8 @@ namespace Assets.Source.Gongtong
         internal static void XiPaiLingShang()
         {
             lingShangPai = new();
-            xuanShangPai = new();
-            liXuanShangPai = new();
+            XuanShangPai = new();
+            LiXuanShangPai = new();
 
             // 嶺上牌
             for (int i = 0; i < 14; i++)
@@ -171,8 +131,8 @@ namespace Assets.Source.Gongtong
             lingShangPai.Reverse();
 
             // 懸賞牌
-            xuanShangPai.Add(lingShangPai[4]);
-            liXuanShangPai.Add(lingShangPai[5]);
+            XuanShangPai.Add(lingShangPai[4]);
+            LiXuanShangPai.Add(lingShangPai[5]);
 
             lingShangKaiHua = false;
             qiangGang = false;
@@ -263,15 +223,15 @@ namespace Assets.Source.Gongtong
         // 懸賞牌数
         internal static int XuanShangPaiShu()
         {
-            return xuanShangPai.Count;
+            return XuanShangPai.Count;
         }
 
         // 嶺上牌処理
         internal static void LingShangPaiChuLi()
         {
             // 懸賞牌
-            xuanShangPai.Add(lingShangPai[4 + xuanShangPai.Count]);
-            liXuanShangPai.Add(lingShangPai[5 + liXuanShangPai.Count]);
+            XuanShangPai.Add(lingShangPai[4 + XuanShangPai.Count]);
+            LiXuanShangPai.Add(lingShangPai[5 + LiXuanShangPai.Count]);
         }
 
         // 槍槓
@@ -295,7 +255,7 @@ namespace Assets.Source.Gongtong
         // 四開槓判定
         internal static bool SiKaiGangPanDing()
         {
-            if (xuanShangPai.Count <= 4)
+            if (XuanShangPai.Count <= 4)
             {
                 return false;
             }

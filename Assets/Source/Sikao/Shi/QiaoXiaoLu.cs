@@ -42,7 +42,7 @@ namespace Assets.Source.Sikao.Shi
                 YouXiaoPaiShuJiSuan();
                 for (int i = 0; i < ShouPai.Count; i++)
                 {
-                    shouPaiDian[i] -= YouXiaoPaiShu[i] * 10;
+                    ShouPaiDian[i] -= YouXiaoPaiShu[i] * 10;
                 }
             }
 
