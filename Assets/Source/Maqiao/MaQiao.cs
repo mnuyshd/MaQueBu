@@ -2503,7 +2503,7 @@ namespace Assets.Source.Maqiao
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        Chang.QiaoShis[(Chang.Qin + j) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
+                        Chang.QiaoShis[(Chang.Qin + j) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo(), true);
                     }
                     isPeiPaiDraw = true;
                     yield return new WaitForSeconds(waitTime / 3);
@@ -2511,7 +2511,7 @@ namespace Assets.Source.Maqiao
             }
             for (int i = 0; i < Chang.QiaoShis.Count; i++)
             {
-                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo());
+                Chang.QiaoShis[(Chang.Qin + i) % Chang.QiaoShis.Count].ZiMo(Pai.ShanPaiZiMo(), true);
                 isPeiPaiDraw = true;
             }
             yield return new WaitForSeconds(waitTime / 3);
@@ -3888,7 +3888,6 @@ namespace Assets.Source.Maqiao
             {
                 shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 shi.ZiJiaXuanZe = xuanZe;
-                shi.DaPaiHou = true;
                 DrawShouPai(jia, QiaoShi.YaoDingYi.Clear, 0, shi.Player, false);
             }
             keyPress = true;

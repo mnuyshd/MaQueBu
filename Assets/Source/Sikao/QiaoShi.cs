@@ -906,7 +906,6 @@ namespace Assets.Source.Sikao
 
             ziJiaYao = YaoDingYi.Wu;
             ziJiaXuanZe = shouPai.Count - 1;
-            daPaiHou = false;
 
             // 初期化
             SiKaoQianChuQiHua();
@@ -1021,9 +1020,10 @@ namespace Assets.Source.Sikao
         }
 
         // 自摸
-        internal void ZiMo(int p)
+        internal void ZiMo(int p, bool isDaPaiHou = false)
         {
             shouPai.Add(p);
+            daPaiHou = isDaPaiHou;
         }
 
         // 打牌前
@@ -1340,6 +1340,7 @@ namespace Assets.Source.Sikao
             (int pai, YaoDingYi yao, bool ziMoQue) sp = shePai[^1];
             sp.yao = yao;
             shePai[^1] = sp;
+            daPaiHou = true;
         }
 
         // 立直処理
