@@ -179,6 +179,12 @@ namespace Assets.Source.Gongtong
             }
         }
 
+        // 四風子連打判定
+        internal static bool SiFengZiLianDaPanDing()
+        {
+            return SiFengZiLianDa && guiZe.siFengZiLianDaLianZhuang > 0;
+        }
+
         // 九種九牌処理
         internal static void JiuZhongJiuPaiChuLi()
         {

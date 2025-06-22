@@ -1079,6 +1079,15 @@ namespace Assets.Source.Sikao
             DianBangJiSuan(-1000, false);
         }
 
+        // 鳴処理
+        internal void MingChuLi()
+        {
+            if (Follow)
+            {
+                DaPaiHou = false;
+            }
+        }
+
         // 流局
         internal bool LiuJu()
         {
