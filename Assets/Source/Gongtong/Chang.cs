@@ -55,6 +55,9 @@ namespace Assets.Source.Gongtong
         // 九種九牌
         private static bool jiuZhongJiuPai;
 
+        // ランダム
+        private static readonly Random r = new();
+
         // 状態
         internal static void ZhuangTai(State state, bool isZiJia)
         {
@@ -72,7 +75,6 @@ namespace Assets.Source.Gongtong
         // シャッフル
         internal static void Shuffle(List<int> list, int num)
         {
-            Random r = new();
             for (int i = 0; i < num; i++)
             {
                 int n1 = r.Next(0, list.Count);
@@ -434,7 +436,7 @@ namespace Assets.Source.Gongtong
                 for (int i = jia + 1; i < jia + QiaoShis.Count; i++)
                 {
                     int taJia = i % QiaoShis.Count;
-                    QiaoShis[taJia].DianBangJiSuan(12000 / QiaoShis.Count);
+                    QiaoShis[taJia].DianBangJiSuan(12000 / (QiaoShis.Count - 1));
                 }
             }
             else
