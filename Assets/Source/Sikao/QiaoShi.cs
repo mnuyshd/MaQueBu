@@ -171,7 +171,7 @@ namespace Assets.Source.Sikao
         }
 
         // 役満名
-        internal static Dictionary<YiManDingYi, string> YiManMing = new()
+        internal static readonly Dictionary<YiManDingYi, string> YiManMing = new()
         {
             { YiManDingYi.TianHe, "天和" },
             { YiManDingYi.DeHe, "地和" },
@@ -269,7 +269,7 @@ namespace Assets.Source.Sikao
         }
 
         // 役名
-        internal static Dictionary<YiDingYi, string> YiMing = new()
+        internal static readonly Dictionary<YiDingYi, string> YiMing = new()
         {
             { YiDingYi.LiZi, "立直" },
             { YiDingYi.WLiZi, "Ｗ立直" },
@@ -346,15 +346,15 @@ namespace Assets.Source.Sikao
         internal Maqiao.JiLu JiLu { get; set; }
 
         // 役満
-        internal bool YiMan { get; set; }
+        internal bool YiMan { get; private set; }
         // 役・飜(役、飜数)
-        internal List<(int yi, int fanShu)> YiFan { get; set; }
+        internal List<(int yi, int fanShu)> YiFan { get; private set; }
         // 飜数計
-        internal int FanShuJi { get; set; }
+        internal int FanShuJi { get; private set; }
         // 符
-        internal int Fu { get; set; }
+        internal int Fu { get; private set; }
         // 和了点
-        internal int HeLeDian { get; set; }
+        internal int HeLeDian { get; private set; }
         // 点棒
         internal int DianBang { get; set; }
         // 集計点
@@ -388,7 +388,7 @@ namespace Assets.Source.Sikao
         // 有効牌数
         internal List<int> YouXiaoPaiShu { get; set; }
         // 向聴数
-        internal int XiangTingShu { get; set; }
+        internal int XiangTingShu { get; private set; }
         internal TextMeshProUGUI goXiangTingShu;
         // 対子
         private List<List<int>> duiZi;
@@ -423,7 +423,7 @@ namespace Assets.Source.Sikao
         // 副露順
         private bool fuLuShun;
         // 形聴
-        internal bool XingTing { get; set; }
+        internal bool XingTing { get; private set; }
         // 終了
         internal bool ZhongLiao { get; set; }
         // 自家
@@ -482,26 +482,21 @@ namespace Assets.Source.Sikao
         internal void SetTransitionZiJiaNextState(State state)
         {
             transitionZiJia.nextState = state;
-            transitionZiJiaList ??= new();
-            transitionZiJiaList.Add(transitionZiJia);
+            TransitionZiJiaList ??= new();
+            TransitionZiJiaList.Add(transitionZiJia);
         }
         internal void SetTransitionZiJiaReward(int score)
         {
             double gamma = 0.9;
             double reward = score;
-            for (int i = transitionZiJiaList.Count - 1; i >= 0; i--)
+            for (int i = TransitionZiJiaList.Count - 1; i >= 0; i--)
             {
-                Transition transitionZiJia = transitionZiJiaList[i];
+                Transition transitionZiJia = TransitionZiJiaList[i];
                 transitionZiJia.reward = reward;
                 reward = Math.Round(reward * gamma, 2);
             }
         }
-        private List<Transition> transitionZiJiaList;
-        internal List<Transition> TransitionZiJiaList
-        {
-            get { return transitionZiJiaList; }
-            set { transitionZiJiaList = value; }
-        }
+        internal List<Transition> TransitionZiJiaList { get; set; }
         // 遷移(他家)
         protected Transition transitionTaJia;
         internal void SetTransitionTaJiaState(State state)
@@ -520,15 +515,10 @@ namespace Assets.Source.Sikao
                 return;
             }
             transitionTaJia.action = action;
-            transitionTaJiaList ??= new();
-            transitionTaJiaList.Add(transitionTaJia);
+            TransitionTaJiaList ??= new();
+            TransitionTaJiaList.Add(transitionTaJia);
         }
-        private List<Transition> transitionTaJiaList;
-        internal List<Transition> TransitionTaJiaList
-        {
-            get { return transitionTaJiaList; }
-            set { transitionTaJiaList = value; }
-        }
+        internal List<Transition> TransitionTaJiaList { get; set; }
 
         // コンストラクタ
         internal QiaoShi()
@@ -756,23 +746,14 @@ namespace Assets.Source.Sikao
         }
         internal void Sort()
         {
-            for (int i = 0; i < ShouPai.Count; i++)
-            {
-                for (int j = i + 1; j < ShouPai.Count; j++)
-                {
-                    if ((ShouPai[i] & QIAO_PAI) > (ShouPai[j] & QIAO_PAI))
-                    {
-                        (ShouPai[i], ShouPai[j]) = (ShouPai[j], ShouPai[i]);
-                    }
-                }
-            }
+            ShouPai.Sort((p1, p2) => (p1 & QIAO_PAI).CompareTo(p2 & QIAO_PAI));
         }
 
         // 自摸
-        internal void ZiMo(int p, bool isDaPaiHou = false)
+        internal void ZiMo(int p, bool daPaiHou = false)
         {
             ShouPai.Add(p);
-            DaPaiHou = isDaPaiHou;
+            DaPaiHou = daPaiHou;
         }
 
         // 打牌前

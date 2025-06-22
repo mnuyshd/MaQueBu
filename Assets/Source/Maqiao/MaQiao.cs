@@ -2527,7 +2527,7 @@ namespace Assets.Source.Maqiao
                 QiaoShi shi = Chang.QiaoShis[jia];
                 QiaoShi.YaoDingYi yao = shi.ZiJiaYao;
                 int xuanZe = shi.ZiJiaXuanZe;
-                DrawShouPai(jia, yao, xuanZe, shi.Player, shi.Follow);
+                DrawShouPai(jia, yao, xuanZe, shi.Follow);
             }
         }
 
@@ -2622,6 +2622,10 @@ namespace Assets.Source.Maqiao
 
             if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.AnGang || Chang.ZiJiaYao == QiaoShi.YaoDingYi.JiaGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.DaMingGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.Chi || Chang.TaJiaYao == QiaoShi.YaoDingYi.Bing)
             {
+                if (ziJiaShi.Follow)
+                {
+                    ziJiaShi.DaPaiHou = false;
+                }
                 yield return new WaitForSeconds(waitTime);
             }
 
@@ -2809,7 +2813,7 @@ namespace Assets.Source.Maqiao
                 // 打牌前
                 int dp = ziJiaShi.DaPaiQian();
                 isDuiJuDraw = true;
-                yield return new WaitForSeconds(waitTime);
+                yield return new WaitForSeconds(waitTime / 2);
                 // 打牌
                 ziJiaShi.DaPai(dp);
                 ziJiaShi.ShePaiChuLi(Chang.ZiJiaYao);
@@ -2820,7 +2824,7 @@ namespace Assets.Source.Maqiao
 
                 ziJiaShi.LiPai();
                 isDuiJuDraw = true;
-                yield return new WaitForSeconds(waitTime);
+                yield return new WaitForSeconds(waitTime / 2);
                 // 四風子連打処理
                 Chang.SiFengZiLianDaChuLi(Chang.ShePai);
                 // 四風子連打判定
@@ -3106,7 +3110,6 @@ namespace Assets.Source.Maqiao
                     {
                         shi.Xiao();
                     }
-                    isDuiJuDraw = true;
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
 
@@ -3126,7 +3129,6 @@ namespace Assets.Source.Maqiao
                     {
                         shi.Xiao();
                     }
-                    isDuiJuDraw = true;
                     // 四風子連打処理
                     Chang.SiFengZiLianDaChuLi(0xff);
 
@@ -3238,11 +3240,11 @@ namespace Assets.Source.Maqiao
                 {
                     if (shi.ZiJiaYao == QiaoShi.YaoDingYi.JiuZhongJiuPai || shi.ZiJiaYao == QiaoShi.YaoDingYi.ZiMo || shi.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi || shi.ZiJiaYao == QiaoShi.YaoDingYi.AnGang || shi.ZiJiaYao == QiaoShi.YaoDingYi.JiaGang)
                     {
-                        DrawShouPai(jia, QiaoShi.YaoDingYi.Wu, -1, shi.Player, false);
+                        DrawShouPai(jia, QiaoShi.YaoDingYi.Wu, -1);
                     }
                     else
                     {
-                        DrawShouPai(jia, yao, xuanZe, shi.Player, isZiJiaYaoDraw && shi.Follow);
+                        DrawShouPai(jia, yao, xuanZe, isZiJiaYaoDraw && shi.Follow);
                     }
                 }
                 else
@@ -3257,7 +3259,7 @@ namespace Assets.Source.Maqiao
                     }
                     else
                     {
-                        DrawShouPai(jia, yao, xuanZe, shi.Player, shi.Follow);
+                        DrawShouPai(jia, yao, xuanZe, shi.Follow);
                     }
                 }
 
@@ -3476,29 +3478,29 @@ namespace Assets.Source.Maqiao
             if (yao == QiaoShi.YaoDingYi.Wu)
             {
                 DrawZiJiaYao(shi, 0, 0, false, false);
-                DrawShouPai(jia, yao, -1, shi.Player, false);
+                DrawShouPai(jia, yao, -1);
                 DrawDaiPai(jia, -1);
             }
             else if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi)
             {
                 DrawZiJiaYao(shi, (mingWei + 1) % shi.LiZhiPaiWei.Count, ShouPaiWei, false, true);
-                DrawShouPai(jia, yao, mingWei, shi.Player, isFollow);
+                DrawShouPai(jia, yao, mingWei, isFollow);
                 DrawDaiPai(jia, shi.LiZhiPaiWei[mingWei]);
             }
             else if (yao == QiaoShi.YaoDingYi.AnGang && shi.AnGangPaiWei.Count > 1)
             {
                 DrawZiJiaYao(shi, (mingWei + 1) % shi.AnGangPaiWei.Count, ShouPaiWei, false, true);
-                DrawShouPai(jia, yao, mingWei, shi.Player, isFollow);
+                DrawShouPai(jia, yao, mingWei, isFollow);
             }
             else if (yao == QiaoShi.YaoDingYi.JiaGang && shi.JiaGangPaiWei.Count > 1)
             {
                 DrawZiJiaYao(shi, (mingWei + 1) % shi.JiaGangPaiWei.Count, ShouPaiWei, false, true);
-                DrawShouPai(jia, yao, mingWei, shi.Player, isFollow);
+                DrawShouPai(jia, yao, mingWei, isFollow);
             }
             else if (yao == QiaoShi.YaoDingYi.Select)
             {
                 DrawZiJiaYao(shi, mingWei, ShouPaiWei, true, false);
-                DrawShouPai(jia, yao, ShouPaiWei, shi.Player, isFollow);
+                DrawShouPai(jia, yao, ShouPaiWei, isFollow);
                 DrawDaiPai(jia, ShouPaiWei);
             }
             else
@@ -3612,7 +3614,7 @@ namespace Assets.Source.Maqiao
         }
 
         // 【描画】手牌
-        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei, bool isPlayerZiMo = false, bool isFollow = false)
+        private void DrawShouPai(int jia, QiaoShi.YaoDingYi yao, int mingWei, bool isFollow = false)
         {
             QiaoShi shi = Chang.QiaoShis[jia];
             ClearGameObject(ref shi.goShouPai);
@@ -3742,7 +3744,7 @@ namespace Assets.Source.Maqiao
                             shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.Wu, wei); });
                         }
                     }
-                    if (isPlayerZiMo && shi.ShouPai.Count - 1 == i && !shi.DaPaiHou)
+                    if (shi.ShouPai.Count - 1 == i && !shi.DaPaiHou)
                     {
                         x += pw / 5;
                     }
@@ -3750,7 +3752,7 @@ namespace Assets.Source.Maqiao
                     {
                         shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = (shi.XuanShangPaiPanDing(shi.ShouPai[i]) > 0) ? "▼" : "";
                     }
-                    if (sheDing.shouPaiDianBiaoShi && isPlayerZiMo && !shi.DaPaiHou)
+                    if (sheDing.shouPaiDianBiaoShi && !shi.DaPaiHou)
                     {
                         shi.goShouPai[i].GetComponentInChildren<TextMeshProUGUI>().text = shi.ShouPaiDian[i].ToString();
                     }
@@ -3863,7 +3865,7 @@ namespace Assets.Source.Maqiao
                 }
                 else
                 {
-                    DrawShouPai(jia, QiaoShi.YaoDingYi.Select, xuanZe, shi.Player, true);
+                    DrawShouPai(jia, QiaoShi.YaoDingYi.Select, xuanZe);
                     DrawDaiPai(jia, xuanZe);
                     return;
                 }
@@ -3872,7 +3874,7 @@ namespace Assets.Source.Maqiao
             {
                 shi.ZiJiaYao = QiaoShi.YaoDingYi.Wu;
                 shi.ZiJiaXuanZe = xuanZe;
-                DrawShouPai(jia, QiaoShi.YaoDingYi.Clear, 0, shi.Player, false);
+                DrawShouPai(jia, QiaoShi.YaoDingYi.Clear, 0);
             }
             keyPress = true;
         }
