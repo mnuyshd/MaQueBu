@@ -2606,7 +2606,8 @@ namespace Assets.Source.Maqiao
 
             isPlayerYao = false;
 
-            QiaoShi.YaoDingYi qianTaJiaYao = Chang.TaJiaYao;
+            QiaoShi.YaoDingYi changZiJiaYao = Chang.ZiJiaYao;
+            QiaoShi.YaoDingYi changTaJiaYao = Chang.TaJiaYao;
 
             QiaoShi ziJiaShi = Chang.QiaoShis[Chang.ZiMoFan];
             if ((Chang.ZiJiaYao == QiaoShi.YaoDingYi.Wu || Chang.ZiJiaYao == QiaoShi.YaoDingYi.LiZhi) && Chang.TaJiaYao == QiaoShi.YaoDingYi.Wu)
@@ -2840,7 +2841,25 @@ namespace Assets.Source.Maqiao
                 }
             }
 
-            if (qianTaJiaYao == QiaoShi.YaoDingYi.DaMingGang)
+            if (changZiJiaYao == QiaoShi.YaoDingYi.JiaGang)
+            {
+                // 加槓成立
+                // 嶺上牌処理
+                Pai.LingShangPaiChuLi();
+                // 四開槓判定
+                if (Pai.SiKaiGangPanDing())
+                {
+                    isSiKaiGangDraw = true;
+                    tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
+                    isZiJiaYaoDraw = false;
+                    isDuiJuDraw = true;
+                    yield return Pause(ForwardMode.FAST_FORWARD);
+                    eventStatus = Event.DIAN_BIAO_SHI;
+                    yield break;
+                }
+            }
+
+            if (changTaJiaYao == QiaoShi.YaoDingYi.DaMingGang)
             {
                 // 大明槓成立
                 // 嶺上牌処理
@@ -3045,7 +3064,7 @@ namespace Assets.Source.Maqiao
                     break;
 
                 case QiaoShi.YaoDingYi.JiaGang:
-                    // 加槓成立
+                    // 加槓
                     // 消
                     foreach (QiaoShi shi in Chang.QiaoShis)
                     {
@@ -3053,19 +3072,6 @@ namespace Assets.Source.Maqiao
                     }
                     // 加槓処理
                     Pai.QiangGangChuLi();
-                    // 嶺上牌処理
-                    Pai.LingShangPaiChuLi();
-                    // 四開槓判定
-                    if (Pai.SiKaiGangPanDing())
-                    {
-                        isSiKaiGangDraw = true;
-                        tingPaiLianZhuang = Chang.guiZe.siKaiGangLianZhuang == 0 ? Zhuang.LIAN_ZHUANG : Zhuang.LUN_ZHUANG;
-                        isZiJiaYaoDraw = false;
-                        isDuiJuDraw = true;
-                        yield return Pause(ForwardMode.FAST_FORWARD);
-                        eventStatus = Event.DIAN_BIAO_SHI;
-                        yield break;
-                    }
                     eventStatus = Event.DUI_JU;
                     isDuiJuCoroutine = false;
                     isDuiJuDraw = true;
@@ -4555,6 +4561,8 @@ namespace Assets.Source.Maqiao
             {
                 eventStatus = Event.PEI_PAI;
             }
+
+            Chang.DianGiSuanGongTuo();
 
             isDianBiaoShiCoroutine = false;
         }

@@ -330,7 +330,6 @@ namespace Assets.Source.Gongtong
                 // 供託
                 QiaoShis[ZiMoFan].DianBangJiSuan(GongTuo);
                 QiaoShis[ZiMoFan].ShouQuGongTuoJiSuan(GongTuo);
-                GongTuo = 0;
                 // 記録 和了数
                 QiaoShis[ZiMoFan].JiLu.heLeShu++;
                 return;
@@ -373,7 +372,6 @@ namespace Assets.Source.Gongtong
                     // 記録 放銃点
                     QiaoShis[ZiMoFan].JiLu.fangChongDian += QiaoShis[RongHeFan[i].fan].HeLeDian;
                 }
-                GongTuo = 0;
                 return;
             }
 
@@ -423,6 +421,24 @@ namespace Assets.Source.Gongtong
                 {
                     shi.DianBangJiSuan(-3000 / (QiaoShis.Count - xingTingShu));
                 }
+            }
+        }
+
+        // 供託計算
+        internal static void DianGiSuanGongTuo()
+        {
+            int cuHe = 1;
+            for (int i = ZiMoFan + 1; i < ZiMoFan + QiaoShis.Count; i++)
+            {
+                QiaoShi shi = QiaoShis[i % QiaoShis.Count];
+                if (shi.CuHeSheng != "")
+                {
+                    cuHe = -1;
+                }
+            }
+            if (ZiJiaYao == QiaoShi.YaoDingYi.ZiMo || cuHe == -1 || TaJiaYao == QiaoShi.YaoDingYi.RongHe)
+            {
+                GongTuo = 0;
             }
         }
 
