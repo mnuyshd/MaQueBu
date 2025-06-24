@@ -2951,7 +2951,7 @@ namespace Assets.Source.Maqiao
                         isDuiJuDraw = true;
                         yield return Pause(ForwardMode.NORMAL);
                         ClearGameObject(ref goYao);
-                        if (Chang.RongHeFan.Count == 0)
+                        if (Chang.RongHeFan.Count == 0 && taJiaShi.TaJiaYao != QiaoShi.YaoDingYi.Wu)
                         {
                             Chang.TaJiaYao = taJiaShi.TaJiaYao;
                             Chang.TaJiaXuanZe = taJiaShi.TaJiaXuanZe;
@@ -4091,7 +4091,10 @@ namespace Assets.Source.Maqiao
         // 【描画】吃
         private void DrawChi(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.Chi));
+            if (!isTaJiaYaoDraw)
+            {
+                DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.Chi));
+            }
         }
 
         // 【描画】四風子連打
