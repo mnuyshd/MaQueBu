@@ -941,7 +941,7 @@ namespace Assets.Source.Sikao
                     gangShu++;
                 }
             }
-            if (fengShu == 3 || sanYuanShu == 2 || gangShu == 3)
+            if (fengShu == 4 || sanYuanShu == 3 || gangShu == 4)
             {
                 (List<int> pais, int jia, YaoDingYi yao) = FuLuPai[^1];
                 if (yao == YaoDingYi.DaMingGang || yao == YaoDingYi.Bing)

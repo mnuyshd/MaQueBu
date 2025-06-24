@@ -3710,7 +3710,7 @@ namespace Assets.Source.Maqiao
                     }
                     if (yao == QiaoShi.YaoDingYi.Wu && mingWei >= -1)
                     {
-                        if (isFollow && mingWei == i && !shi.DaPaiHou)
+                        if (isFollow && mingWei == i && isZiJiaYaoDraw &&!shi.DaPaiHou)
                         {
                             shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
                             yy = y + margin;
