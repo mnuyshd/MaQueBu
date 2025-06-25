@@ -606,7 +606,6 @@ namespace Assets.Source.Sikao
                 }
                 if (shi.KaiLiZhi)
                 {
-                    shi.KaiLiZhiTingPaiPanDing();
                     if (shi.ZhenTingPanDing())
                     {
                         continue;

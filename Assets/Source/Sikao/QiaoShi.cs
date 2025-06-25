@@ -645,6 +645,8 @@ namespace Assets.Source.Sikao
 
             ZiJiaYao = YaoDingYi.Wu;
             ZiJiaXuanZe = ShouPai.Count - 1;
+            TaJiaYao = YaoDingYi.Wu;
+            TaJiaXuanZe = 0;
 
             // 初期化
             SiKaoQianChuQiHua();
@@ -839,7 +841,7 @@ namespace Assets.Source.Sikao
             }
         }
 
-        // 立直
+        // 立直処理
         internal void LiZhiChuLi()
         {
             if (ShePai.Count == 0)
@@ -849,6 +851,16 @@ namespace Assets.Source.Sikao
             LiZhiWei = ShePai.Count;
             LiZhi = true;
             YiFa = true;
+        }
+
+        // 開立直処理
+        internal void KaiLiZhiChuLi()
+        {
+            if (ZiJiaYao == YaoDingYi.KaiLiZhi)
+            {
+                KaiLiZhi = true;
+                ZiJiaYao = YaoDingYi.LiZhi;
+            }
         }
 
         // 暗槓
@@ -1447,13 +1459,8 @@ namespace Assets.Source.Sikao
 
             // 手牌数計算(向聴数計算で手牌の一番右を切った状態で手牌数を計算して終わるので、再度 手牌数を計算しておく)
             ShouPaiShuJiSuan();
-
         }
-        internal void XiangTingShuJiSuan(int wei)
-        {
-            XiangTingShuJiSuan(wei, 0);
-        }
-        internal void XiangTingShuJiSuan(int wei, int plusMianZiShu)
+        internal void XiangTingShuJiSuan(int wei, int plusMianZiShu = 0)
         {
             XiangTingShu = 99;
             int xiang;
@@ -1784,7 +1791,6 @@ namespace Assets.Source.Sikao
         // 振聴判定
         internal bool ZhenTingPanDing()
         {
-            DaiPaiJiSuan(true);
             foreach (int dp in DaiPai)
             {
                 // 振聴
@@ -1852,17 +1858,6 @@ namespace Assets.Source.Sikao
 
                 ShouPai = new(shouPaiC);
             }
-        }
-
-        // 開立直聴牌判定
-        internal void KaiLiZhiTingPaiPanDing()
-        {
-            if (!KaiLiZhi)
-            {
-                return;
-            }
-
-            DaiPaiJiSuan(false);
         }
 
         // 暗槓判定
@@ -3925,9 +3920,12 @@ namespace Assets.Source.Sikao
                 GongKaiPaiShu[pai & QIAO_PAI]++;
             }
             // 手牌
-            foreach (int pai in ShouPai)
+            if (!KaiLiZhi)
             {
-                GongKaiPaiShu[pai & QIAO_PAI]++;
+                foreach (int pai in ShouPai)
+                {
+                    GongKaiPaiShu[pai & QIAO_PAI]++;
+                }
             }
         }
 
@@ -3965,7 +3963,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.JiaGang:
                         // 加槓
                         if (JiaGangPaiWei.Count <= ZiJiaXuanZe)
@@ -3974,7 +3971,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.AnGang:
                         // 暗槓
                         if (AnGangPaiWei.Count <= ZiJiaXuanZe)
@@ -3983,7 +3979,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.ZiMo:
                         // 自摸
                         if (!HeLe)
@@ -3992,7 +3987,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     default:
                         CuHeSheng = "立直後腰間違い";
                         return true;
@@ -4011,7 +4005,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.JiaGang:
                         // 加槓
                         if (JiaGangPaiWei.Count <= ZiJiaXuanZe)
@@ -4020,7 +4013,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.AnGang:
                         // 暗槓
                         if (AnGangPaiWei.Count <= ZiJiaXuanZe)
@@ -4029,7 +4021,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.LiZhi:
                         // 立直
                         if (TaJiaFuLuShu > 0)
@@ -4043,7 +4034,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.ZiMo:
                         // 自摸
                         if (!HeLe)
@@ -4052,7 +4042,6 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
                     case YaoDingYi.JiuZhongJiuPai:
                         // 九種九牌
                         if (!JiuZhongJiuPai || Chang.guiZe.jiuZhongJiuPaiLianZhuang == 0)
@@ -4061,7 +4050,13 @@ namespace Assets.Source.Sikao
                             return true;
                         }
                         break;
-
+                    case YaoDingYi.KaiLiZhi:
+                        if (!Chang.guiZe.kaiLiZhi)
+                        {
+                            CuHeSheng = "開立直不可";
+                            return true;
+                        }
+                        break;
                     default:
                         CuHeSheng = "腰間違い";
                         return true;
@@ -4077,7 +4072,6 @@ namespace Assets.Source.Sikao
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -4104,7 +4098,6 @@ namespace Assets.Source.Sikao
                         return true;
                     }
                     break;
-
                 case YaoDingYi.Bing:
                     // 石並
                     if (BingPaiWei.Count <= TaJiaXuanZe)
@@ -4113,7 +4106,6 @@ namespace Assets.Source.Sikao
                         return true;
                     }
                     break;
-
                 case YaoDingYi.DaMingGang:
                     // 大明槓
                     if (DaMingGangPaiWei.Count <= TaJiaXuanZe)
@@ -4122,7 +4114,6 @@ namespace Assets.Source.Sikao
                         return true;
                     }
                     break;
-
                 case YaoDingYi.RongHe:
                     // 栄和
                     if (!HeLe)
@@ -4136,7 +4127,6 @@ namespace Assets.Source.Sikao
                         return true;
                     }
                     break;
-
                 default:
                     CuHeSheng = "腰間違い";
                     return true;
