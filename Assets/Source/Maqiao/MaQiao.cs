@@ -636,7 +636,7 @@ namespace Assets.Source.Maqiao
             y -= offset;
             DrawToggleOption(() => sheDing.mingQuXiao, v => sheDing.mingQuXiao = v, new string[] { "鳴パスはボタン", "鳴パスはタップ" }, new Vector2(-x, y), len);
             y -= offset;
-            DrawXiangShouPaiOpen(() => sheDing.xiangShouPaiOpen, v => sheDing.xiangShouPaiOpen = v, new string[] { "相手牌オープン", "相手牌クローズ" }, new Vector2(-x, y), len);
+            DrawToggleOption(() => sheDing.xiangShouPaiOpen, v => sheDing.xiangShouPaiOpen = v, new string[] { "相手牌オープン", "相手牌クローズ" }, new Vector2(-x, y), len);
             DrawToggleOption(() => sheDing.shouPaiDianBiaoShi, v => sheDing.shouPaiDianBiaoShi = v, new string[] { "手牌点表示有り", "手牌点表示無し" }, new Vector2(x, y), len);
             y -= offset;
             DrawToggleOption(() => sheDing.learningData, v => sheDing.learningData = v, new string[] { "学習データ有り", "学習データ無し" }, new Vector2(-x, y), len);
@@ -651,7 +651,7 @@ namespace Assets.Source.Maqiao
         }
 
         // トグルボタン描画メソッド
-        private void DrawToggleButton<T>(Func<T> getValue, Action<T> setValue, Func<T, string> getText, Func<T, T> toggleValue, Vector2 xy, int len, Action onToggle = null)
+        private void DrawToggleButton<T>(Func<T> getValue, Action<T> setValue, Func<T, string> getText, Func<T, T> toggleValue, Vector2 xy, int len)
         {
             Button button = Instantiate(goButton, goSettingPanel.transform);
             string displayText = getText(getValue());
@@ -662,11 +662,18 @@ namespace Assets.Source.Maqiao
                 T newValue = toggleValue(getValue());
                 setValue(newValue);
                 text.text = getText(newValue);
-                onToggle?.Invoke();
                 File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
+
+                switch (eventStatus)
+                {
+                    case Event.PEI_PAI:
+                    case Event.DUI_JU:
+                    case Event.DUI_JU_ZHONG_LE:
+                        isDuiJuDraw = true;
+                        break;
+                }
             });
         }
-
         private void DrawToggleOption(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
         {
             DrawToggleButton(getValue, setValue, v => v ? textOnOff[0] : textOnOff[1], v => !v, xy, len);
@@ -674,20 +681,6 @@ namespace Assets.Source.Maqiao
         private void DrawToggleOption(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy, int len)
         {
             DrawToggleButton(getValue, setValue, v => textOnOff[v], v => (v + 1) % textOnOff.Length, xy, len);
-        }
-        private void DrawXiangShouPaiOpen(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
-        {
-            DrawToggleButton(getValue, setValue, v => v ? textOnOff[0] : textOnOff[1], v => !v, xy, len, () =>
-            {
-                switch (eventStatus)
-                {
-                    case Event.PEI_PAI:
-                    case Event.DUI_JU:
-                    case Event.DUI_JU_ZHONG_LE:
-                        DrawDuiJu();
-                        break;
-                }
-            });
         }
 
         // 設定オプションのリセット
@@ -3710,7 +3703,7 @@ namespace Assets.Source.Maqiao
                     }
                     if (yao == QiaoShi.YaoDingYi.Wu && mingWei >= -1)
                     {
-                        if (isFollow && mingWei == i && isZiJiaYaoDraw &&!shi.DaPaiHou)
+                        if (isFollow && mingWei == i && isZiJiaYaoDraw && !shi.DaPaiHou)
                         {
                             shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
                             yy = y + margin;
