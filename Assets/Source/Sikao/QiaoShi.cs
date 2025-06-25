@@ -809,23 +809,13 @@ namespace Assets.Source.Sikao
                 }
             }
         }
-        internal void DaiPaiJiSuan(bool isZiMo)
+
+        // 待牌・向聴数計算
+        internal void DaiPaiXiangTingShuJiSuan(int xuanZe)
         {
-            List<int> shouPaiC = new(ShouPai);
-            DaiPai = new();
-            if (!isZiMo)
-            {
-                ShouPai.Add(0xff);
-            }
-            foreach (int p in Pai.QiaoPai)
-            {
-                ShouPai[^1] = p;
-                if (HeLePanDing() == Ting.TingPai)
-                {
-                    DaiPai.Add(p);
-                }
-            }
-            ShouPai = new(shouPaiC);
+            DaiPaiJiSuan(xuanZe);
+            GongKaiPaiShuJiSuan();
+            XiangTingShuJiSuan(xuanZe);
         }
 
         // 和了処理
@@ -3878,7 +3868,7 @@ namespace Assets.Source.Sikao
             Init(GongKaiPaiShu, 0);
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                if (shi.KaiLiZhi)
+                if (shi.KaiLiZhi && shi.Feng != Feng)
                 {
                     // 開立直の場合、手牌
                     foreach (int sp in ShouPai)
@@ -3920,12 +3910,9 @@ namespace Assets.Source.Sikao
                 GongKaiPaiShu[pai & QIAO_PAI]++;
             }
             // 手牌
-            if (!KaiLiZhi)
+            foreach (int pai in ShouPai)
             {
-                foreach (int pai in ShouPai)
-                {
-                    GongKaiPaiShu[pai & QIAO_PAI]++;
-                }
+                GongKaiPaiShu[pai & QIAO_PAI]++;
             }
         }
 
