@@ -3871,7 +3871,7 @@ namespace Assets.Source.Sikao
                 if (shi.KaiLiZhi && shi.Feng != Feng)
                 {
                     // 開立直の場合、手牌
-                    foreach (int sp in ShouPai)
+                    foreach (int sp in shi.ShouPai)
                     {
                         int p = sp & QIAO_PAI;
                         GongKaiPaiShu[p]++;

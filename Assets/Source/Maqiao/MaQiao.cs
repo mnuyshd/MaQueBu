@@ -3256,88 +3256,55 @@ namespace Assets.Source.Maqiao
                     // 流し満貫
                     if (shi.LiuShiManGuan)
                     {
-                        DrawLiuManGuan(jia);
-                    }
-                    else if (shi.XingTing)
-                    {
-                        DrawTingPai(jia);
+                        DrawSheng(jia, QiaoShi.YaoDingYi.LiuManGuan);
                     }
                     else
                     {
-                        DrawBuTing(jia);
+                        DrawSheng(jia, shi.XingTing ? QiaoShi.YaoDingYi.TingPai : QiaoShi.YaoDingYi.BuTing);
                     }
                 }
             }
-
             // 声
-            switch (Chang.ZiJiaYao)
-            {
-                case QiaoShi.YaoDingYi.ZiMo:
-                    DrawZiMo(Chang.ZiMoFan);
-                    break;
-                case QiaoShi.YaoDingYi.JiuZhongJiuPai:
-                    DrawJiuZhongJiuPai(Chang.ZiMoFan);
-                    break;
-                case QiaoShi.YaoDingYi.AnGang:
-                    DrawAnGang(Chang.ZiMoFan);
-                    break;
-                case QiaoShi.YaoDingYi.LiZhi:
-                    DrawLiZi(Chang.ZiMoFan);
-                    break;
-                case QiaoShi.YaoDingYi.JiaGang:
-                    DrawJiaGang(Chang.ZiMoFan);
-                    break;
-            }
-            switch (Chang.TaJiaYao)
-            {
-                case QiaoShi.YaoDingYi.DaMingGang:
-                    DrawDaMingGang(Chang.MingFan);
-                    break;
-                case QiaoShi.YaoDingYi.Bing:
-                    DrawBing(Chang.MingFan);
-                    break;
-                case QiaoShi.YaoDingYi.Chi:
-                    DrawChi(Chang.MingFan);
-                    break;
-            }
+            DrawSheng(Chang.ZiMoFan, Chang.ZiJiaYao);
+            DrawSheng(Chang.MingFan, Chang.TaJiaYao);
             // 四家立直
             if (Chang.SiJiaLiZhiPanDing())
             {
-                DrawSiJiaLiZhi(Chang.ZiMoFan);
+                DrawSheng(Chang.ZiMoFan, QiaoShi.YaoDingYi.SiJiaLiZhi);
             }
             // 四開槓
             if (Pai.SiKaiGangPanDing())
             {
-                DrawSiKaiGangPanDing(Chang.ZiMoFan);
+                DrawSheng(Chang.ZiMoFan, QiaoShi.YaoDingYi.SiJiaLiZhi);
             }
             // 四風子連打
             if (Chang.SiFengZiLianDaPanDing())
             {
-                DrawSiFengZiLianDa(Chang.ZiMoFan);
+                DrawSheng(Chang.ZiMoFan, QiaoShi.YaoDingYi.SiFengZiLianDa);
             }
             // 栄和
             if (Chang.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
             {
                 foreach ((int fan, _) in Chang.RongHeFan)
                 {
-                    DrawRongHe(fan);
+                    DrawSheng(fan, QiaoShi.YaoDingYi.RongHe);
                 }
                 if (Chang.RongHeFan.Count == 3)
                 {
                     if (Chang.guiZe.tRongHe == 0)
                     {
-                        DrawShang(Chang.MingFan, "ロン(頭ハネ)");
+                        DrawSheng(Chang.MingFan, "ロン(頭ハネ)");
                     }
                     else if (Chang.guiZe.tRongHe >= 2)
                     {
-                        DrawShang(Chang.RongHeFan[2].fan, "ロン(流局)");
+                        DrawSheng(Chang.RongHeFan[2].fan, "ロン(流局)");
                     }
                 }
                 else if (Chang.RongHeFan.Count == 2)
                 {
                     if (Chang.guiZe.tRongHe == 0)
                     {
-                        DrawShang(Chang.MingFan, "ロン(頭ハネ)");
+                        DrawSheng(Chang.MingFan, "ロン(頭ハネ)");
                     }
                 }
             }
@@ -3973,7 +3940,21 @@ namespace Assets.Source.Maqiao
         }
 
         // 【描画】声
-        private void DrawShang(int jia, string text)
+        private void DrawSheng(int jia, QiaoShi.YaoDingYi yao)
+        {
+            if (yao == QiaoShi.YaoDingYi.Wu || (yao == QiaoShi.YaoDingYi.Chi && isTaJiaYaoDraw))
+            {
+                return;
+            }
+            string text = QiaoShi.YaoMing(yao);
+            QiaoShi shi = Chang.QiaoShis[jia];
+            if (yao == QiaoShi.YaoDingYi.LiZhi && shi.KaiLiZhi)
+            {
+                text = QiaoShi.YaoMing(QiaoShi.YaoDingYi.KaiLiZhi);
+            }
+            DrawSheng(jia, text);
+        }
+        private void DrawSheng(int jia, string text)
         {
             QiaoShi shi = Chang.QiaoShis[jia];
             if (goSheng[jia] == null)
@@ -3994,111 +3975,10 @@ namespace Assets.Source.Maqiao
             rt.sizeDelta = new Vector2(goText.preferredWidth + paiWidth / 2, rt.sizeDelta.y);
         }
 
-        // 【描画】自摸
-        private void DrawZiMo(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.ZiMo));
-        }
-
-        // 【描画】九種九牌
-        private void DrawJiuZhongJiuPai(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.JiuZhongJiuPai));
-        }
-
-        // 【描画】立直
-        private void DrawLiZi(int jia)
-        {
-            QiaoShi shi = Chang.QiaoShis[jia];
-            if (shi.KaiLiZhi)
-            {
-                DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.KaiLiZhi));
-            }
-            else
-            {
-                DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.LiZhi));
-            }
-        }
-
-        // 【描画】暗槓
-        private void DrawAnGang(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.AnGang));
-        }
-
-        // 【描画】流し満貫
-        private void DrawLiuManGuan(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.LiuManGuan));
-        }
-
-        // 【描画】四開槓
-        private void DrawSiKaiGangPanDing(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.SiKaiGang));
-        }
-
-        // 【描画】加槓
-        private void DrawJiaGang(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.JiaGang));
-        }
-
-        // 【描画】大明槓
-        private void DrawDaMingGang(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.DaMingGang));
-        }
-
-        // 【描画】石並
-        private void DrawBing(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.Bing));
-        }
-
-        // 【描画】吃
-        private void DrawChi(int jia)
-        {
-            if (!isTaJiaYaoDraw)
-            {
-                DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.Chi));
-            }
-        }
-
-        // 【描画】四風子連打
-        private void DrawSiFengZiLianDa(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.SiFengZiLianDa));
-        }
-
-        // 【描画】四家立直
-        private void DrawSiJiaLiZhi(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.SiJiaLiZhi));
-        }
-
-        // 【描画】栄和
-        private void DrawRongHe(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.RongHe));
-        }
-
-        // 【描画】聴牌
-        private void DrawTingPai(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.TingPai));
-        }
-
-        // 【描画】不聴
-        private void DrawBuTing(int jia)
-        {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.BuTing));
-        }
-
         // 【描画】錯和
         private void DrawCuHe(int jia)
         {
-            DrawShang(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.CuHe) + " " + Chang.QiaoShis[Chang.CuHeFan].CuHeSheng);
+            DrawSheng(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.CuHe) + " " + Chang.QiaoShis[Chang.CuHeFan].CuHeSheng);
             DrawShouPai(jia, QiaoShi.YaoDingYi.CuHe, 0);
         }
 
