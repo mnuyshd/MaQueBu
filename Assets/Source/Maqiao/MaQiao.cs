@@ -2777,7 +2777,7 @@ namespace Assets.Source.Maqiao
                 isDuiJuDraw = true;
                 yield return new WaitForSeconds(waitTime / 2);
                 // 打牌
-                ziJiaShi.DaPai(dp);
+                ziJiaShi.DaPai(dp, changZiJiaYao, changTaJiaYao);
                 ziJiaShi.ShePaiChuLi(Chang.ZiJiaYao);
 
                 ziJiaShi.TaJiaYao = QiaoShi.YaoDingYi.Wu;

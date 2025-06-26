@@ -766,7 +766,7 @@ namespace Assets.Source.Sikao
             return p;
         }
         // 打牌
-        internal void DaPai(int p)
+        internal void DaPai(int p, YaoDingYi ziJiaYao = YaoDingYi.Wu, YaoDingYi taJiaYao = YaoDingYi.Wu)
         {
             Chang.ShePai = p;
             ShePaiShu[p & QIAO_PAI]++;
@@ -782,7 +782,7 @@ namespace Assets.Source.Sikao
             bool ziMoQie = false;
             if (ZiJiaXuanZe == ShouPai.Count)
             {
-                if (ZiJiaYao == YaoDingYi.Wu || ZiJiaYao == YaoDingYi.LiZhi)
+                if (ziJiaYao != YaoDingYi.AnGang && ziJiaYao != YaoDingYi.JiaGang && taJiaYao != YaoDingYi.Chi && taJiaYao != YaoDingYi.Bing && taJiaYao != YaoDingYi.DaMingGang)
                 {
                     ziMoQie = true;
                 }
