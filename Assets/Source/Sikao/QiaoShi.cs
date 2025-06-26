@@ -2079,40 +2079,40 @@ namespace Assets.Source.Sikao
             return false;
         }
 
-        // 鳴選択
-        protected int MingXuanZe(List<List<int>> paiWei)
-        {
-            // 向聴数計算
-            XiangTingShuJiSuan(-1);
-            int xiangTing = XiangTingShu;
-            int xuanZe = -1;
-            for (int i = 0; i < paiWei.Count; i++)
-            {
-                List<int> shouPaiC = new(ShouPai);
-                for (int j = 0; j < paiWei[i].Count; j++)
-                {
-                    ShouPai[paiWei[i][j]] = 0xff;
-                }
-                LiPai();
-                int minXiangTing = 99;
-                for (int j = 0; j < ShouPai.Count - paiWei[i].Count; j++)
-                {
-                    // 向聴数計算(副露牌は処理していない状態なので面子数を1加算して計算)
-                    XiangTingShuJiSuan(j, 1);
-                    if (minXiangTing > XiangTingShu)
-                    {
-                        minXiangTing = XiangTingShu;
-                    }
-                }
-                if (xiangTing > minXiangTing)
-                {
-                    xiangTing = minXiangTing;
-                    xuanZe = i;
-                }
-                ShouPai = new(shouPaiC);
-            }
-            return xuanZe;
-        }
+        // // 鳴選択
+        // protected int MingXuanZe(List<List<int>> paiWei)
+        // {
+        //     // 向聴数計算
+        //     XiangTingShuJiSuan(-1);
+        //     int xiangTing = XiangTingShu;
+        //     int xuanZe = -1;
+        //     for (int i = 0; i < paiWei.Count; i++)
+        //     {
+        //         List<int> shouPaiC = new(ShouPai);
+        //         for (int j = 0; j < paiWei[i].Count; j++)
+        //         {
+        //             ShouPai[paiWei[i][j]] = 0xff;
+        //         }
+        //         LiPai();
+        //         int minXiangTing = 99;
+        //         for (int j = 0; j < ShouPai.Count - paiWei[i].Count; j++)
+        //         {
+        //             // 向聴数計算(副露牌は処理していない状態なので面子数を1加算して計算)
+        //             XiangTingShuJiSuan(j, 1);
+        //             if (minXiangTing > XiangTingShu)
+        //             {
+        //                 minXiangTing = XiangTingShu;
+        //             }
+        //         }
+        //         if (xiangTing > minXiangTing)
+        //         {
+        //             xiangTing = minXiangTing;
+        //             xuanZe = i;
+        //         }
+        //         ShouPai = new(shouPaiC);
+        //     }
+        //     return xuanZe;
+        // }
 
         // 食替牌判定
         private void ShiTiPaiPanDing()

@@ -2634,7 +2634,7 @@ namespace Assets.Source.Maqiao
                 isZiJiaYaoDraw = true;
                 if (!(sheDing.liZhiAuto && ziJiaShi.LiZhi) || ziJiaShi.HeLe || ziJiaShi.AnGangPaiWei.Count > 0 || ziJiaShi.JiaGangPaiWei.Count > 0)
                 {
-                    if (ziJiaShi.Follow && ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.Wu)
+                    if (ziJiaShi.Follow)
                     {
                         ziJiaShi.DaiPaiXiangTingShuJiSuan(ziJiaShi.ZiJiaXuanZe);
                     }
