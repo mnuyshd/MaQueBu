@@ -353,10 +353,7 @@ namespace Assets.Source.Maqiao
             goLine = GameObject.Find("Line").GetComponent<Image>();
             // スクリーン
             goScreen = GameObject.Find("Screen").GetComponent<Button>();
-            goScreen.onClick.AddListener(delegate
-            {
-                OnClickScreen();
-            });
+            goScreen.onClick.AddListener(() => OnClickScreen());
             goScreen.transform.SetSiblingIndex(10);
             // スライダー
             goSlider = GameObject.Find("Slider").GetComponent<Slider>();
@@ -364,6 +361,7 @@ namespace Assets.Source.Maqiao
             goButton = GameObject.Find("Button").GetComponent<Button>();
             goPai = GameObject.Find("Pai").GetComponent<Button>();
             goYao = new Button[5];
+            goBack = GameObject.Find("Back").GetComponent<Button>();
             // 牌
             goPais = new GameObject[0xff];
             goPais[0x00] = GameObject.Find("0x00");
@@ -377,14 +375,10 @@ namespace Assets.Source.Maqiao
                 goPais[cp] = GameObject.Find("0x" + cp.ToString("x2"));
             }
             // プレイヤー以外の手牌画像作成
-            Sprite sprite = GameObject.Find("0x00").GetComponent<SpriteRenderer>().sprite;
-            int spriteHeight = sprite.texture.height;
-            int spriteWidth = sprite.texture.width;
-            int tHeight = spriteHeight / 7;
-            Rect rect = new(0, spriteHeight - tHeight, spriteWidth, tHeight);
-            Texture2D texture = new(spriteWidth, tHeight);
-            Color[] pixels = sprite.texture.GetPixels((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
-            texture.SetPixels(pixels);
+            Sprite sprite = goPais[0x00].GetComponent<SpriteRenderer>().sprite;
+            int tHeight = sprite.texture.height / 7;
+            Texture2D texture = new(sprite.texture.width, tHeight);
+            texture.SetPixels(sprite.texture.GetPixels(0, sprite.texture.height - tHeight, sprite.texture.width, tHeight));
             texture.Apply();
             goJiXieShouPai = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             // 点棒
@@ -395,10 +389,10 @@ namespace Assets.Source.Maqiao
             goSpeech = GameObject.Find("Speech").GetComponent<Button>();
             // 起家マーク
             goQiJias = new GameObject[4];
-            goQiJias[0] = GameObject.Find("QiJiaDong");
-            goQiJias[1] = GameObject.Find("QiJiaNan");
-            goQiJias[2] = GameObject.Find("QiJiaXi");
-            goQiJias[3] = GameObject.Find("QiJiaBei");
+            for (int i = 0; i < goQiJias.Length; i++)
+            {
+                goQiJias[i] = GameObject.Find($"QiJia{new[] { "Dong", "Nan", "Xi", "Bei" }[i]}");
+            }
             // サイコロ
             goSais = new GameObject[6];
             for (int i = 0; i < goSais.Length; i++)
@@ -409,37 +403,27 @@ namespace Assets.Source.Maqiao
             // scale設定
             SetScale();
 
-            TextMeshProUGUI text = goText.GetComponent<TextMeshProUGUI>();
-            RectTransform rtText = text.rectTransform;
-            rtText.localScale *= scale.x;
-
-            RectTransform rtButton = goButton.GetComponent<RectTransform>();
-            TextMeshProUGUI buttonText = goButton.GetComponentInChildren<TextMeshProUGUI>();
-            RectTransform rtFrame = goFrame.rectTransform;
-            rtFrame.localScale *= scale.x;
-
-            RectTransform rtLine = goLine.GetComponent<RectTransform>();
-            rtLine.localScale *= scale.x;
-
-            RectTransform rtSlider = goSlider.GetComponent<RectTransform>();
-            rtSlider.localScale *= scale.x;
-
-            // ボタンのスケールとサイズを設定
-            rtButton.localScale *= scale.x;
-            rtButton.sizeDelta = new Vector2(buttonText.rectTransform.rect.size.x, rtButton.sizeDelta.y);
+            goText.rectTransform.localScale *= scale.x;
+            goFrame.rectTransform.localScale *= scale.x;
+            goLine.rectTransform.localScale *= scale.x;
             goDianBang100.rectTransform.localScale *= scale.x;
             goDianBang1000.rectTransform.localScale *= scale.x;
+            goSlider.GetComponent<RectTransform>().localScale *= scale.x;
             goSpeech.GetComponent<RectTransform>().localScale *= scale.x;
-            for (int i = 0; i < goQiJias.Length; i++)
-            {
-                goQiJias[i].GetComponent<RectTransform>().localScale *= scale.x;
-            }
-            for (int i = 0; i < goSais.Length; i++)
-            {
-                goSais[i].GetComponent<RectTransform>().localScale *= scale.x;
-            }
 
-            goBack = GameObject.Find("Back").GetComponent<Button>();
+            // ボタンのスケールとサイズを設定
+            RectTransform rtButton = goButton.GetComponent<RectTransform>();
+            TextMeshProUGUI buttonText = goButton.GetComponentInChildren<TextMeshProUGUI>();
+            rtButton.localScale *= scale.x;
+            rtButton.sizeDelta = new Vector2(buttonText.rectTransform.rect.size.x, rtButton.sizeDelta.y);
+            foreach (var obj in goQiJias)
+            {
+                obj.GetComponent<RectTransform>().localScale *= scale.x;
+            }
+            foreach (var obj in goSais)
+            {
+                obj.GetComponent<RectTransform>().localScale *= scale.x;
+            }
 
             // デバッグボタン
             DrawDebugOption();
@@ -457,7 +441,7 @@ namespace Assets.Source.Maqiao
         // scale設定
         private void SetScale()
         {
-            float w = (Screen.safeArea.height < Screen.safeArea.width) ? Screen.safeArea.height : Screen.safeArea.width;
+            float w = Mathf.Min(Screen.safeArea.height, Screen.safeArea.width);
             RectTransform rtPai = goPai.GetComponent<RectTransform>();
             w = w / 20f / rtPai.rect.width;
             scale = new(w, w, w);
@@ -466,23 +450,14 @@ namespace Assets.Source.Maqiao
             if (paiWidth * 5f > Math.Abs(Screen.safeArea.width - Screen.safeArea.height) / 2)
             {
                 // 縦横の長さの差が牌5枚以内の場合、牌16枚分の大きさに縮小する
-                w = paiWidth * 16f;
-                w = w / 20f / rtPai.rect.width;
+                w = paiWidth * 16f / 20f / rtPai.rect.width;
                 scale = new(w, w, w);
                 goPai.transform.localScale = scale;
                 paiWidth = rtPai.rect.width * scale.x;
             }
             paiHeight = rtPai.rect.height * scale.y;
 
-            quiaoShiButtonMaxLen = 0;
-            foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
-            {
-                int len = kvp.Key.Length;
-                if (len > quiaoShiButtonMaxLen)
-                {
-                    quiaoShiButtonMaxLen = len;
-                }
-            }
+            quiaoShiButtonMaxLen = qiaoShiMingQian.Keys.Max(k => k.Length);
         }
 
         // 【描画】デバッグボタン
@@ -490,7 +465,7 @@ namespace Assets.Source.Maqiao
         {
             // 早送り
             Button goFast = GameObject.Find("Fast").GetComponent<Button>();
-            goFast.onClick.AddListener(delegate
+            goFast.onClick.AddListener(() =>
             {
                 forwardMode = (ForwardMode)(((int)forwardMode + 1) % Enum.GetValues(typeof(ForwardMode)).Length);
                 if (forwardMode == ForwardMode.NORMAL)
@@ -510,13 +485,12 @@ namespace Assets.Source.Maqiao
             });
             RectTransform rtFast = goFast.GetComponent<RectTransform>();
             rtFast.localScale *= scale.x;
-            rtFast.anchorMin = new Vector2(0, 1);
-            rtFast.anchorMax = new Vector2(0, 1);
+            rtFast.anchorMin = rtFast.anchorMax = new Vector2(0, 1);
             rtFast.pivot = new Vector2(0, 1);
             rtFast.anchoredPosition = new Vector2(paiWidth * 3.2f, -paiHeight * 0.4f);
             // 再生
             Button goReproduction = GameObject.Find("Reproduction").GetComponent<Button>();
-            goReproduction.onClick.AddListener(delegate
+            goReproduction.onClick.AddListener(() =>
             {
                 forwardMode = ForwardMode.NORMAL;
                 Application.targetFrameRate = FRAME_RATE;
@@ -524,8 +498,7 @@ namespace Assets.Source.Maqiao
             });
             RectTransform rtReproduction = goReproduction.GetComponent<RectTransform>();
             rtReproduction.localScale *= scale.x;
-            rtReproduction.anchorMin = new Vector2(0, 1);
-            rtReproduction.anchorMax = new Vector2(0, 1);
+            rtReproduction.anchorMin = rtReproduction.anchorMax = new Vector2(0, 1);
             rtReproduction.pivot = new Vector2(0, 1);
             rtReproduction.anchoredPosition = new Vector2(paiWidth * 0.7f, -paiHeight * 0.4f);
         }
@@ -548,20 +521,16 @@ namespace Assets.Source.Maqiao
             goSettingPanel.SetActive(false);
             // 設定ボタン
             goSetting = GameObject.Find("Setting").GetComponent<Button>();
-            goSetting.onClick.AddListener(delegate
-            {
-                goSettingPanel.SetActive(true);
-            });
+            goSetting.onClick.AddListener(() => goSettingPanel.SetActive(true));
             RectTransform rtSetting = goSetting.GetComponent<RectTransform>();
             rtSetting.localScale *= scale.x;
-            rtSetting.anchorMin = new Vector2(1, 1);
-            rtSetting.anchorMax = new Vector2(1, 1);
+            rtSetting.anchorMin = rtSetting.anchorMax = new Vector2(1, 1);
             rtSetting.pivot = new Vector2(1, 1);
             rtSetting.anchoredPosition = new Vector2(-(paiWidth * 0.5f), -(paiHeight * 0.2f));
 
             // リスタート
             Button goRestart = goSettingPanel.transform.Find("Restart").GetComponent<Button>();
-            goRestart.onClick.AddListener(delegate
+            goRestart.onClick.AddListener(() =>
             {
                 Application.targetFrameRate = FRAME_RATE;
                 waitTime = WAIT_TIME;
@@ -569,8 +538,7 @@ namespace Assets.Source.Maqiao
             });
             RectTransform rtRestart = goRestart.GetComponent<RectTransform>();
             rtRestart.localScale *= scale.x;
-            rtRestart.anchorMin = new Vector2(0, 1);
-            rtRestart.anchorMax = new Vector2(0, 1);
+            rtRestart.anchorMin = rtRestart.anchorMax = new Vector2(0, 1);
             rtRestart.pivot = new Vector2(0, 1);
             rtRestart.anchoredPosition = new Vector2(paiWidth, -(rtRestart.sizeDelta.y * scale.x));
 
@@ -580,12 +548,11 @@ namespace Assets.Source.Maqiao
             goSettingDialogPanel = GameObject.Find("SettingDialogPanel");
 
             EventTrigger etResetPanel = goSettingDialogPanel.AddComponent<EventTrigger>();
-            EventTrigger.Entry eResetPanel = new();
-            eResetPanel.eventID = EventTriggerType.PointerClick;
-            eResetPanel.callback.AddListener((eventData) =>
+            EventTrigger.Entry eResetPanel = new()
             {
-                goSettingDialogPanel.SetActive(false);
-            });
+                eventID = EventTriggerType.PointerClick
+            };
+            eResetPanel.callback.AddListener((eventData) => goSettingDialogPanel.SetActive(false));
             etResetPanel.triggers.Add(eResetPanel);
 
             goSettingDialogPanel.SetActive(false);
@@ -593,7 +560,7 @@ namespace Assets.Source.Maqiao
             DrawText(ref message, "全ての設定をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goSettingDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
-            goYes.onClick.AddListener(delegate
+            goYes.onClick.AddListener(() =>
             {
                 ResetSheDing();
                 Button[] buttons = goSettingPanel.GetComponentsInChildren<Button>();
@@ -609,10 +576,7 @@ namespace Assets.Source.Maqiao
                 DrawOption();
             });
             Button goNo = Instantiate(goButton, goSettingDialogPanel.transform);
-            goNo.onClick.AddListener(delegate
-            {
-                goSettingDialogPanel.SetActive(false);
-            });
+            goNo.onClick.AddListener(() => goSettingDialogPanel.SetActive(false));
             DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
         }
 
@@ -625,45 +589,55 @@ namespace Assets.Source.Maqiao
             float offset = paiHeight * 1.6f;
             int len = 7;
 
-            DrawToggleOption(() => sheDing.daPaiFangFa, v => sheDing.daPaiFangFa = v, new string[] { "１タップ打牌", "２タップ打牌" }, new Vector2(-x, y), len);
-            DrawToggleOption(() => sheDing.liZhiAuto, v => sheDing.liZhiAuto = v, new string[] { "立直後自動打牌", "立直後手動打牌" }, new Vector2(x, y), len);
-            y -= offset;
-            DrawToggleOption(() => sheDing.xuanShangYin, v => sheDing.xuanShangYin = v, new string[] { "ドラマーク有り", "ドラマーク無し" }, new Vector2(-x, y), len);
-            DrawToggleOption(() => sheDing.ziMoQieBiaoShi, v => sheDing.ziMoQieBiaoShi = v, new string[] { "ツモ切表示有り", "ツモ切表示無し" }, new Vector2(x, y), len);
-            y -= offset;
-            DrawToggleOption(() => sheDing.daiPaiBiaoShi, v => sheDing.daiPaiBiaoShi = v, new string[] { "待牌表示有り", "待牌表示無し" }, new Vector2(-x, y), len);
-            DrawToggleOption(() => sheDing.xiangTingShuBiaoShi, v => sheDing.xiangTingShuBiaoShi = v, new string[] { "向聴数表示有り", "向聴数表示無し" }, new Vector2(x, y), len);
-            y -= offset;
-            DrawToggleOption(() => sheDing.mingQuXiao, v => sheDing.mingQuXiao = v, new string[] { "鳴パスはボタン", "鳴パスはタップ" }, new Vector2(-x, y), len);
-            y -= offset;
-            DrawToggleOption(() => sheDing.xiangShouPaiOpen, v => sheDing.xiangShouPaiOpen = v, new string[] { "相手牌オープン", "相手牌クローズ" }, new Vector2(-x, y), len);
-            DrawToggleOption(() => sheDing.shouPaiDianBiaoShi, v => sheDing.shouPaiDianBiaoShi = v, new string[] { "手牌点表示有り", "手牌点表示無し" }, new Vector2(x, y), len);
-            y -= offset;
-            DrawToggleOption(() => sheDing.learningData, v => sheDing.learningData = v, new string[] { "学習データ有り", "学習データ無し" }, new Vector2(-x, y), len);
-            y -= offset;
+            // int型オプション
+            (Func<int> get, Action<int> set, string[] labels, Vector2 pos)[] intOptions = {
+                (() => sheDing.daPaiFangFa, v => sheDing.daPaiFangFa = v, new[] { "１タップ打牌", "２タップ打牌" }, new Vector2(-x, y)),
+            };
+            foreach (var (get, set, labels, pos) in intOptions)
+            {
+                DrawToggleOption(get, set, labels, pos, len);
+            }
+            // bool型オプション
+            (Func<bool> get, Action<bool> set, string[] labels, Vector2 pos)[] boolOptions = {
+                (() => sheDing.liZhiAuto, v => sheDing.liZhiAuto = v, new[] { "立直後自動打牌", "立直後手動打牌" }, new Vector2(x, y)),
+                (() => sheDing.xuanShangYin, v => sheDing.xuanShangYin = v, new[] { "ドラマーク有り", "ドラマーク無し" }, new Vector2(-x, y - offset)),
+                (() => sheDing.ziMoQieBiaoShi, v => sheDing.ziMoQieBiaoShi = v, new[] { "ツモ切表示有り", "ツモ切表示無し" }, new Vector2(x, y - offset)),
+                (() => sheDing.daiPaiBiaoShi, v => sheDing.daiPaiBiaoShi = v, new[] { "待牌表示有り", "待牌表示無し" }, new Vector2(-x, y - offset * 2)),
+                (() => sheDing.xiangTingShuBiaoShi, v => sheDing.xiangTingShuBiaoShi = v, new[] { "向聴数表示有り", "向聴数表示無し" }, new Vector2(x, y - offset * 2)),
+                (() => sheDing.mingQuXiao, v => sheDing.mingQuXiao = v, new[] { "鳴パスはボタン", "鳴パスはタップ" }, new Vector2(-x, y - offset * 3)),
+                (() => sheDing.xiangShouPaiOpen, v => sheDing.xiangShouPaiOpen = v, new[] { "相手牌オープン", "相手牌クローズ" }, new Vector2(-x, y - offset * 4)),
+                (() => sheDing.shouPaiDianBiaoShi, v => sheDing.shouPaiDianBiaoShi = v, new[] { "手牌点表示有り", "手牌点表示無し" }, new Vector2(x, y - offset * 4)),
+                (() => sheDing.learningData, v => sheDing.learningData = v, new[] { "学習データ有り", "学習データ無し" }, new Vector2(-x, y - offset * 5)),
+            };
+            foreach (var (get, set, labels, pos) in boolOptions)
+            {
+                DrawToggleOption(get, set, labels, pos, len);
+            }
             // リセット
             Button resetButton = Instantiate(goButton, goSettingPanel.transform);
-            resetButton.onClick.AddListener(delegate
-            {
-                goSettingDialogPanel.SetActive(true);
-            });
-            DrawButton(ref resetButton, "リセット", new Vector2(0, y));
+            resetButton.onClick.AddListener(() => goSettingDialogPanel.SetActive(true));
+            DrawButton(ref resetButton, "リセット", new Vector2(0, y - offset * 6));
         }
 
-        // トグルボタン描画メソッド
+        // オプションボタン描画
+        private void DrawToggleOption(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy, int len)
+        {
+            DrawToggleButton(getValue, setValue, v => textOnOff[v], v => (v + 1) % textOnOff.Length, xy, len);
+        }
+        private void DrawToggleOption(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
+        {
+            DrawToggleButton(getValue, setValue, v => v ? textOnOff[0] : textOnOff[1], v => !v, xy, len);
+        }
         private void DrawToggleButton<T>(Func<T> getValue, Action<T> setValue, Func<T, string> getText, Func<T, T> toggleValue, Vector2 xy, int len)
         {
             Button button = Instantiate(goButton, goSettingPanel.transform);
-            string displayText = getText(getValue());
-            DrawButton(ref button, displayText, xy, len);
-            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            button.onClick.AddListener(delegate
+            DrawButton(ref button, getText(getValue()), xy, len);
+            button.onClick.AddListener(() =>
             {
                 T newValue = toggleValue(getValue());
-                setValue(newValue);
-                text.text = getText(newValue);
+                setValue(toggleValue(getValue()));
+                button.GetComponentInChildren<TextMeshProUGUI>().text = getText(newValue);
                 File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
-
                 switch (eventStatus)
                 {
                     case Event.PEI_PAI:
@@ -673,14 +647,6 @@ namespace Assets.Source.Maqiao
                         break;
                 }
             });
-        }
-        private void DrawToggleOption(Func<bool> getValue, Action<bool> setValue, string[] textOnOff, Vector2 xy, int len)
-        {
-            DrawToggleButton(getValue, setValue, v => v ? textOnOff[0] : textOnOff[1], v => !v, xy, len);
-        }
-        private void DrawToggleOption(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy, int len)
-        {
-            DrawToggleButton(getValue, setValue, v => textOnOff[v], v => (v + 1) % textOnOff.Length, xy, len);
         }
 
         // 設定オプションのリセット
@@ -693,9 +659,13 @@ namespace Assets.Source.Maqiao
             }
             sheDing = new SheDing();
             DrawOption();
-            if (eventStatus == Event.DUI_JU)
+            switch (eventStatus)
             {
-                DrawJuOption();
+                case Event.PEI_PAI:
+                case Event.DUI_JU:
+                case Event.DUI_JU_ZHONG_LE:
+                    isDuiJuDraw = true;
+                    break;
             }
         }
 
@@ -709,25 +679,17 @@ namespace Assets.Source.Maqiao
             {
                 eventID = EventTriggerType.PointerClick
             };
-            eScore.callback.AddListener((eventData) =>
-            {
-                goScorePanel.SetActive(false);
-            });
+            eScore.callback.AddListener((eventData) => goScorePanel.SetActive(false));
             etScore.triggers.Add(eScore);
             goScorePanel.SetActive(false);
 
             // 得点ボタン
             goScore = GameObject.Find("Score").GetComponent<Button>();
-            goScore.onClick.AddListener(delegate
-            {
-                goScorePanel.SetActive(true);
-            });
+            goScore.onClick.AddListener(() => goScorePanel.SetActive(true));
 
             RectTransform rtScore = goScore.GetComponent<RectTransform>();
             rtScore.localScale *= scale.x;
-            rtScore.anchorMin = new Vector2(1, 1);
-            rtScore.anchorMax = new Vector2(1, 1);
-            rtScore.pivot = new Vector2(1, 1);
+            rtScore.anchorMin = rtScore.anchorMax = rtScore.pivot = new Vector2(1, 1);
             rtScore.anchoredPosition = new Vector2(-(paiWidth * 3f), -(paiHeight * 0.2f));
 
             goScoreQiaoShi = new Button[qiaoShiMingQian.Count + 1];
@@ -736,10 +698,7 @@ namespace Assets.Source.Maqiao
             float y = paiHeight * 5f;
 
             goScoreQiaoShi[qiaoShiMingQian.Count] = Instantiate(goButton, goScorePanel.transform);
-            goScoreQiaoShi[qiaoShiMingQian.Count].onClick.AddListener(delegate
-            {
-                OnClickScoreQiaoShi(PLAYER_NAME);
-            });
+            goScoreQiaoShi[qiaoShiMingQian.Count].onClick.AddListener(() => OnClickScoreQiaoShi(PLAYER_NAME));
             DrawButton(ref goScoreQiaoShi[qiaoShiMingQian.Count], PLAYER_NAME, new Vector2(x, y));
             y -= paiHeight * 1.5f;
 
@@ -749,12 +708,8 @@ namespace Assets.Source.Maqiao
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
                 goScoreQiaoShi[i] = Instantiate(goButton, goScorePanel.transform);
-                goScoreQiaoShi[i].onClick.AddListener(delegate
-                {
-                    OnClickScoreQiaoShi(kvp.Key);
-                });
+                goScoreQiaoShi[i].onClick.AddListener(() => OnClickScoreQiaoShi(kvp.Key));
                 DrawButton(ref goScoreQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
-
                 if (i % 2 == 1 || i == qiaoShiMingQian.Count - 1)
                 {
                     y -= paiHeight * 1.5f;
@@ -764,10 +719,7 @@ namespace Assets.Source.Maqiao
 
             goScoreDialogPanel = GameObject.Find("ScoreDialogPanel");
             Button goScoreReset = Instantiate(goButton, goScorePanel.transform);
-            goScoreReset.onClick.AddListener(delegate
-            {
-                goScoreDialogPanel.SetActive(true);
-            });
+            goScoreReset.onClick.AddListener(() => goScoreDialogPanel.SetActive(true));
             DrawButton(ref goScoreReset, "リセット", new Vector2(0, y));
 
             EventTrigger etResetPanel = goScoreDialogPanel.AddComponent<EventTrigger>();
@@ -775,10 +727,7 @@ namespace Assets.Source.Maqiao
             {
                 eventID = EventTriggerType.PointerClick
             };
-            eResetPanel.callback.AddListener((eventData) =>
-            {
-                goScoreDialogPanel.SetActive(false);
-            });
+            eResetPanel.callback.AddListener((eventData) => goScoreDialogPanel.SetActive(false));
             etResetPanel.triggers.Add(eResetPanel);
 
             goScoreDialogPanel.SetActive(false);
@@ -786,16 +735,13 @@ namespace Assets.Source.Maqiao
             DrawText(ref message, "全員の得点をリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goScoreDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
-            goYes.onClick.AddListener(delegate
+            goYes.onClick.AddListener(() =>
             {
                 ResetJiLu();
                 goScoreDialogPanel.SetActive(false);
             });
             Button goNo = Instantiate(goButton, goScoreDialogPanel.transform);
-            goNo.onClick.AddListener(delegate
-            {
-                goScoreDialogPanel.SetActive(false);
-            });
+            goNo.onClick.AddListener(() => goScoreDialogPanel.SetActive(false));
             DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
         }
 
@@ -835,16 +781,14 @@ namespace Assets.Source.Maqiao
 
             // データ画面の上の戻るボタン
             Button goDataBack = Instantiate(goBack, goDataBackCanvas.transform, false);
-            goDataBack.onClick.AddListener(delegate
+            goDataBack.onClick.AddListener(() =>
             {
                 goDataScrollView.SetActive(false);
                 goDataBackCanvas.SetActive(false);
             });
             RectTransform rtBack = goDataBack.GetComponent<RectTransform>();
             rtBack.localScale *= scale.x;
-            rtBack.anchorMin = new Vector2(0, 1);
-            rtBack.anchorMax = new Vector2(0, 1);
-            rtBack.pivot = new Vector2(0, 1);
+            rtBack.anchorMin = rtBack.anchorMax = rtBack.pivot = new Vector2(0, 1);
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 1.5f));
 
             goYiMing = new TextMeshProUGUI[QiaoShi.YiMing.Count];
@@ -856,62 +800,40 @@ namespace Assets.Source.Maqiao
             goJiJuMingQian = Instantiate(goText, goDataContent.transform);
             DrawText(ref goJiJuMingQian, "", new Vector2(0, y), 0, 25);
 
-            float x = -(paiWidth * 2f);
+            // スライダー項目
+            DrawDataSlider(ref goJiLuNaoXuanShang, ref goJiLuNaoXuanShangValue, "懸賞", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoYiPai, ref goJiLuNaoYiPaiValue, "役牌", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoShunZi, ref goJiLuNaoShunZiValue, "順子", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoKeZi, ref goJiLuNaoKeZiValue, "刻子", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoLiZhi, ref goJiLuNaoLiZhiValue, "立直", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoMing, ref goJiLuNaoMingValue, "鳴き", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoRan, ref goJiLuNaoRanValue, "染め", y -= paiHeight);
+            DrawDataSlider(ref goJiLuNaoTao, ref goJiLuNaoTaoValue, "逃げ", y -= paiHeight);
             y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoXuanShang, ref goJiLuNaoXuanShangValue, "懸賞", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoYiPai, ref goJiLuNaoYiPaiValue, "役牌", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoShunZi, ref goJiLuNaoShunZiValue, "順子", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoKeZi, ref goJiLuNaoKeZiValue, "刻子", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoLiZhi, ref goJiLuNaoLiZhiValue, "立直", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoMing, ref goJiLuNaoMingValue, "鳴き", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoRan, ref goJiLuNaoRanValue, "染め", y);
-            y -= paiHeight;
-            DrawDataSlider(ref goJiLuNaoTao, ref goJiLuNaoTaoValue, "逃げ", y);
-
-            y -= paiHeight * 2;
-            DrawData(ref goJiLuJiJiDian, "集計点", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuBanZhuangShu, "半荘数", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuDuiJuShu, "対局数", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuShunWei1Shuai, "１位", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuShunWei2Shuai, "２位", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuShunWei3Shuai, "３位", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuShunWei4Shuai, "４位", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuHeLeShuai, "和了率", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuFangChongShuai, "放銃率", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuTingPaiShuai, "聴牌率", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuPingJunHeLeDian, "平均和了点", y);
-            y -= paiHeight;
-            DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", y);
+            DrawData(ref goJiLuJiJiDian, "集計点", y -= paiHeight);
+            DrawData(ref goJiLuBanZhuangShu, "半荘数", y -= paiHeight);
+            DrawData(ref goJiLuDuiJuShu, "対局数", y -= paiHeight);
+            DrawData(ref goJiLuShunWei1Shuai, "１位", y -= paiHeight);
+            DrawData(ref goJiLuShunWei2Shuai, "２位", y -= paiHeight);
+            DrawData(ref goJiLuShunWei3Shuai, "３位", y -= paiHeight);
+            DrawData(ref goJiLuShunWei4Shuai, "４位", y -= paiHeight);
+            DrawData(ref goJiLuHeLeShuai, "和了率", y -= paiHeight);
+            DrawData(ref goJiLuFangChongShuai, "放銃率", y -= paiHeight);
+            DrawData(ref goJiLuTingPaiShuai, "聴牌率", y -= paiHeight);
+            DrawData(ref goJiLuPingJunHeLeDian, "平均和了点", y -= paiHeight);
+            DrawData(ref goJiLuPingJunFangChongDian, "平均放銃点", y -= paiHeight);
             y -= paiHeight;
             int index = 0;
             foreach (KeyValuePair<QiaoShi.YiDingYi, string> kvp in QiaoShi.YiMing)
             {
-                y -= paiHeight;
-                DrawData(ref goYiMing[index], ref goYiShu[index], kvp.Value, y);
+                DrawData(ref goYiMing[index], ref goYiShu[index], kvp.Value, y -= paiHeight);
                 index++;
             }
             y -= paiHeight;
             index = 0;
             foreach (KeyValuePair<QiaoShi.YiManDingYi, string> kvp in QiaoShi.YiManMing)
             {
-                y -= paiHeight;
-                DrawData(ref goYiManMing[index], ref goYiManShu[index], kvp.Value, y);
+                DrawData(ref goYiManMing[index], ref goYiManShu[index], kvp.Value, y -= paiHeight);
                 index++;
             }
 
@@ -998,70 +920,27 @@ namespace Assets.Source.Maqiao
 
             goJiJuMingQian.text = mingQian;
 
-            goJiLuNaoXuanShang.onValueChanged.RemoveAllListeners();
-            goJiLuNaoXuanShang.onValueChanged.AddListener(delegate (float value)
+            (Slider slider, TextMeshProUGUI valueText, Action<JiLu, int> setValue, Func<JiLu, int> getValue)[] binds = {
+                (goJiLuNaoXuanShang, goJiLuNaoXuanShangValue, (j, v) => j.naoXuanShang = v, j => j.naoXuanShang),
+                (goJiLuNaoYiPai, goJiLuNaoYiPaiValue, (j, v) => j.naoYiPai = v, j => j.naoYiPai),
+                (goJiLuNaoShunZi, goJiLuNaoShunZiValue, (j, v) => j.naoShunZi = v, j => j.naoShunZi),
+                (goJiLuNaoKeZi, goJiLuNaoKeZiValue, (j, v) => j.naoKeZi = v, j => j.naoKeZi),
+                (goJiLuNaoLiZhi, goJiLuNaoLiZhiValue, (j, v) => j.naoLiZhi = v, j => j.naoLiZhi),
+                (goJiLuNaoMing, goJiLuNaoMingValue, (j, v) => j.naoMing = v, j => j.naoMing),
+                (goJiLuNaoRan, goJiLuNaoRanValue, (j, v) => j.naoRan = v, j => j.naoRan),
+                (goJiLuNaoTao, goJiLuNaoTaoValue, (j, v) => j.naoTao = v, j => j.naoTao),
+            };
+            foreach (var (slider, valueText, setValue, getValue) in binds)
             {
-                goJiLuNaoXuanShangValue.text = ((int)value).ToString();
-                shi.JiLu.naoXuanShang = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoYiPai.onValueChanged.RemoveAllListeners();
-            goJiLuNaoYiPai.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoYiPaiValue.text = ((int)value).ToString();
-                shi.JiLu.naoYiPai = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoShunZi.onValueChanged.RemoveAllListeners();
-            goJiLuNaoShunZi.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoShunZiValue.text = ((int)value).ToString();
-                shi.JiLu.naoShunZi = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoKeZi.onValueChanged.RemoveAllListeners();
-            goJiLuNaoKeZi.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoKeZiValue.text = ((int)value).ToString();
-                shi.JiLu.naoKeZi = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoLiZhi.onValueChanged.RemoveAllListeners();
-            goJiLuNaoLiZhi.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoLiZhiValue.text = ((int)value).ToString();
-                shi.JiLu.naoLiZhi = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoMing.onValueChanged.RemoveAllListeners();
-            goJiLuNaoMing.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoMingValue.text = ((int)value).ToString();
-                shi.JiLu.naoMing = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoRan.onValueChanged.RemoveAllListeners();
-            goJiLuNaoRan.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoRanValue.text = ((int)value).ToString();
-                shi.JiLu.naoRan = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoTao.onValueChanged.RemoveAllListeners();
-            goJiLuNaoTao.onValueChanged.AddListener(delegate (float value)
-            {
-                goJiLuNaoTaoValue.text = ((int)value).ToString();
-                shi.JiLu.naoTao = (int)value;
-                WriteJiLu(shi.MingQian, shi.JiLu);
-            });
-            goJiLuNaoXuanShang.value = shi.JiLu.naoXuanShang;
-            goJiLuNaoYiPai.value = shi.JiLu.naoYiPai;
-            goJiLuNaoShunZi.value = shi.JiLu.naoShunZi;
-            goJiLuNaoKeZi.value = shi.JiLu.naoKeZi;
-            goJiLuNaoLiZhi.value = shi.JiLu.naoLiZhi;
-            goJiLuNaoMing.value = shi.JiLu.naoMing;
-            goJiLuNaoRan.value = shi.JiLu.naoRan;
-            goJiLuNaoTao.value = shi.JiLu.naoTao;
+                slider.onValueChanged.RemoveAllListeners();
+                slider.onValueChanged.AddListener(value =>
+                {
+                    valueText.text = ((int)value).ToString();
+                    setValue(shi.JiLu, (int)value);
+                    WriteJiLu(shi.MingQian, shi.JiLu);
+                });
+                slider.value = getValue(shi.JiLu);
+            }
 
             goJiLuJiJiDian.text = shi.JiLu.jiJiDian + "点";
             goJiLuBanZhuangShu.text = shi.JiLu.banZhuangShu + "回";
@@ -1078,14 +957,12 @@ namespace Assets.Source.Maqiao
             for (int i = 0; i < goYiShu.Length; i++)
             {
                 goYiShu[i].text = shi.JiLu.yiShu[i] + "回";
-                goYiMing[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
-                goYiShu[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
+                goYiMing[i].color = goYiShu[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
             }
             for (int i = 0; i < goYiManShu.Length; i++)
             {
                 goYiManShu[i].text = shi.JiLu.yiManShu[i] + "回";
-                goYiManMing[i].color = shi.JiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
-                goYiManShu[i].color = shi.JiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
+                goYiManMing[i].color = goYiManShu[i].color = shi.JiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
             }
 
             goDataScrollView.SetActive(true);
@@ -1115,16 +992,11 @@ namespace Assets.Source.Maqiao
 
             // ルールボタン
             goGuiZe = GameObject.Find("GuiZe").GetComponent<Button>();
-            goGuiZe.onClick.AddListener(delegate
-            {
-                goGuiZeScrollView.SetActive(true);
-            });
+            goGuiZe.onClick.AddListener(() => goGuiZeScrollView.SetActive(true));
 
             RectTransform rtGuiZe = goGuiZe.GetComponent<RectTransform>();
             rtGuiZe.localScale *= scale.x;
-            rtGuiZe.anchorMin = new Vector2(1, 1);
-            rtGuiZe.anchorMax = new Vector2(1, 1);
-            rtGuiZe.pivot = new Vector2(1, 1);
+            rtGuiZe.anchorMax = rtGuiZe.anchorMin = rtGuiZe.pivot = new Vector2(1, 1);
             rtGuiZe.anchoredPosition = new Vector2(-(paiWidth * 5.5f), -(paiHeight * 0.2f));
 
             goGuiZeBackCanvas = GameObject.Find("GuiZeBackCanvas");
@@ -1132,16 +1004,14 @@ namespace Assets.Source.Maqiao
 
             // ルール画面の上の戻るボタン
             Button goGuiZeBack = Instantiate(goBack, goGuiZeScrollView.transform);
-            goGuiZeBack.onClick.AddListener(delegate
+            goGuiZeBack.onClick.AddListener(() =>
             {
                 goGuiZeScrollView.SetActive(false);
                 goGuiZeBackCanvas.SetActive(false);
             });
             RectTransform rtBack = goGuiZeBack.GetComponent<RectTransform>();
             rtBack.localScale *= scale.x;
-            rtBack.anchorMin = new Vector2(0, 1);
-            rtBack.anchorMax = new Vector2(0, 1);
-            rtBack.pivot = new Vector2(0, 1);
+            rtBack.anchorMin = rtBack.anchorMax = rtBack.pivot = new Vector2(0, 1);
             rtBack.anchoredPosition = new Vector2(paiWidth * 0.5f, -(paiHeight * 1.5f));
 
             DrawGuiZe();
@@ -1153,10 +1023,7 @@ namespace Assets.Source.Maqiao
             {
                 eventID = EventTriggerType.PointerClick
             };
-            eResetPanel.callback.AddListener((eventData) =>
-            {
-                goGuiZeDialogPanel.SetActive(false);
-            });
+            eResetPanel.callback.AddListener((eventData) => goGuiZeDialogPanel.SetActive(false));
             etResetPanel.triggers.Add(eResetPanel);
 
             goGuiZeDialogPanel.SetActive(false);
@@ -1164,7 +1031,7 @@ namespace Assets.Source.Maqiao
             DrawText(ref message, "全てのルールをリセットしますか？", new Vector2(0, paiHeight * 2f), 0, 25);
             Button goYes = Instantiate(goButton, goGuiZeDialogPanel.transform);
             DrawButton(ref goYes, "は　い", new Vector2(-paiWidth * 3f, 0));
-            goYes.onClick.AddListener(delegate
+            goYes.onClick.AddListener(() =>
             {
                 ResetGuiZe();
                 Button[] buttons = goGuiZeContent.GetComponentsInChildren<Button>();
@@ -1176,10 +1043,7 @@ namespace Assets.Source.Maqiao
                 DrawGuiZe();
             });
             Button goNo = Instantiate(goButton, goGuiZeDialogPanel.transform);
-            goNo.onClick.AddListener(delegate
-            {
-                goGuiZeDialogPanel.SetActive(false);
-            });
+            goNo.onClick.AddListener(() => goGuiZeDialogPanel.SetActive(false));
             DrawButton(ref goNo, "いいえ", new Vector2(paiWidth * 3f, 0));
 
             RectTransform rtGuiZeContent = goGuiZeContent.GetComponent<RectTransform>();
@@ -1220,7 +1084,7 @@ namespace Assets.Source.Maqiao
             DrawButton(ref buttonChiPaiShu, Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1], new Vector2(x, y), 12);
             TextMeshProUGUI text = buttonChiPaiShu.GetComponentInChildren<TextMeshProUGUI>();
             text.fontSize = 17f;
-            buttonChiPaiShu.onClick.AddListener(delegate
+            buttonChiPaiShu.onClick.AddListener(() =>
             {
                 Chang.guiZe.chiPaiShu = Chang.guiZe.chiPaiShu[0] == 0 ? new int[] { 1, 1, 1 } : new int[] { 0, 0, 0 };
                 text.text = Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1];
@@ -1255,7 +1119,7 @@ namespace Assets.Source.Maqiao
             y -= offset;
 
             Button resetButton = Instantiate(goButton, goGuiZeContent.transform);
-            resetButton.onClick.AddListener(delegate
+            resetButton.onClick.AddListener(() =>
             {
                 goGuiZeDialogPanel.SetActive(true);
             });
@@ -1271,7 +1135,7 @@ namespace Assets.Source.Maqiao
             DrawButton(ref button, displayText, xy, 12);
             TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
             text.fontSize = 17f;
-            button.onClick.AddListener(delegate
+            button.onClick.AddListener(() =>
             {
                 bool newValue = !getValue();
                 setValue(newValue);
@@ -1287,7 +1151,7 @@ namespace Assets.Source.Maqiao
             DrawButton(ref button, displayText, xy, 12);
             TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
             text.fontSize = 17f;
-            button.onClick.AddListener(delegate
+            button.onClick.AddListener(() =>
             {
                 int newValue = (getValue() + 1) % textOnOff.Length;
                 setValue(newValue);
@@ -1929,7 +1793,7 @@ namespace Assets.Source.Maqiao
             if (goMingWu == null)
             {
                 goMingWu = Instantiate(goButton, goButton.transform.parent);
-                goMingWu.onClick.AddListener(delegate
+                goMingWu.onClick.AddListener(() =>
                 {
                     sheDing.mingWu = !sheDing.mingWu;
                     goMingWu.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
@@ -1995,7 +1859,7 @@ namespace Assets.Source.Maqiao
 
             string[] displayText = new string[] { "観戦", "対戦" };
             DrawButton(ref goPlayerNoExists, existsPlayer ? displayText[1] : displayText[0], new Vector2(0, y), 4);
-            goPlayerNoExists.onClick.AddListener(delegate
+            goPlayerNoExists.onClick.AddListener(() =>
             {
                 existsPlayer = !existsPlayer;
                 goPlayerNoExists.GetComponentInChildren<TextMeshProUGUI>().text = existsPlayer ? displayText[1] : displayText[0];
@@ -2039,7 +1903,7 @@ namespace Assets.Source.Maqiao
                 x = paiWidth * 4 * (index % 2 == 0 ? -1 : 1);
                 int pos = index;
                 DrawButton(ref goQiaoShi[index], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
-                goQiaoShi[index].onClick.AddListener(delegate
+                goQiaoShi[index].onClick.AddListener(() =>
                 {
                     OnClickQiaoShi(kvp.Key, pos);
                 });
@@ -2053,7 +1917,7 @@ namespace Assets.Source.Maqiao
             }
 
             DrawButton(ref goRandom, "ランダム", new Vector2(0, y));
-            goRandom.onClick.AddListener(delegate
+            goRandom.onClick.AddListener(() =>
             {
                 RandomQiaoShiXuanZe();
                 index = 0;
@@ -2169,7 +2033,7 @@ namespace Assets.Source.Maqiao
                 x = paiWidth * 4 * (i % 2 == 0 ? -1 : 1);
                 int pos = i;
                 DrawButton(ref goQiaoShi[i], kvp.Key, new Vector2(x, y), quiaoShiButtonMaxLen);
-                goQiaoShi[i].onClick.AddListener(delegate
+                goQiaoShi[i].onClick.AddListener(() =>
                 {
                     OnClickFollowQiaoShi(kvp.Key);
                 });
@@ -3386,7 +3250,7 @@ namespace Assets.Source.Maqiao
         private void DrawOnClickZiJiaYao(ref Button go, QiaoShi shi, Vector2 xy, QiaoShi.YaoDingYi yao, int mingWei, int ShouPaiWei, bool isFollow)
         {
             go = Instantiate(goButton, goButton.transform.parent);
-            go.onClick.AddListener(delegate
+            go.onClick.AddListener(() =>
             {
                 OnClickZiJiaYao(Chang.ZiMoFan, shi, yao, mingWei, ShouPaiWei, isFollow);
             });
@@ -3514,7 +3378,7 @@ namespace Assets.Source.Maqiao
         private void DrawOnClickTaJiaYao(ref Button go, int jia, QiaoShi shi, Vector2 xy, QiaoShi.YaoDingYi yao, int mingWei)
         {
             go = Instantiate(goButton, goButton.transform.parent);
-            go.onClick.AddListener(delegate
+            go.onClick.AddListener(() =>
             {
                 OnClickTaJiaYao(jia, shi, yao, mingWei);
             });
@@ -3619,7 +3483,7 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.LiZhiPaiWei[mingWei] == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, wei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, yao, wei); });
                             yy = y + margin;
                         }
                     }
@@ -3627,7 +3491,7 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.AnGangPaiWei[mingWei][0] == i || shi.AnGangPaiWei[mingWei][1] == i || shi.AnGangPaiWei[mingWei][2] == i || shi.AnGangPaiWei[mingWei][3] == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, mingWei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, yao, mingWei); });
                             yy = y + margin;
                         }
                     }
@@ -3635,7 +3499,7 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.JiaGangPaiWei[mingWei][0] == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, mingWei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, yao, mingWei); });
                             yy = y + margin;
                         }
                     }
@@ -3643,7 +3507,7 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.BingPaiWei[mingWei][0] == i || shi.BingPaiWei[mingWei][1] == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, mingWei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, yao, mingWei); });
                             yy = y + margin;
                         }
                     }
@@ -3651,7 +3515,7 @@ namespace Assets.Source.Maqiao
                     {
                         if (shi.ChiPaiWei[mingWei][0] == i || shi.ChiPaiWei[mingWei][1] == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, mingWei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, yao, mingWei); });
                             yy = y + margin;
                         }
                     }
@@ -3659,24 +3523,24 @@ namespace Assets.Source.Maqiao
                     {
                         if (isFollow && mingWei == i && isZiJiaYaoDraw && !shi.DaPaiHou)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
                             yy = y + margin;
                         }
                         else if (!shi.LiZhi || shi.ShouPai.Count - 1 == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, yao, wei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, yao, wei); });
                         }
                     }
                     if (yao == QiaoShi.YaoDingYi.Select)
                     {
                         if (mingWei == i)
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.DaPai, wei); });
                             yy = y + margin;
                         }
                         else
                         {
-                            shi.goShouPai[i].onClick.AddListener(delegate { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.Wu, wei); });
+                            shi.goShouPai[i].onClick.AddListener(() => { OnClickShouPai(jia, shi, QiaoShi.YaoDingYi.Wu, wei); });
                         }
                     }
                     if (shi.ShouPai.Count - 1 == i && !shi.DaPaiHou)
@@ -3965,7 +3829,7 @@ namespace Assets.Source.Maqiao
             goText.text = text;
             goText.fontSize = 23;
             goSheng[jia].transform.SetAsLastSibling();
-            goSheng[jia].onClick.AddListener(delegate
+            goSheng[jia].onClick.AddListener(() =>
             {
                 ClearGameObject(ref goSheng[jia]);
             });
@@ -4045,7 +3909,7 @@ namespace Assets.Source.Maqiao
         {
             // 戻るボタン
             goBackDuiJuZhongLe = Instantiate(goBack, goBack.transform.parent);
-            goBackDuiJuZhongLe.onClick.AddListener(delegate
+            goBackDuiJuZhongLe.onClick.AddListener(() =>
             {
                 isBackDuiJuZhongLe = true;
                 keyPress = true;
