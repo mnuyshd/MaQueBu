@@ -2498,7 +2498,7 @@ namespace Assets.Source.Maqiao
                 isZiJiaYaoDraw = true;
                 if (!(sheDing.liZhiAuto && ziJiaShi.LiZhi) || ziJiaShi.HeLe || ziJiaShi.AnGangPaiWei.Count > 0 || ziJiaShi.JiaGangPaiWei.Count > 0)
                 {
-                    if (ziJiaShi.Follow)
+                    if (ziJiaShi.Follow && ziJiaShi.ZiJiaYao == QiaoShi.YaoDingYi.Wu)
                     {
                         ziJiaShi.DaiPaiXiangTingShuJiSuan(ziJiaShi.ZiJiaXuanZe);
                     }
@@ -3278,6 +3278,7 @@ namespace Assets.Source.Maqiao
             {
                 DrawZiJiaYao(shi, 0, 0, false, false);
                 DrawShouPai(jia, yao, -1);
+                shi.DaiPaiJiSuan(-1);
                 DrawDaiPai(jia);
             }
             else if (yao == QiaoShi.YaoDingYi.LiZhi || yao == QiaoShi.YaoDingYi.KaiLiZhi)
