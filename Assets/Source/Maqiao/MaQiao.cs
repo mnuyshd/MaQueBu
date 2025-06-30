@@ -308,7 +308,7 @@ namespace Assets.Source.Maqiao
 
             // 設定の読込
             Debug.Log(Application.persistentDataPath);
-            string sheDingFilePath = Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json";
+            string sheDingFilePath = $"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json";
             if (File.Exists(sheDingFilePath))
             {
                 sheDing = JsonUtility.FromJson<SheDing>(File.ReadAllText(sheDingFilePath));
@@ -318,7 +318,7 @@ namespace Assets.Source.Maqiao
                 sheDing = new SheDing();
             }
             // ルールの読込
-            string guiZeFilePath = Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json";
+            string guiZeFilePath = $"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json";
             if (File.Exists(guiZeFilePath))
             {
                 Chang.guiZe = JsonUtility.FromJson<GuiZe>(File.ReadAllText(guiZeFilePath));
@@ -367,12 +367,12 @@ namespace Assets.Source.Maqiao
             goPais[0x00] = GameObject.Find("0x00");
             foreach (int p in Pai.QiaoPai)
             {
-                goPais[p] = GameObject.Find("0x" + p.ToString("x2"));
+                goPais[p] = GameObject.Find($"0x{p:x2}");
             }
             foreach (int p in Pai.ChiPaiDingYi)
             {
                 int cp = p + QiaoShi.CHI_PAI;
-                goPais[cp] = GameObject.Find("0x" + cp.ToString("x2"));
+                goPais[cp] = GameObject.Find($"0x{cp:x2}");
             }
             // プレイヤー以外の手牌画像作成
             Sprite sprite = goPais[0x00].GetComponent<SpriteRenderer>().sprite;
@@ -397,7 +397,7 @@ namespace Assets.Source.Maqiao
             goSais = new GameObject[6];
             for (int i = 0; i < goSais.Length; i++)
             {
-                goSais[i] = GameObject.Find("Sai" + (i + 1));
+                goSais[i] = GameObject.Find($"Sai{i + 1}");
             }
 
             // scale設定
@@ -637,7 +637,7 @@ namespace Assets.Source.Maqiao
                 T newValue = toggleValue(getValue());
                 setValue(toggleValue(getValue()));
                 button.GetComponentInChildren<TextMeshProUGUI>().text = getText(newValue);
-                File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
+                File.WriteAllText($"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json", JsonUtility.ToJson(sheDing));
                 switch (eventStatus)
                 {
                     case Event.PEI_PAI:
@@ -652,7 +652,7 @@ namespace Assets.Source.Maqiao
         // 設定オプションのリセット
         private void ResetSheDing()
         {
-            string filePath = Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json";
+            string filePath = $"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json";
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -748,14 +748,14 @@ namespace Assets.Source.Maqiao
         // 全員の記録リセット
         private void ResetJiLu()
         {
-            string filePath = Application.persistentDataPath + "/" + PLAYER_NAME + ".json";
+            string filePath = $"{Application.persistentDataPath}/{PLAYER_NAME}.json";
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
-                filePath = Application.persistentDataPath + "/" + kvp.Key + ".json";
+                filePath = $"{Application.persistentDataPath}/{kvp.Key}.json";
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
@@ -905,7 +905,7 @@ namespace Assets.Source.Maqiao
         private void OnClickScoreQiaoShi(string mingQian)
         {
             QiaoShi shi = GetQiaoShi(mingQian, false);
-            string filePath = Application.persistentDataPath + "/" + mingQian + ".json";
+            string filePath = $"{Application.persistentDataPath}/{mingQian}.json";
             if (File.Exists(filePath))
             {
                 shi.JiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
@@ -942,26 +942,26 @@ namespace Assets.Source.Maqiao
                 slider.value = getValue(shi.JiLu);
             }
 
-            goJiLuJiJiDian.text = shi.JiLu.jiJiDian + "点";
-            goJiLuBanZhuangShu.text = shi.JiLu.banZhuangShu + "回";
-            goJiLuDuiJuShu.text = shi.JiLu.duiJuShu + "回";
-            goJiLuShunWei1Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei1 / shi.JiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei2Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei2 / shi.JiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei3Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei3 / shi.JiLu.banZhuangShu * 100) + "％";
-            goJiLuShunWei4Shuai.text = shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei4 / shi.JiLu.banZhuangShu * 100) + "％";
-            goJiLuHeLeShuai.text = shi.JiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.heLeShu / shi.JiLu.duiJuShu * 100) + "％";
-            goJiLuFangChongShuai.text = shi.JiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongShu / shi.JiLu.duiJuShu * 100) + "％";
-            goJiLuTingPaiShuai.text = shi.JiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.tingPaiShu / shi.JiLu.liuJuShu * 100) + "％";
-            goJiLuPingJunHeLeDian.text = shi.JiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.heLeDian / shi.JiLu.heLeShu) + "点";
-            goJiLuPingJunFangChongDian.text = shi.JiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongDian / shi.JiLu.fangChongShu) + "点";
+            goJiLuJiJiDian.text = $"{shi.JiLu.jiJiDian}点";
+            goJiLuBanZhuangShu.text = $"{shi.JiLu.banZhuangShu}回";
+            goJiLuDuiJuShu.text = $"{shi.JiLu.duiJuShu}回";
+            goJiLuShunWei1Shuai.text = $"{(shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei1 / shi.JiLu.banZhuangShu * 100))}％";
+            goJiLuShunWei2Shuai.text = $"{(shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei2 / shi.JiLu.banZhuangShu * 100))}％";
+            goJiLuShunWei3Shuai.text = $"{(shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei3 / shi.JiLu.banZhuangShu * 100))}％";
+            goJiLuShunWei4Shuai.text = $"{(shi.JiLu.banZhuangShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.shunWei4 / shi.JiLu.banZhuangShu * 100))}％";
+            goJiLuHeLeShuai.text = $"{(shi.JiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.heLeShu / shi.JiLu.duiJuShu * 100))}％";
+            goJiLuFangChongShuai.text = $"{(shi.JiLu.duiJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongShu / shi.JiLu.duiJuShu * 100))}％";
+            goJiLuTingPaiShuai.text = $"{(shi.JiLu.liuJuShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.tingPaiShu / shi.JiLu.liuJuShu * 100))}％";
+            goJiLuPingJunHeLeDian.text = $"{(shi.JiLu.heLeShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.heLeDian / shi.JiLu.heLeShu))}点";
+            goJiLuPingJunFangChongDian.text = $"{(shi.JiLu.fangChongShu == 0 ? "" : (int)Math.Floor((double)shi.JiLu.fangChongDian / shi.JiLu.fangChongShu))}点";
             for (int i = 0; i < goYiShu.Length; i++)
             {
-                goYiShu[i].text = shi.JiLu.yiShu[i] + "回";
+                goYiShu[i].text = $"{shi.JiLu.yiShu[i]}回";
                 goYiMing[i].color = goYiShu[i].color = shi.JiLu.yiShu[i] == 0 ? Color.gray : Color.black;
             }
             for (int i = 0; i < goYiManShu.Length; i++)
             {
-                goYiManShu[i].text = shi.JiLu.yiManShu[i] + "回";
+                goYiManShu[i].text = $"{shi.JiLu.yiManShu[i]}回";
                 goYiManMing[i].color = goYiManShu[i].color = shi.JiLu.yiManShu[i] == 0 ? Color.gray : Color.black;
             }
 
@@ -971,7 +971,7 @@ namespace Assets.Source.Maqiao
 
         private void WriteJiLu(string ming, JiLu jiLu)
         {
-            File.WriteAllText(Application.persistentDataPath + "/" + ming + ".json", JsonUtility.ToJson(jiLu));
+            File.WriteAllText($"{Application.persistentDataPath}/{ming}.json", JsonUtility.ToJson(jiLu));
 
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
@@ -1088,7 +1088,7 @@ namespace Assets.Source.Maqiao
             {
                 Chang.guiZe.chiPaiShu = Chang.guiZe.chiPaiShu[0] == 0 ? new int[] { 1, 1, 1 } : new int[] { 0, 0, 0 };
                 text.text = Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1];
-                File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
+                File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(Chang.guiZe));
             });
             y -= offset;
             DrawToggleGuiZe(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌無し", "九種九牌は流局（親連荘）", "九種九牌は流局（親流れ）" }, new Vector2(x, y));
@@ -1140,7 +1140,7 @@ namespace Assets.Source.Maqiao
                 bool newValue = !getValue();
                 setValue(newValue);
                 text.text = newValue ? textOnOff[0] : textOnOff[1];
-                File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
+                File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(Chang.guiZe));
             });
         }
         private void DrawToggleGuiZe(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy)
@@ -1156,14 +1156,14 @@ namespace Assets.Source.Maqiao
                 int newValue = (getValue() + 1) % textOnOff.Length;
                 setValue(newValue);
                 text.text = textOnOff[newValue];
-                File.WriteAllText(Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json", JsonUtility.ToJson(Chang.guiZe));
+                File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(Chang.guiZe));
             });
         }
 
         // ルールリセット
         private void ResetGuiZe()
         {
-            string filePath = Application.persistentDataPath + "/" + GUI_ZE_FILE_NAME + ".json";
+            string filePath = $"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json";
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -1585,7 +1585,7 @@ namespace Assets.Source.Maqiao
             goJu = Instantiate(goText, goJuFrame.transform.parent);
             float x = paiWidth * -0.8f;
             float y = paiHeight * 0.9f;
-            string value = Pai.FengPaiMing[Chang.ChangFeng - 0x31] + (Chang.Ju + 1) + "局";
+            string value = $"{Pai.FengPaiMing[Chang.ChangFeng - 0x31]}{Chang.Ju + 1}局";
             DrawText(ref goJu, value, new Vector2(x, y), 0, 17);
             goJu.rectTransform.SetSiblingIndex(1);
         }
@@ -1602,7 +1602,7 @@ namespace Assets.Source.Maqiao
             rt100.anchoredPosition = new Vector2(x, y);
             ClearGameObject(ref goBenChangText);
             goBenChangText = Instantiate(goText, goJuFrame.transform.parent);
-            string valueBenChang = "x" + Chang.BenChang.ToString();
+            string valueBenChang = $"x{Chang.BenChang}";
             DrawText(ref goBenChangText, valueBenChang, new Vector2(x + paiWidth * 0.9f, y + paiHeight * 0.05f), 0, 12);
 
             y -= paiHeight * 0.3f;
@@ -1613,7 +1613,7 @@ namespace Assets.Source.Maqiao
             rt1000.anchoredPosition = new Vector2(x, y);
             ClearGameObject(ref goGongTouText);
             goGongTouText = Instantiate(goText, goJuFrame.transform.parent);
-            string valueGongTou = "x" + (Chang.GongTuo / 1000).ToString();
+            string valueGongTou = $"x{Chang.GongTuo / 1000}";
             DrawText(ref goGongTouText, valueGongTou, new Vector2(x + paiWidth * 0.9f, y + paiHeight * 0.05f), 0, 12);
         }
 
@@ -1797,7 +1797,7 @@ namespace Assets.Source.Maqiao
                 {
                     sheDing.mingWu = !sheDing.mingWu;
                     goMingWu.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
-                    File.WriteAllText(Application.persistentDataPath + "/" + SHE_DING_FILE_NAME + ".json", JsonUtility.ToJson(sheDing));
+                    File.WriteAllText($"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json", JsonUtility.ToJson(sheDing));
                 });
             }
             float x = paiWidth * 8f;
@@ -2111,7 +2111,7 @@ namespace Assets.Source.Maqiao
             // 記録の読込
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
-                string filePath = Application.persistentDataPath + "/" + shi.MingQian + ".json";
+                string filePath = $"{Application.persistentDataPath}/{shi.MingQian}.json";
                 if (File.Exists(filePath))
                 {
                     shi.JiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
@@ -2164,7 +2164,7 @@ namespace Assets.Source.Maqiao
                 shi.JiLu.naoTao = qjx.Nao[QiaoJiXie.XingGe.TAO];
             }
 
-            File.WriteAllText(Application.persistentDataPath + "/" + shi.MingQian + ".json", JsonUtility.ToJson(shi.JiLu));
+            File.WriteAllText($"{Application.persistentDataPath}/{shi.MingQian}.json", JsonUtility.ToJson(shi.JiLu));
         }
 
         // 【ゲーム】親決
@@ -3731,7 +3731,7 @@ namespace Assets.Source.Maqiao
                 {
                     if (shi.XiangTingShu > 0)
                     {
-                        DrawText(ref shi.goXiangTingShu, shi.XiangTingShu.ToString() + "シャンテン", Cal(x, y, shi.PlayOrder), 0, 18);
+                        DrawText(ref shi.goXiangTingShu, $"{shi.XiangTingShu}シャンテン", Cal(x, y, shi.PlayOrder), 0, 18);
                     }
                 }
             }
@@ -3843,7 +3843,7 @@ namespace Assets.Source.Maqiao
         // 【描画】錯和
         private void DrawCuHe(int jia)
         {
-            DrawSheng(jia, QiaoShi.YaoMing(QiaoShi.YaoDingYi.CuHe) + " " + Chang.QiaoShis[Chang.CuHeFan].CuHeSheng);
+            DrawSheng(jia, $"{QiaoShi.YaoMing(QiaoShi.YaoDingYi.CuHe)} {Chang.QiaoShis[Chang.CuHeFan].CuHeSheng}");
             DrawShouPai(jia, QiaoShi.YaoDingYi.CuHe, 0);
         }
 
@@ -4133,7 +4133,7 @@ namespace Assets.Source.Maqiao
                 }
                 if (ziJiaList.Count > 0)
                 {
-                    File.WriteAllText(dirPathZiJia + "/" + $"ZiJia_{timestamp}.json", JsonConvert.SerializeObject(ziJiaList, Formatting.None));
+                    File.WriteAllText($"{dirPathZiJia}/ZiJia_{timestamp}.json", JsonConvert.SerializeObject(ziJiaList, Formatting.None));
                 }
 
                 string dirPathTaJia = Path.Combine(dirPath, "TaJia");
@@ -4143,7 +4143,7 @@ namespace Assets.Source.Maqiao
                 }
                 if (taJiaList.Count > 0)
                 {
-                    File.WriteAllText(dirPathTaJia + "/" + $"TaJia_{timestamp}.json", JsonConvert.SerializeObject(taJiaList, Formatting.None));
+                    File.WriteAllText($"{dirPathTaJia}/TaJia_{timestamp}.json", JsonConvert.SerializeObject(taJiaList, Formatting.None));
                 }
             }
             for (int i = 0; i < Chang.QiaoShis.Count; i++)
@@ -4210,7 +4210,7 @@ namespace Assets.Source.Maqiao
             {
                 // 記録 対局数
                 shi.JiLu.duiJuShu++;
-                File.WriteAllText(Application.persistentDataPath + "/" + shi.MingQian + ".json", JsonUtility.ToJson(shi.JiLu));
+                File.WriteAllText($"{Application.persistentDataPath}/{shi.MingQian}.json", JsonUtility.ToJson(shi.JiLu));
             }
 
             yield return Pause(ForwardMode.FAST_FORWARD);
@@ -4278,8 +4278,8 @@ namespace Assets.Source.Maqiao
             {
                 QiaoShi shi = Chang.QiaoShis[i];
                 // 受取
-                string shouQuGongTuo = (shi.ShouQuGongTuo > 0 ? "+" : "") + (shi.ShouQuGongTuo == 0 ? "" : shi.ShouQuGongTuo.ToString());
-                string shouQu = (shi.ShouQu - shi.ShouQuGongTuo > 0 ? "+" : "") + (shi.ShouQu - shi.ShouQuGongTuo == 0 ? "" : (shi.ShouQu - shi.ShouQuGongTuo).ToString());
+                string shouQuGongTuo = $"{(shi.ShouQuGongTuo > 0 ? "+" : "")}{(shi.ShouQuGongTuo == 0 ? "" : shi.ShouQuGongTuo)}";
+                string shouQu = $"{(shi.ShouQu - shi.ShouQuGongTuo > 0 ? "+" : "")}{(shi.ShouQu - shi.ShouQuGongTuo == 0 ? "" : (shi.ShouQu - shi.ShouQuGongTuo))}";
 
                 int len = shouQuGongTuo.Length;
                 if (len < shouQu.Length)
@@ -4340,16 +4340,16 @@ namespace Assets.Source.Maqiao
                         shi.JiLu.shunWei4++;
                         break;
                 }
-                File.WriteAllText(Application.persistentDataPath + "/" + shi.MingQian + ".json", JsonUtility.ToJson(shi.JiLu));
+                File.WriteAllText($"{Application.persistentDataPath}/{shi.MingQian}.json", JsonUtility.ToJson(shi.JiLu));
             }
 
             banZhuangShu++;
 
-            Debug.Log(banZhuangShu + "回戦");
+            Debug.Log($"{banZhuangShu}回戦");
             for (int i = 0; i < shunWei.Count; i++)
             {
                 QiaoShi shi = shunWei[i].shi;
-                Debug.Log(" " + (i + 1) + "位 " + shi.MingQian + "(" + shi.JiJiDian + ")");
+                Debug.Log($" { i + 1}位 {shi.MingQian}({shi.JiJiDian})");
             }
             eventStatus = Event.QIAO_SHI_XUAN_ZE;
 
@@ -4430,12 +4430,12 @@ namespace Assets.Source.Maqiao
                 string dianBang = shi.DianBang.ToString();
                 for (int j = dianBang.Length; j < maxDianBang; j++)
                 {
-                    dianBang = " " + dianBang;
+                    dianBang = $" {dianBang}";
                 }
-                string deDian = (shi.JiJiDian > 0 ? "+" : "") + shi.JiJiDian.ToString();
+                string deDian = $"{(shi.JiJiDian > 0 ? "+" : "") + shi.JiJiDian})";
                 for (int j = deDian.Length; j < maxDeDian; j++)
                 {
-                    deDian = " " + deDian;
+                    deDian = $" {deDian}";
                 }
 
                 DrawText(ref goMingQian[i], shi.MingQian, new Vector2(-(paiWidth * 5f), y), 0, 30, TextAlignmentOptions.Left, quiaoShiButtonMaxLen);
