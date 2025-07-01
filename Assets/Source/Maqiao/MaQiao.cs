@@ -1063,25 +1063,16 @@ namespace Assets.Source.Maqiao
 
             TextMeshProUGUI title = Instantiate(goText, goGuiZeContent.transform);
             DrawText(ref title, "ルール", new Vector2(0, y), 0, 25);
-            y -= offset;
-
-            DrawToggleGuiZe(() => Chang.guiZe.banZhuang, v => Chang.guiZe.banZhuang = v, new string[] { "半荘戦", "東風戦" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.ziMoPingHe, v => Chang.guiZe.ziMoPingHe = v, new string[] { "ピンヅモ有り", "ピンヅモ無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.shiDuan, v => Chang.guiZe.shiDuan = v, new string[] { "食いタン有り", "食いタン無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.shiTi, v => Chang.guiZe.shiTi = v, new string[] { "食い替え有り", "食い替え無し（チョンボ扱い）" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.wRongHe, v => Chang.guiZe.wRongHe = v, new string[] { "ダブルロン無し（頭ハネ）", "ダブルロン有り" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.tRongHe, v => Chang.guiZe.tRongHe = v, new string[] { "トリプルロン無し（頭ハネ）", "トリプルロン有り", "トリプルロンは流局（親連荘）", "トリプルロンは流局（親流れ）" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.baoZe, v => Chang.guiZe.baoZe = v, new string[] { "パオ（責任払い）有り", "パオ（責任払い）無し" }, new Vector2(x, y));
-            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.banZhuang, v => Chang.guiZe.banZhuang = v, new string[] { "半荘戦", "東風戦" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.ziMoPingHe, v => Chang.guiZe.ziMoPingHe = v, new string[] { "ピンヅモ有り", "ピンヅモ無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.shiDuan, v => Chang.guiZe.shiDuan = v, new string[] { "食いタン有り", "食いタン無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.shiTi, v => Chang.guiZe.shiTi = v, new string[] { "食い替え有り", "食い替え無し（チョンボ扱い）" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.wRongHe, v => Chang.guiZe.wRongHe = v, new string[] { "ダブルロン無し（頭ハネ）", "ダブルロン有り" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.tRongHe, v => Chang.guiZe.tRongHe = v, new string[] { "トリプルロン無し（頭ハネ）", "トリプルロン有り", "トリプルロンは流局（親連荘）", "トリプルロンは流局（親流れ）" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.baoZe, v => Chang.guiZe.baoZe = v, new string[] { "パオ（責任払い）有り", "パオ（責任払い）無し" }, new Vector2(x, y -= offset));
             string[] chiPaiShuText = new string[] { "赤ドラ無し", "赤ドラ有り（各１枚）" };
             Button buttonChiPaiShu = Instantiate(goButton, goGuiZeContent.transform);
-            DrawButton(ref buttonChiPaiShu, Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1], new Vector2(x, y), 12);
+            DrawButton(ref buttonChiPaiShu, Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1], new Vector2(x, y -= offset), 12);
             TextMeshProUGUI text = buttonChiPaiShu.GetComponentInChildren<TextMeshProUGUI>();
             text.fontSize = 17f;
             buttonChiPaiShu.onClick.AddListener(() =>
@@ -1090,40 +1081,26 @@ namespace Assets.Source.Maqiao
                 text.text = Chang.guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1];
                 File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(Chang.guiZe));
             });
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌無し", "九種九牌は流局（親連荘）", "九種九牌は流局（親流れ）" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.siJiaLiZhiLianZhuang, v => Chang.guiZe.siJiaLiZhiLianZhuang = v, new string[] { "四家立直は続行", "四家立直は流局（親連荘）", "四家立直は流局（親流れ）" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.siFengZiLianDaLianZhuang, v => Chang.guiZe.siFengZiLianDaLianZhuang = v, new string[] { "四風子連打無し", "四風子連打は流局（親連荘）", "四風子連打は流局（親流れ）" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.siKaiGangLianZhuang, v => Chang.guiZe.siKaiGangLianZhuang = v, new string[] { "四開槓は流局（親連荘）", "四開槓は流局（親流れ）" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.xiang, v => Chang.guiZe.xiang = v, new string[] { "箱（０点以下で終了）有り", "箱（０点以下で終了）無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.jieJinLiZhi, v => Chang.guiZe.jieJinLiZhi = v, new string[] { "１０００点未満のリーチ可能", "１０００点未満のリーチ不可" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.liuManGuan, v => Chang.guiZe.liuManGuan = v, new string[] { "流し満貫有り", "流し満貫無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.sanLianKe, v => Chang.guiZe.sanLianKe = v, new string[] { "三連刻有り", "三連刻無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.yanFan, v => Chang.guiZe.yanFan = v, new string[] { "燕返し有り", "燕返し無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.kaiLiZhi, v => Chang.guiZe.kaiLiZhi = v, new string[] { "オープンリーチ有り", "オープンリーチ無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.shiSanBuTa, v => Chang.guiZe.shiSanBuTa = v, new string[] { "十三不塔有り", "十三不塔無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.baLianZhuang, v => Chang.guiZe.baLianZhuang = v, new string[] { "八連荘有り", "八連荘無し" }, new Vector2(x, y));
-            y -= offset;
-            DrawToggleGuiZe(() => Chang.guiZe.localYiMan, v => Chang.guiZe.localYiMan = v, new string[] { "ローカル役満有り", "ローカル役満無し" }, new Vector2(x, y));
-            y -= offset;
+            DrawToggleGuiZe(() => Chang.guiZe.jiuZhongJiuPaiLianZhuang, v => Chang.guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌無し", "九種九牌は流局（親連荘）", "九種九牌は流局（親流れ）" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.siJiaLiZhiLianZhuang, v => Chang.guiZe.siJiaLiZhiLianZhuang = v, new string[] { "四家立直は続行", "四家立直は流局（親連荘）", "四家立直は流局（親流れ）" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.siFengZiLianDaLianZhuang, v => Chang.guiZe.siFengZiLianDaLianZhuang = v, new string[] { "四風子連打無し", "四風子連打は流局（親連荘）", "四風子連打は流局（親流れ）" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.siKaiGangLianZhuang, v => Chang.guiZe.siKaiGangLianZhuang = v, new string[] { "四開槓は流局（親連荘）", "四開槓は流局（親流れ）" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.xiang, v => Chang.guiZe.xiang = v, new string[] { "箱（０点以下で終了）有り", "箱（０点以下で終了）無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.jieJinLiZhi, v => Chang.guiZe.jieJinLiZhi = v, new string[] { "１０００点未満のリーチ可能", "１０００点未満のリーチ不可" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.liuManGuan, v => Chang.guiZe.liuManGuan = v, new string[] { "流し満貫有り", "流し満貫無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.sanLianKe, v => Chang.guiZe.sanLianKe = v, new string[] { "三連刻有り", "三連刻無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.yanFan, v => Chang.guiZe.yanFan = v, new string[] { "燕返し有り", "燕返し無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.kaiLiZhi, v => Chang.guiZe.kaiLiZhi = v, new string[] { "オープンリーチ有り", "オープンリーチ無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.shiSanBuTa, v => Chang.guiZe.shiSanBuTa = v, new string[] { "十三不塔有り", "十三不塔無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.baLianZhuang, v => Chang.guiZe.baLianZhuang = v, new string[] { "八連荘有り", "八連荘無し" }, new Vector2(x, y -= offset));
+            DrawToggleGuiZe(() => Chang.guiZe.localYiMan, v => Chang.guiZe.localYiMan = v, new string[] { "ローカル役満有り", "ローカル役満無し" }, new Vector2(x, y -= offset));
 
             Button resetButton = Instantiate(goButton, goGuiZeContent.transform);
             resetButton.onClick.AddListener(() =>
             {
                 goGuiZeDialogPanel.SetActive(true);
             });
-            DrawButton(ref resetButton, "リセット", new Vector2(0, y - paiHeight * 0.5f));
+            DrawButton(ref resetButton, "リセット", new Vector2(0, y - paiHeight * 1.5f));
         }
 
         // トグルボタン描画
@@ -2050,7 +2027,7 @@ namespace Assets.Source.Maqiao
         private void OnClickFollowQiaoShi(string mingQian)
         {
             Chang.QiaoShis.Insert(0, GetQiaoShi(mingQian, true));
-            Chang.QiaoShis[0].MingQian = PLAYER_NAME;
+            Chang.QiaoShis[0].MingQian = $"{mingQian}Ｆ";
             Chang.QiaoShis[0].Follow = true;
             Chang.QiaoShis[0].Player = true;
             keyPress = true;
@@ -4432,7 +4409,7 @@ namespace Assets.Source.Maqiao
                 {
                     dianBang = $" {dianBang}";
                 }
-                string deDian = $"{(shi.JiJiDian > 0 ? "+" : "") + shi.JiJiDian})";
+                string deDian = $"（{(shi.JiJiDian > 0 ? "+" : "")}{shi.JiJiDian}）";
                 for (int j = deDian.Length; j < maxDeDian; j++)
                 {
                     deDian = $" {deDian}";
