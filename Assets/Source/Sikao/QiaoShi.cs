@@ -558,15 +558,7 @@ namespace Assets.Source.Sikao
             List<int> sp = new();
             for (int i = 0; i < 0x30; i++)
             {
-                if (i < ShePai.Count)
-                {
-                    (int pai, YaoDingYi _, bool _) = ShePai[i];
-                    sp.Add(pai);
-                }
-                else
-                {
-                    sp.Add(0);
-                }
+                sp.Add(i < ShePai.Count ? ShePai[i].pai : 0);
             }
             if (ziJia)
             {
@@ -586,15 +578,6 @@ namespace Assets.Source.Sikao
         internal abstract void SiKaoTaJia();
         internal abstract IEnumerator SiKaoTaJiaCoroutine();
 
-        // 初期化
-        protected static void Init(int[] list, int value)
-        {
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = value;
-            }
-        }
-
         // 荘初期化
         internal void ZhuangChuQiHua()
         {
@@ -611,8 +594,8 @@ namespace Assets.Source.Sikao
             BaoZeFan = -1;
             TaJiaFuLuShu = 0;
             ShePai = new();
-            Init(ShePaiShu, 0);
-            Init(LiZhiShePaiShu, 0);
+            Array.Fill(ShePaiShu, 0);
+            Array.Fill(LiZhiShePaiShu, 0);
             liZhiHouPai = new();
             LiZhiWei = -1;
             DaiPai = new();
@@ -1189,7 +1172,7 @@ namespace Assets.Source.Sikao
             }
             JiuZhongJiuPai = false;
 
-            Init(ShouPaiDian, 0);
+            Array.Fill(ShouPaiDian, 0);
         }
 
         // 字牌判定
@@ -1687,61 +1670,50 @@ namespace Assets.Source.Sikao
         private void DianJiSuan()
         {
             HeLeDian = 0;
-            if (!YiMan)
+            if (YiMan)
             {
-                if (FanShuJi < 5)
-                {
-                    HeLeDian = (Feng == 0x31 ? 6 : 4) * 2 * 2 * Fu;
-                    for (int i = 0; i < FanShuJi; i++)
-                    {
-                        HeLeDian *= 2;
-                    }
-                    HeLeDian = Chang.Ceil(HeLeDian, 100);
-                    if (Feng == 0x31)
-                    {
-                        if (HeLeDian > 12000)
-                        {
-                            HeLeDian = 12000;
-                        }
-                    }
-                    else
-                    {
-                        if (HeLeDian > 8000)
-                        {
-                            HeLeDian = 8000;
-                        }
-                    }
-                }
-                else if (FanShuJi == 5)
-                {
-                    // 満貫
-                    HeLeDian = Feng == 0x31 ? 12000 : 8000;
-                }
-                else if (FanShuJi == 6 || FanShuJi == 7)
-                {
-                    // 跳満
-                    HeLeDian = Feng == 0x31 ? 18000 : 12000;
-                }
-                else if (FanShuJi == 8 || FanShuJi == 9 || FanShuJi == 10)
-                {
-                    // 倍満
-                    HeLeDian = Feng == 0x31 ? 24000 : 16000;
-                }
-                else if (FanShuJi == 11 || FanShuJi == 12)
-                {
-                    // 三倍満
-                    HeLeDian = Feng == 0x31 ? 36000 : 24000;
-                }
-                else if (FanShuJi >= 13)
-                {
-                    // 役満
-                    HeLeDian = Feng == 0x31 ? 48000 : 32000;
-                }
+                HeLeDian = (Feng == 0x31 ? 48000 : 32000) * FanShuJi;
+                return;
+            }
 
+            if (FanShuJi < 5)
+            {
+                HeLeDian = (Feng == 0x31 ? 6 : 4) * 2 * 2 * Fu;
+                for (int i = 0; i < FanShuJi; i++)
+                {
+                    HeLeDian *= 2;
+                }
+                HeLeDian = Chang.Ceil(HeLeDian, 100);
+                int limit = Feng == 0x31 ? 12000 : 8000;
+                if (HeLeDian > limit)
+                {
+                    HeLeDian = limit;
+                }
+            }
+            else if (FanShuJi == 5)
+            {
+                // 満貫
+                HeLeDian = Feng == 0x31 ? 12000 : 8000;
+            }
+            else if (FanShuJi <= 7)
+            {
+                // 跳満
+                HeLeDian = Feng == 0x31 ? 18000 : 12000;
+            }
+            else if (FanShuJi <= 10)
+            {
+                // 倍満
+                HeLeDian = Feng == 0x31 ? 24000 : 16000;
+            }
+            else if (FanShuJi <= 12)
+            {
+                // 三倍満
+                HeLeDian = Feng == 0x31 ? 36000 : 24000;
             }
             else
             {
-                HeLeDian = (Feng == 0x31 ? 48000 : 32000) * FanShuJi;
+                // 役満
+                HeLeDian = Feng == 0x31 ? 48000 : 32000;
             }
         }
 
@@ -1765,14 +1737,9 @@ namespace Assets.Source.Sikao
             int yaoJiuPaiShu = 0;
             foreach (int p in Pai.YaoJiuPaiDingYi)
             {
-                for (int j = 0; j < ShouPai.Count; j++)
+                if (ShouPai.Exists(sp => (sp & QIAO_PAI) == p))
                 {
-                    int sp = ShouPai[j] & QIAO_PAI;
-                    if (p == sp)
-                    {
-                        yaoJiuPaiShu++;
-                        break;
-                    }
+                    yaoJiuPaiShu++;
                 }
             }
             return yaoJiuPaiShu;
@@ -1823,7 +1790,7 @@ namespace Assets.Source.Sikao
                 int wei = 0;
                 List<int> hp = new();
                 int[] dian = new int[0x40];
-                Init(dian, 0);
+                Array.Fill(dian, 0);
                 foreach (int p in Pai.QiaoPai)
                 {
                     ShouPai[^1] = p;
@@ -2078,41 +2045,6 @@ namespace Assets.Source.Sikao
             }
             return false;
         }
-
-        // // 鳴選択
-        // protected int MingXuanZe(List<List<int>> paiWei)
-        // {
-        //     // 向聴数計算
-        //     XiangTingShuJiSuan(-1);
-        //     int xiangTing = XiangTingShu;
-        //     int xuanZe = -1;
-        //     for (int i = 0; i < paiWei.Count; i++)
-        //     {
-        //         List<int> shouPaiC = new(ShouPai);
-        //         for (int j = 0; j < paiWei[i].Count; j++)
-        //         {
-        //             ShouPai[paiWei[i][j]] = 0xff;
-        //         }
-        //         LiPai();
-        //         int minXiangTing = 99;
-        //         for (int j = 0; j < ShouPai.Count - paiWei[i].Count; j++)
-        //         {
-        //             // 向聴数計算(副露牌は処理していない状態なので面子数を1加算して計算)
-        //             XiangTingShuJiSuan(j, 1);
-        //             if (minXiangTing > XiangTingShu)
-        //             {
-        //                 minXiangTing = XiangTingShu;
-        //             }
-        //         }
-        //         if (xiangTing > minXiangTing)
-        //         {
-        //             xiangTing = minXiangTing;
-        //             xuanZe = i;
-        //         }
-        //         ShouPai = new(shouPaiC);
-        //     }
-        //     return xuanZe;
-        // }
 
         // 食替牌判定
         private void ShiTiPaiPanDing()
@@ -2502,7 +2434,7 @@ namespace Assets.Source.Sikao
                 return;
             }
             int[] jiuLian = new int[10];
-            Init(jiuLian, 0);
+            Array.Fill(jiuLian, 0);
             int se = -1;
             foreach (int sp in ShouPai)
             {
@@ -3837,13 +3769,9 @@ namespace Assets.Source.Sikao
         }
 
         // 手牌数計算
-        protected void ShouPaiShuJiSuan()
+        protected void ShouPaiShuJiSuan(bool fuLu = false)
         {
-            ShouPaiShuJiSuan(false);
-        }
-        protected void ShouPaiShuJiSuan(bool fuLu)
-        {
-            Init(ShouPaiShu, 0);
+            Array.Fill(ShouPaiShu, 0);
             foreach (int sp in ShouPai)
             {
                 ShouPaiShu[sp & QIAO_PAI]++;
@@ -3865,7 +3793,7 @@ namespace Assets.Source.Sikao
         // 公開牌数計算
         internal void GongKaiPaiShuJiSuan()
         {
-            Init(GongKaiPaiShu, 0);
+            Array.Fill(GongKaiPaiShu, 0);
             foreach (QiaoShi shi in Chang.QiaoShis)
             {
                 if (shi.KaiLiZhi && shi.Feng != Feng)
@@ -3919,7 +3847,7 @@ namespace Assets.Source.Sikao
         // 副露牌数計算
         protected void FuLuPaiShuJiSuan()
         {
-            Init(FuLuPaiShu, 0);
+            Array.Fill(FuLuPaiShu, 0);
             foreach ((List<int> pais, _, _) in FuLuPai)
             {
                 foreach (int fp in pais)

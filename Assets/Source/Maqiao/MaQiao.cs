@@ -3123,32 +3123,6 @@ namespace Assets.Source.Maqiao
             {
                 DrawSheng(Chang.ZiMoFan, QiaoShi.YaoDingYi.SiFengZiLianDa);
             }
-            // 栄和
-            if (Chang.TaJiaYao == QiaoShi.YaoDingYi.RongHe)
-            {
-                foreach ((int fan, _) in Chang.RongHeFan)
-                {
-                    DrawSheng(fan, QiaoShi.YaoDingYi.RongHe);
-                }
-                if (Chang.RongHeFan.Count == 3)
-                {
-                    if (Chang.guiZe.tRongHe == 0)
-                    {
-                        DrawSheng(Chang.MingFan, "ロン(頭ハネ)");
-                    }
-                    else if (Chang.guiZe.tRongHe >= 2)
-                    {
-                        DrawSheng(Chang.RongHeFan[2].fan, "ロン(流局)");
-                    }
-                }
-                else if (Chang.RongHeFan.Count == 2)
-                {
-                    if (Chang.guiZe.tRongHe == 0)
-                    {
-                        DrawSheng(Chang.MingFan, "ロン(頭ハネ)");
-                    }
-                }
-            }
         }
 
         // 【描画】自家腰
@@ -3788,6 +3762,35 @@ namespace Assets.Source.Maqiao
             {
                 return;
             }
+
+            // 栄和
+            if (yao == QiaoShi.YaoDingYi.RongHe)
+            {
+                foreach ((int fan, _) in Chang.RongHeFan)
+                {
+                    DrawSheng(fan, QiaoShi.YaoMing(QiaoShi.YaoDingYi.RongHe));
+                }
+                if (Chang.RongHeFan.Count == 3)
+                {
+                    if (Chang.guiZe.tRongHe == 0)
+                    {
+                        DrawSheng(Chang.MingFan, "ロン(頭ハネ)");
+                    }
+                    else if (Chang.guiZe.tRongHe >= 2)
+                    {
+                        DrawSheng(Chang.RongHeFan[2].fan, "ロン(流局)");
+                    }
+                }
+                else if (Chang.RongHeFan.Count == 2)
+                {
+                    if (Chang.guiZe.tRongHe == 0)
+                    {
+                        DrawSheng(Chang.MingFan, "ロン(頭ハネ)");
+                    }
+                }
+                return;
+            }
+
             string text = QiaoShi.YaoMing(yao);
             QiaoShi shi = Chang.QiaoShis[jia];
             if (yao == QiaoShi.YaoDingYi.LiZhi && shi.KaiLiZhi)
@@ -4326,7 +4329,7 @@ namespace Assets.Source.Maqiao
             for (int i = 0; i < shunWei.Count; i++)
             {
                 QiaoShi shi = shunWei[i].shi;
-                Debug.Log($" { i + 1}位 {shi.MingQian}({shi.JiJiDian})");
+                Debug.Log($" {i + 1}位 {shi.MingQian}({shi.JiJiDian})");
             }
             eventStatus = Event.QIAO_SHI_XUAN_ZE;
 

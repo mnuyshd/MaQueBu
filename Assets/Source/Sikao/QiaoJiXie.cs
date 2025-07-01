@@ -537,7 +537,7 @@ namespace Assets.Source.Sikao
         private (int se, int maxShu) SeSuan()
         {
             int[] shu = new int[4];
-            Init(shu, 0);
+            Array.Fill(shu, 0);
             for (int i = 0; i < ShouPaiShu.Length; i++)
             {
                 if (ShouPaiShu[i] > 0)
@@ -754,7 +754,7 @@ namespace Assets.Source.Sikao
 
             // 手牌数計算
             ShouPaiShuJiSuan();
-            Init(shouPaiDianShu, 1);
+            Array.Fill(shouPaiDianShu, 1);
             // 刻子
             for (int i = 0x01; i <= 0x37; i++)
             {
@@ -821,7 +821,7 @@ namespace Assets.Source.Sikao
 
             // 手牌数計算
             ShouPaiShuJiSuan();
-            Init(shouPaiDianShu, 1);
+            Array.Fill(shouPaiDianShu, 1);
             // 順子(1-9)
             for (int i = 0x01; i <= 0x27; i++)
             {
@@ -967,7 +967,7 @@ namespace Assets.Source.Sikao
 
             // 手牌数計算
             ShouPaiShuJiSuan();
-            Init(shouPaiDianShu, 1);
+            Array.Fill(shouPaiDianShu, 1);
             // 順子(9-1)
             for (int i = 0x29; i >= 0x03; i--)
             {
@@ -1113,7 +1113,7 @@ namespace Assets.Source.Sikao
 
             // 手牌数計算
             ShouPaiShuJiSuan();
-            Init(shouPaiDianShu, 1);
+            Array.Fill(shouPaiDianShu, 1);
             // 孤立牌への加減点
             for (int i = 0; i < ShouPai.Count; i++)
             {
