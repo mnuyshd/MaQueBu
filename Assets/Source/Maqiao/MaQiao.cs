@@ -3476,6 +3476,7 @@ namespace Assets.Source.Maqiao
                     {
                         shi.goFuLuPai[i][3] = Instantiate(goPai, goPai.transform.parent);
                         shi.goFuLuPai[i][3].transform.Rotate(0, 0, 90 * GetDrawOrder(shi.PlayOrder));
+                        shi.goFuLuPai[i][3].transform.SetSiblingIndex(0);
                     }
                     if (isMingPai)
                     {
