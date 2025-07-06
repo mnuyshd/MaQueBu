@@ -77,18 +77,8 @@ namespace Assets.Source.Gongtong
         {
             for (int i = 0; i < num; i++)
             {
-                int n1 = r.Next(0, list.Count);
+                int n1 = r.Next(list.Count);
                 int n2 = r.Next(list.Count);
-                (list[n2], list[n1]) = (list[n1], list[n2]);
-            }
-        }
-        internal static void Shuffle(int[] list, int num)
-        {
-            Random r = new();
-            for (int i = 0; i < num; i++)
-            {
-                int n1 = r.Next(0, list.Length);
-                int n2 = r.Next(list.Length);
                 (list[n2], list[n1]) = (list[n1], list[n2]);
             }
         }

@@ -356,37 +356,37 @@ namespace Assets.Source.Sikao
         // 和了点
         internal int HeLeDian { get; private set; }
         // 点棒
-        internal int DianBang { get; set; }
+        internal int DianBang { get; private set; }
         // 集計点
-        internal int JiJiDian { get; set; }
+        internal int JiJiDian { get; private set; }
         // 風
-        internal int Feng { get; set; }
+        internal int Feng { get; private set; }
         // 手牌
-        internal List<int> ShouPai { get; set; }
+        internal List<int> ShouPai { get; private set; }
         internal Button[] goShouPai;
         // 副露牌(牌、家、腰)
-        internal List<(List<int> pais, int jia, YaoDingYi yao)> FuLuPai { get; set; }
+        internal List<(List<int> pais, int jia, YaoDingYi yao)> FuLuPai { get; private set; }
         internal Button[][] goFuLuPai;
         // 包則番
-        internal int BaoZeFan { get; set; }
+        internal int BaoZeFan { get; private set; }
         // 他家副露数
-        internal int TaJiaFuLuShu { get; set; }
+        internal int TaJiaFuLuShu { get; private set; }
         // 捨牌(牌、腰、自摸切)
-        internal List<(int pai, YaoDingYi yao, bool ziMoQie)> ShePai { get; set; }
+        internal List<(int pai, YaoDingYi yao, bool ziMoQie)> ShePai { get; private set; }
         internal Button[] goShePai = new Button[0x30];
         // 立直位
-        internal int LiZhiWei { get; set; }
+        internal int LiZhiWei { get; private set; }
         // 同順牌
         private List<int> tongShunPai = new();
         // 立直後牌
         private List<int> liZhiHouPai;
         // 待牌
-        internal List<int> DaiPai { get; set; }
+        internal List<int> DaiPai { get; private set; }
         internal Button[] goDaiPai = new Button[13];
         // 残牌数
         internal TextMeshProUGUI[] goCanPaiShu = new TextMeshProUGUI[13];
         // 有効牌数
-        internal List<int> YouXiaoPaiShu { get; set; }
+        internal List<int> YouXiaoPaiShu { get; private set; }
         // 向聴数
         internal int XiangTingShu { get; private set; }
         internal TextMeshProUGUI goXiangTingShu;
@@ -399,25 +399,25 @@ namespace Assets.Source.Sikao
         // 塔子
         private List<List<int>> taZi;
         // 手牌数
-        internal int[] ShouPaiShu { get; set; } = new int[0x40];
+        internal int[] ShouPaiShu { get; private set; } = new int[0x40];
         // 副露牌数
-        internal int[] FuLuPaiShu { get; set; } = new int[0x40];
+        internal int[] FuLuPaiShu { get; private set; } = new int[0x40];
         // 捨牌数
-        internal int[] ShePaiShu { get; set; } = new int[0x40];
+        internal int[] ShePaiShu { get; private set; } = new int[0x40];
         // 立直後捨牌数
-        internal int[] LiZhiShePaiShu { get; set; } = new int[0x40];
+        internal int[] LiZhiShePaiShu { get; private set; } = new int[0x40];
         // 公開牌数
-        internal int[] GongKaiPaiShu { get; set; } = new int[0x40];
+        internal int[] GongKaiPaiShu { get; private set; } = new int[0x40];
         // 和了
-        internal bool HeLe { get; set; }
+        internal bool HeLe { get; private set; }
         // 立直
-        internal bool LiZhi { get; set; }
+        internal bool LiZhi { get; private set; }
         // 開立直
-        internal bool KaiLiZhi { get; set; }
+        internal bool KaiLiZhi { get; private set; }
         // W立直
         private bool wLiZhi;
         // 一発
-        internal bool YiFa { get; set; }
+        internal bool YiFa { get; private set; }
         // 一巡目
         private bool yiXunMu;
         // 副露順
@@ -427,41 +427,41 @@ namespace Assets.Source.Sikao
         // 終了
         internal bool ZhongLiao { get; set; }
         // 自家
-        internal bool JiJia { get; set; }
+        internal bool JiJia { get; private set; }
         // 和了牌(牌、位、予想点)
-        internal List<(List<int> pais, int wei, int[] yuXiangDian)> HeLePai { get; set; }
+        internal List<(List<int> pais, int wei, int[] yuXiangDian)> HeLePai { get; private set; }
         // 立直牌位
-        internal List<int> LiZhiPaiWei { get; set; }
+        internal List<int> LiZhiPaiWei { get; private set; }
         // 暗槓牌位
-        internal List<List<int>> AnGangPaiWei { get; set; }
+        internal List<List<int>> AnGangPaiWei { get; private set; }
         // 加槓牌位
-        internal List<List<int>> JiaGangPaiWei { get; set; }
+        internal List<List<int>> JiaGangPaiWei { get; private set; }
         // 大明槓牌位
-        internal List<List<int>> DaMingGangPaiWei { get; set; }
+        internal List<List<int>> DaMingGangPaiWei { get; private set; }
         // 石並牌位
-        internal List<List<int>> BingPaiWei { get; set; }
+        internal List<List<int>> BingPaiWei { get; private set; }
         // 吃牌位
-        internal List<List<int>> ChiPaiWei { get; set; }
+        internal List<List<int>> ChiPaiWei { get; private set; }
         // 九種九牌
-        internal bool JiuZhongJiuPai { get; set; }
+        internal bool JiuZhongJiuPai { get; private set; }
         // 受取
-        internal int ShouQu { get; set; }
+        internal int ShouQu { get; private set; }
         // 受取(供託)
-        internal int ShouQuGongTuo { get; set; }
+        internal int ShouQuGongTuo { get; private set; }
         // 錯和声
-        internal string CuHeSheng { get; set; }
+        internal string CuHeSheng { get; private set; }
         // 食替牌
-        internal List<int> ShiTiPai { get; set; } = new();
+        internal List<int> ShiTiPai { get; private set; } = new();
         // 手牌点数
-        internal int[] ShouPaiDian { get; set; }
+        internal int[] ShouPaiDian { get; private set; }
         // 連荘数
         internal int LianZhuangShu { get; set; }
 
         // 打牌後
-        internal bool DaPaiHou { get; set; }
+        internal bool DaPaiHou { get; private set; }
 
         // 流し満貫
-        internal bool LiuShiManGuan { get; set; }
+        internal bool LiuShiManGuan { get; private set; }
         // 点数（表示用）
         internal int ShuBiao { get; set; }
 
@@ -1098,6 +1098,7 @@ namespace Assets.Source.Sikao
                 {
                     HeLeDian = 8000;
                 }
+                LiuShiManGuan = true;
                 return true;
             }
             return false;

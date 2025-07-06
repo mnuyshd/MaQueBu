@@ -2867,7 +2867,6 @@ namespace Assets.Source.Maqiao
                             Chang.ZiJiaYao = QiaoShi.YaoDingYi.ZiMo;
                             Chang.ZiMoFan = jia;
                             Chang.HeleFan = jia;
-                            Chang.QiaoShis[jia].LiuShiManGuan = true;
                             break;
                         }
                     }
