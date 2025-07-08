@@ -2774,6 +2774,17 @@ namespace Assets.Source.Maqiao
                         Chang.RongHeFan.RemoveAt(1);
                     }
                 }
+                if (Chang.RongHeFan.Count >= 2)
+                {
+                    // ダブル栄和・トリプル栄和の場合、親が栄和した場合は連荘
+                    foreach ((int fan, _) in Chang.RongHeFan)
+                    {
+                        if (Chang.QiaoShis[fan].Feng == 0x31)
+                        {
+                            tingPaiLianZhuang = Zhuang.LIAN_ZHUANG;
+                        }
+                    }
+                }
 
                 Chang.HeleFan = Chang.MingFan;
                 eventStatus = Event.YI_BIAO_SHI;
