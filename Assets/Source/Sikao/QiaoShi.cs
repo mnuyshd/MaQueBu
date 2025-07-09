@@ -1423,7 +1423,7 @@ namespace Assets.Source.Sikao
             int minXiangTing = 99;
             for (int i = 0; i < ShouPai.Count; i++)
             {
-                XiangTingShuJiSuan(i, FuLuPai.Count);
+                XiangTingShuJiSuan(i);
                 if (minXiangTing > XiangTingShu)
                 {
                     minXiangTing = XiangTingShu;
