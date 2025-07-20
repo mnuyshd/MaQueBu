@@ -2444,6 +2444,10 @@ namespace Assets.Source.Maqiao
 
             if (Chang.ZiJiaYao == QiaoShi.YaoDingYi.AnGang || Chang.ZiJiaYao == QiaoShi.YaoDingYi.JiaGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.DaMingGang || Chang.TaJiaYao == QiaoShi.YaoDingYi.Chi || Chang.TaJiaYao == QiaoShi.YaoDingYi.Bing)
             {
+                if (!ziJiaShi.Player)
+                {
+                    yield return new WaitForSeconds(waitTime);
+                }
                 // 鳴処理
                 ziJiaShi.MingChuLi();
                 // 消
