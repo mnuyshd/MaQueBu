@@ -6,7 +6,7 @@ using System.Collections;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Assets.Source.Sikao.Shi
+namespace Assets.Scripts.Sikao.Shi
 {
     // 学習雀士
     internal class QiaoXueXi : QiaoJiXie

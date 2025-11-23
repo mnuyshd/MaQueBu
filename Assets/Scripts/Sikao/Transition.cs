@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Assets.Source.Sikao
+namespace Assets.Scripts.Sikao
 {
     // 遷移
     public class Transition

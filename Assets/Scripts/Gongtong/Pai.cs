@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-using Assets.Source.Sikao;
+using Assets.Scripts.Sikao;
 
-namespace Assets.Source.Gongtong
+namespace Assets.Scripts.Gongtong
 {
     // 牌
     internal class Pai

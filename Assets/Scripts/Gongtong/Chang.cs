@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Assets.Source.Sikao;
+using Assets.Scripts.Sikao;
 
-namespace Assets.Source.Gongtong
+namespace Assets.Scripts.Gongtong
 {
     // 場
     internal class Chang

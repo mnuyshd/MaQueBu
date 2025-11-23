@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
-using Assets.Source.Gongtong;
+using Assets.Scripts.Gongtong;
 
-namespace Assets.Source.Sikao
+namespace Assets.Scripts.Sikao
 {
     // 雀士
     internal abstract class QiaoShi

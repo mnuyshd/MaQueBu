@@ -1,4 +1,4 @@
-namespace Assets.Source.Sikao.Shi
+namespace Assets.Scripts.Sikao.Shi
 {
     internal class SomeyaMei : QiaoJiXie
     {

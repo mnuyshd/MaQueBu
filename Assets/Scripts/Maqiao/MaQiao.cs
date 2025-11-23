@@ -11,12 +11,12 @@ using Unity.VisualScripting;
 using TMPro;
 using Newtonsoft.Json;
 
-using Assets.Source.Gongtong;
-using Assets.Source.Sikao;
-using Assets.Source.Sikao.Shi;
-using State = Assets.Source.Sikao.State;
+using Assets.Scripts.Gongtong;
+using Assets.Scripts.Sikao;
+using Assets.Scripts.Sikao.Shi;
+using State = Assets.Scripts.Sikao.State;
 
-namespace Assets.Source.Maqiao
+namespace Assets.Scripts.Maqiao
 {
     // 麻雀
     internal class MaQiao : MonoBehaviour

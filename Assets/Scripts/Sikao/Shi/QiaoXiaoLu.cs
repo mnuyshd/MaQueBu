@@ -1,6 +1,6 @@
-using Assets.Source.Gongtong;
+using Assets.Scripts.Gongtong;
 
-namespace Assets.Source.Sikao.Shi
+namespace Assets.Scripts.Sikao.Shi
 {
     // 効率雀士
     internal class QiaoXiaoLu : QiaoJiXie

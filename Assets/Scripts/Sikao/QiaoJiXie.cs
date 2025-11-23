@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Assets.Source.Gongtong;
+using Assets.Scripts.Gongtong;
 
-namespace Assets.Source.Sikao
+namespace Assets.Scripts.Sikao
 {
     // 機械雀士
     internal class QiaoJiXie : QiaoShi

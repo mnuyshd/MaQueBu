@@ -1,4 +1,4 @@
-namespace Assets.Source.Gongtong
+namespace Assets.Scripts.Gongtong
 {
     // 規則
     public class GuiZe

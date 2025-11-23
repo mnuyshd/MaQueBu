@@ -1,4 +1,4 @@
-namespace Assets.Source.Maqiao
+namespace Assets.Scripts.Maqiao
 {
     // 記録
     public class JiLu
