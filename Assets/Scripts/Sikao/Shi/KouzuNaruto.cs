@@ -1,21 +1,18 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    internal class KouzuNaruto : QiaoJiXie
+    public class KouzuNaruto : QiaoJiXie
     {
-        internal const string MING_QIAN = "河津鳴人";
-        internal KouzuNaruto() : base(MING_QIAN)
+        public const string MING_QIAN = "河津鳴人";
+        public KouzuNaruto() : base(MING_QIAN)
         {
-            nao = new()
-            {
-                { XingGe.XUAN_SHANG, 50 },
-                { XingGe.YI_PAI, 80 },
-                { XingGe.SHUN_ZI, 10 },
-                { XingGe.KE_ZI, 100 },
-                { XingGe.LI_ZHI, 50 },
-                { XingGe.MING, 80 },
-                { XingGe.RAN, 10 },
-                { XingGe.TAO, 40 },
-            };
+            naos[(int)XingGe.XUAN_SHANG].score = 50;
+            naos[(int)XingGe.YI_PAI].score = 80;
+            naos[(int)XingGe.SHUN_ZI].score = 10;
+            naos[(int)XingGe.KE_ZI].score = 100;
+            naos[(int)XingGe.LI_ZHI].score = 50;
+            naos[(int)XingGe.MING].score = 80;
+            naos[(int)XingGe.RAN].score = 10;
+            naos[(int)XingGe.TAO].score = 40;
         }
     }
 }

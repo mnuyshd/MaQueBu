@@ -1,21 +1,18 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    internal class UchidaKou : QiaoJiXie
+    public class UchidaKou : QiaoJiXie
     {
-        internal const string MING_QIAN = "打田攻";
-        internal UchidaKou() : base(MING_QIAN)
+        public const string MING_QIAN = "打田攻";
+        public UchidaKou() : base(MING_QIAN)
         {
-            nao = new()
-            {
-                { XingGe.XUAN_SHANG, 40 },
-                { XingGe.YI_PAI, 60 },
-                { XingGe.SHUN_ZI, 20 },
-                { XingGe.KE_ZI, 20 },
-                { XingGe.LI_ZHI, 80 },
-                { XingGe.MING, 30 },
-                { XingGe.RAN, 30 },
-                { XingGe.TAO, 0 },
-            };
+            naos[(int)XingGe.XUAN_SHANG].score = 40;
+            naos[(int)XingGe.YI_PAI].score = 60;
+            naos[(int)XingGe.SHUN_ZI].score = 20;
+            naos[(int)XingGe.KE_ZI].score = 20;
+            naos[(int)XingGe.LI_ZHI].score = 80;
+            naos[(int)XingGe.MING].score = 30;
+            naos[(int)XingGe.RAN].score = 30;
+            naos[(int)XingGe.TAO].score = 0;
         }
     }
 }

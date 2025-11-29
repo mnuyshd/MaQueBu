@@ -1,79 +1,106 @@
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Maqiao;
 using Assets.Scripts.Sikao;
 
 namespace Assets.Scripts.Gongtong
 {
     // 場
-    internal class Chang
+    public class Chang
     {
-        // ルール
-        internal static GuiZe guiZe;
-        // 雀士
-        internal static List<QiaoShi> QiaoShis { get; set; } = new();
+        // イベント
+        public MaQiao.Event eventStatus = MaQiao.Event.KAI_SHI;
+        // プレイヤー有り
+        public bool existsPlayer = true;
+        // 半荘数
+        public int banZhuangShu = 0;
+        // 連荘
+        public MaQiao.Zhuang tingPaiLianZhuang;
+        // キー状態
+        public bool keyPress = false;
+        // 描画フラグ
+        public bool isKaiShiDraw;
+        public bool isQiaoShiXuanZeDraw;
+        public bool isFollowQiaoShiXuanZeDraw;
+        public bool isQinJueDraw;
+        public bool isPeiPaiDraw;
+        public bool isDuiJuDraw;
+        public bool isDuiJuZhongLeDraw;
+        public bool isYiBiaoShiDraw;
+        public bool isDianBiaoShiDraw;
+        public bool isZhuangZhongLeDraw;
+
+        public bool isZiJiaYaoDraw = false;
+        public bool isTaJiaYaoDraw = false;
+        public bool isDianChaDraw = false;
+
+        public bool isBackDuiJuZhongLe = false;
+        public bool isDianCha = false;
+        public int yiBiaoShiFan;
+
         // 場風
-        internal static int ChangFeng { get; set; }
+        public int changFeng;
         // 局
-        internal static int Ju { get; set; }
+        public int ju;
         // 本場
-        internal static int BenChang { get; set; }
+        public int benChang;
         // 親
-        internal static int Qin { get; set; }
+        public int qin;
         // 起家
-        internal static int QiaJia { get; set; }
+        public int qiaJia;
         // 捨牌
-        internal static int ShePai { get; set; }
+        public int shePai;
         // 自摸番
-        internal static int ZiMoFan { get; set; }
+        public int ziMoFan;
         // 鳴番
-        internal static int MingFan { get; set; }
+        public int mingFan;
         // 栄和番
-        internal static List<(int fan, int index)> RongHeFan { get; set; } = new();
+        public List<RongHeFan> rongHeFans = new();
         // 和了番
-        internal static int HeleFan { get; set; }
+        public int heleFan;
         // 錯和番
-        internal static int CuHeFan { get; set; }
+        public int cuHeFan;
         // 供託
-        internal static int GongTuo { get; set; }
+        public int gongTuo;
         // 自家思考結果
-        internal static QiaoShi.YaoDingYi ZiJiaYao { get; set; }
+        public QiaoShi.YaoDingYi ziJiaYao;
         // 自家選択
-        internal static int ZiJiaXuanZe { get; set; }
+        public int ziJiaXuanZe;
         // 他家思考結果
-        internal static QiaoShi.YaoDingYi TaJiaYao { get; set; }
+        public QiaoShi.YaoDingYi taJiaYao;
         // 他家選択
-        internal static int TaJiaXuanZe { get; set; }
+        public int taJiaXuanZe;
 
         // 風
-        private static int feng;
+        public int feng;
         // 立直数
-        private static int liZhiShu;
+        public int liZhiShu;
         // 四風子連打牌
-        private static List<int> siFengZiLianDaPai;
+        public List<int> siFengZiLianDaPai;
         // 四風子連打
-        internal static bool SiFengZiLianDa { get; set; }
+        public bool siFengZiLianDa;
         // 九種九牌
-        private static bool jiuZhongJiuPai;
+        public bool jiuZhongJiuPai;
 
         // ランダム
-        private static readonly Random r = new();
+        private readonly Random r = new();
 
         // 状態
-        internal static void ZhuangTai(State state, bool isZiJia)
+        public void ZhuangTai(State state, bool isZiJia)
         {
-            state.changFeng = ChangFeng;
-            state.ju = Ju;
-            state.changShePai = isZiJia ? 0 : ShePai;
+            state.changFeng = changFeng;
+            state.ju = ju;
+            state.changShePai = isZiJia ? 0 : shePai;
         }
 
         // 切り上げ
-        internal static int Ceil(int value, double p)
+        public int Ceil(int value, double p)
         {
             return (int)(Math.Ceiling(value / p) * p);
         }
 
         // シャッフル
-        internal static void Shuffle(List<int> list, int num)
+        public void Shuffle(List<int> list, int num)
         {
             for (int i = 0; i < num; i++)
             {
@@ -84,55 +111,55 @@ namespace Assets.Scripts.Gongtong
         }
 
         // 荘初期化
-        internal static void ZhuangChuQiHua()
+        public void ZhuangChuQiHua()
         {
-            BenChang = 0;
-            Ju = 0;
+            benChang = 0;
+            ju = 0;
             feng = 0;
-            ChangFeng = Pai.FengPaiDingYi[feng];
-            GongTuo = 0;
-            foreach (QiaoShi shi in QiaoShis)
+            changFeng = Pai.FENG_PAI_DING_YI[feng];
+            gongTuo = 0;
+            foreach (QiaoShi shi in MaQiao.qiaoShis)
             {
-                shi.LianZhuangShu = 0;
+                shi.lianZhuangShu = 0;
             }
         }
 
         // 局初期化
-        internal static void JuChuQiHua()
+        public void JuChuQiHua()
         {
-            ZiMoFan = Qin;
-            MingFan = 0;
-            HeleFan = -1;
-            CuHeFan = -1;
-            ShePai = 0xff;
+            ziMoFan = qin;
+            mingFan = 0;
+            heleFan = -1;
+            cuHeFan = -1;
+            shePai = 0xff;
             liZhiShu = 0;
-            SiFengZiLianDa = false;
+            siFengZiLianDa = false;
             jiuZhongJiuPai = false;
             siFengZiLianDaPai = new List<int>();
-            ZiJiaYao = QiaoShi.YaoDingYi.Wu;
-            TaJiaYao = QiaoShi.YaoDingYi.Wu;
-            RongHeFan = new List<(int, int)>();
+            ziJiaYao = QiaoShi.YaoDingYi.Wu;
+            taJiaYao = QiaoShi.YaoDingYi.Wu;
+            rongHeFans = new List<RongHeFan>();
         }
 
         // 立直処理
-        internal static void LiZhiChuLi()
+        public void LiZhiChuLi()
         {
             liZhiShu++;
-            GongTuo += 1000;
+            gongTuo += 1000;
         }
 
         // 四家立直判定
-        internal static bool SiJiaLiZhiPanDing()
+        public bool SiJiaLiZhiPanDing()
         {
-            if (guiZe.siJiaLiZhiLianZhuang == 0)
+            if (MaQiao.guiZe.siJiaLiZhiLianZhuang == 0)
             {
                 return false;
             }
-            if (QiaoShis.Count != 4)
+            if (MaQiao.qiaoShis.Count != 4)
             {
                 return false;
             }
-            if (liZhiShu >= QiaoShis.Count)
+            if (liZhiShu >= MaQiao.qiaoShis.Count)
             {
                 return true;
             }
@@ -140,9 +167,9 @@ namespace Assets.Scripts.Gongtong
         }
 
         // 四風子連打牌処理
-        internal static void SiFengZiLianDaChuLi(int shePai)
+        public void SiFengZiLianDaChuLi(int shePai)
         {
-            if (QiaoShis.Count != 4)
+            if (MaQiao.qiaoShis.Count != 4)
             {
                 return;
             }
@@ -165,84 +192,84 @@ namespace Assets.Scripts.Gongtong
                         return;
                     }
                 }
-                SiFengZiLianDa = true;
+                siFengZiLianDa = true;
             }
         }
 
         // 四風子連打判定
-        internal static bool SiFengZiLianDaPanDing()
+        public bool SiFengZiLianDaPanDing()
         {
-            return SiFengZiLianDa && guiZe.siFengZiLianDaLianZhuang > 0;
+            return siFengZiLianDa && MaQiao.guiZe.siFengZiLianDaLianZhuang > 0;
         }
 
         // 九種九牌処理
-        internal static void JiuZhongJiuPaiChuLi()
+        public void JiuZhongJiuPaiChuLi()
         {
             jiuZhongJiuPai = true;
         }
 
         // 連荘
-        internal static void LianZhuang()
+        public void LianZhuang()
         {
             LianZhuangShuJiSuan();
-            BenChang++;
+            benChang++;
         }
 
         // 輪荘
-        internal static void LunZhuang()
+        public void LunZhuang()
         {
             LianZhuangShuJiSuan();
 
-            Ju++;
-            if (Ju >= (4 - (4 - QiaoShis.Count)))
+            ju++;
+            if (ju >= (4 - (4 - MaQiao.qiaoShis.Count)))
             {
                 // 場変更
                 ChangBianGeng();
-                Ju = 0;
+                ju = 0;
             }
-            if (HeleFan == -1)
+            if (heleFan == -1)
             {
-                BenChang++;
+                benChang++;
             }
             else
             {
-                BenChang = 0;
+                benChang = 0;
             }
-            Qin++;
-            Qin %= QiaoShis.Count;
+            qin++;
+            qin %= MaQiao.qiaoShis.Count;
         }
 
         // 連荘数計算
-        private static void LianZhuangShuJiSuan()
+        private void LianZhuangShuJiSuan()
         {
-            for (int i = 0; i < QiaoShis.Count; i++)
+            for (int i = 0; i < MaQiao.qiaoShis.Count; i++)
             {
-                QiaoShi shi = QiaoShis[i];
+                QiaoShi shi = MaQiao.qiaoShis[i];
                 bool isHeLe = false;
-                foreach ((int fan, int _) in RongHeFan)
+                foreach (RongHeFan rongHeFan in rongHeFans)
                 {
-                    if (i == fan)
+                    if (i == rongHeFan.fan)
                     {
                         isHeLe = true;
                     }
                 }
-                if (isHeLe || HeleFan == i)
+                if (isHeLe || heleFan == i)
                 {
-                    shi.LianZhuangShu++;
-                    if (shi.LianZhuangShu > 7)
+                    shi.lianZhuangShu++;
+                    if (shi.lianZhuangShu > 7)
                     {
-                        shi.LianZhuangShu = 0;
+                        shi.lianZhuangShu = 0;
                     }
                 }
                 else
                 {
-                    shi.LianZhuangShu = 0;
+                    shi.lianZhuangShu = 0;
                 }
             }
         }
 
         // 点計算
-        internal static void DianJiSuan()
+        public void DianJiSuan()
         {
             // 和了点
             int dian;
@@ -251,52 +278,52 @@ namespace Assets.Scripts.Gongtong
             // 受取
             int shouQu = 0;
             int cuHe = 1;
-            for (int i = ZiMoFan + 1; i < ZiMoFan + QiaoShis.Count; i++)
+            for (int i = ziMoFan + 1; i < ziMoFan + MaQiao.qiaoShis.Count; i++)
             {
-                QiaoShi shi = QiaoShis[i % QiaoShis.Count];
-                if (shi.CuHeSheng != "")
+                QiaoShi shi = MaQiao.qiaoShis[i % MaQiao.qiaoShis.Count];
+                if (shi.cuHeSheng != "")
                 {
                     cuHe = -1;
                 }
             }
-            if (ZiJiaYao == QiaoShi.YaoDingYi.ZiMo || cuHe == -1)
+            if (ziJiaYao == QiaoShi.YaoDingYi.ZiMo || cuHe == -1)
             {
                 // 自摸
-                dian = QiaoShis[ZiMoFan].HeLeDian;
+                dian = MaQiao.qiaoShis[ziMoFan].heLeDian;
                 // 記録 和了点
-                QiaoShis[ZiMoFan].JiLu.heLeDian += QiaoShis[ZiMoFan].HeLeDian;
+                MaQiao.qiaoShis[ziMoFan].jiLu.heLeDian += MaQiao.qiaoShis[ziMoFan].heLeDian;
 
-                if (QiaoShis[ZiMoFan].BaoZeFan >= 0)
+                if (MaQiao.qiaoShis[ziMoFan].baoZeFan >= 0)
                 {
                     // 包則
-                    int baoZeFan = (ZiMoFan + QiaoShis.Count - QiaoShis[ZiMoFan].BaoZeFan) % QiaoShis.Count;
-                    shouQu = dian + BenChang * 100 * cuHe;
-                    QiaoShis[ZiMoFan].DianBangJiSuan(shouQu);
-                    QiaoShis[baoZeFan].DianBangJiSuan(-shouQu);
+                    int baoZeFan = (ziMoFan + MaQiao.qiaoShis.Count - MaQiao.qiaoShis[ziMoFan].baoZeFan) % MaQiao.qiaoShis.Count;
+                    shouQu = dian + benChang * 100 * cuHe;
+                    MaQiao.qiaoShis[ziMoFan].DianBangJiSuan(shouQu);
+                    MaQiao.qiaoShis[baoZeFan].DianBangJiSuan(-shouQu);
                     // 記録 親和了数
-                    QiaoShis[ZiMoFan].JiLu.qinHeLeShu++;
+                    MaQiao.qiaoShis[ziMoFan].jiLu.qinHeLeShu++;
                 }
-                else if (ZiMoFan == Qin)
+                else if (ziMoFan == qin)
                 {
                     // 親
-                    zhiFu = Ceil(dian / (QiaoShis.Count - 1), 100);
+                    zhiFu = Ceil(dian / (MaQiao.qiaoShis.Count - 1), 100);
                     // 本場
-                    zhiFu += BenChang * 100 * cuHe;
-                    for (int i = ZiMoFan + 1; i < ZiMoFan + QiaoShis.Count; i++)
+                    zhiFu += benChang * 100 * cuHe;
+                    for (int i = ziMoFan + 1; i < ziMoFan + MaQiao.qiaoShis.Count; i++)
                     {
-                        QiaoShis[i % QiaoShis.Count].DianBangJiSuan(-zhiFu);
+                        MaQiao.qiaoShis[i % MaQiao.qiaoShis.Count].DianBangJiSuan(-zhiFu);
                         shouQu += zhiFu;
                     }
-                    QiaoShis[ZiMoFan].DianBangJiSuan(shouQu);
+                    MaQiao.qiaoShis[ziMoFan].DianBangJiSuan(shouQu);
                     // 記録 親和了数
-                    QiaoShis[ZiMoFan].JiLu.qinHeLeShu++;
+                    MaQiao.qiaoShis[ziMoFan].jiLu.qinHeLeShu++;
                 }
                 else
                 {
                     // 子
-                    for (int i = ZiMoFan + 1; i < ZiMoFan + QiaoShis.Count; i++)
+                    for (int i = ziMoFan + 1; i < ziMoFan + MaQiao.qiaoShis.Count; i++)
                     {
-                        if ((i % QiaoShis.Count) == Qin)
+                        if ((i % MaQiao.qiaoShis.Count) == qin)
                         {
                             zhiFu = Ceil(dian / 2, 100);
                         }
@@ -305,161 +332,161 @@ namespace Assets.Scripts.Gongtong
                             zhiFu = Ceil(dian / 4, 100);
                         }
                         // 本場
-                        zhiFu += BenChang * 100 * cuHe;
-                        if (QiaoShis.Count == 3)
+                        zhiFu += benChang * 100 * cuHe;
+                        if (MaQiao.qiaoShis.Count == 3)
                         {
                             // 3打ちの場合、北家分を折半
                             zhiFu += Ceil(Ceil(dian / 4, 100) / 2, 100);
-                            zhiFu += BenChang * 100 / 2 * cuHe;
+                            zhiFu += benChang * 100 / 2 * cuHe;
                         }
-                        else if (QiaoShis.Count == 2)
+                        else if (MaQiao.qiaoShis.Count == 2)
                         {
                             // 2打ちの場合、全て支払
                             zhiFu = dian;
-                            zhiFu += BenChang * 300 * cuHe;
+                            zhiFu += benChang * 300 * cuHe;
                         }
-                        QiaoShis[i % QiaoShis.Count].DianBangJiSuan(-zhiFu);
+                        MaQiao.qiaoShis[i % MaQiao.qiaoShis.Count].DianBangJiSuan(-zhiFu);
                         shouQu += zhiFu;
                     }
-                    QiaoShis[ZiMoFan].DianBangJiSuan(shouQu);
+                    MaQiao.qiaoShis[ziMoFan].DianBangJiSuan(shouQu);
                 }
                 // 供託
-                QiaoShis[ZiMoFan].DianBangJiSuan(GongTuo);
-                QiaoShis[ZiMoFan].ShouQuGongTuoJiSuan(GongTuo);
+                MaQiao.qiaoShis[ziMoFan].DianBangJiSuan(gongTuo);
+                MaQiao.qiaoShis[ziMoFan].ShouQuGongTuoJiSuan(gongTuo);
                 // 記録 和了数
-                QiaoShis[ZiMoFan].JiLu.heLeShu++;
+                MaQiao.qiaoShis[ziMoFan].jiLu.heLeShu++;
                 return;
             }
-            else if (TaJiaYao == QiaoShi.YaoDingYi.RongHe)
+            else if (taJiaYao == QiaoShi.YaoDingYi.RongHe)
             {
                 // 栄和
-                for (int i = 0; i < RongHeFan.Count; i++)
+                for (int i = 0; i < rongHeFans.Count; i++)
                 {
-                    dian = QiaoShis[RongHeFan[i].fan].HeLeDian;
+                    dian = MaQiao.qiaoShis[rongHeFans[i].fan].heLeDian;
                     // 本場
-                    dian += BenChang * 300;
+                    dian += benChang * 300;
 
-                    if (QiaoShis[RongHeFan[i].fan].BaoZeFan >= 0)
+                    if (MaQiao.qiaoShis[rongHeFans[i].fan].baoZeFan >= 0)
                     {
                         // 包則
-                        int baoZeFan = (RongHeFan[i].fan + QiaoShis.Count - QiaoShis[RongHeFan[i].fan].BaoZeFan) % QiaoShis.Count;
+                        int baoZeFan = (rongHeFans[i].fan + MaQiao.qiaoShis.Count - MaQiao.qiaoShis[rongHeFans[i].fan].baoZeFan) % MaQiao.qiaoShis.Count;
                         shouQu = Ceil(dian / 2, 100);
-                        QiaoShis[ZiMoFan].DianBangJiSuan(-(dian - shouQu));
-                        QiaoShis[baoZeFan].DianBangJiSuan(-shouQu);
+                        MaQiao.qiaoShis[ziMoFan].DianBangJiSuan(-(dian - shouQu));
+                        MaQiao.qiaoShis[baoZeFan].DianBangJiSuan(-shouQu);
                     }
                     else
                     {
-                        QiaoShis[ZiMoFan].DianBangJiSuan(-dian);
+                        MaQiao.qiaoShis[ziMoFan].DianBangJiSuan(-dian);
                     }
-                    QiaoShis[RongHeFan[i].fan].DianBangJiSuan(dian);
+                    MaQiao.qiaoShis[rongHeFans[i].fan].DianBangJiSuan(dian);
                     // 供託
                     if (i == 0)
                     {
-                        QiaoShis[RongHeFan[i].fan].DianBangJiSuan(GongTuo);
-                        QiaoShis[RongHeFan[i].fan].ShouQuGongTuoJiSuan(GongTuo);
+                        MaQiao.qiaoShis[rongHeFans[i].fan].DianBangJiSuan(gongTuo);
+                        MaQiao.qiaoShis[rongHeFans[i].fan].ShouQuGongTuoJiSuan(gongTuo);
 
                     }
                     // 記録 和了数
-                    QiaoShis[RongHeFan[i].fan].JiLu.heLeShu++;
+                    MaQiao.qiaoShis[rongHeFans[i].fan].jiLu.heLeShu++;
                     // 記録 放銃数
-                    QiaoShis[ZiMoFan].JiLu.fangChongShu++;
+                    MaQiao.qiaoShis[ziMoFan].jiLu.fangChongShu++;
                     // 記録 和了点
-                    QiaoShis[RongHeFan[i].fan].JiLu.heLeDian += QiaoShis[RongHeFan[i].fan].HeLeDian;
+                    MaQiao.qiaoShis[rongHeFans[i].fan].jiLu.heLeDian += MaQiao.qiaoShis[rongHeFans[i].fan].heLeDian;
                     // 記録 放銃点
-                    QiaoShis[ZiMoFan].JiLu.fangChongDian += QiaoShis[RongHeFan[i].fan].HeLeDian;
+                    MaQiao.qiaoShis[ziMoFan].jiLu.fangChongDian += MaQiao.qiaoShis[rongHeFans[i].fan].heLeDian;
                 }
                 return;
             }
 
             // 流局
-            if (liZhiShu >= 4 || SiFengZiLianDa || jiuZhongJiuPai)
+            if (liZhiShu >= 4 || siFengZiLianDa || jiuZhongJiuPai)
             {
                 return;
             }
-            if (ZiJiaYao == QiaoShi.YaoDingYi.AnGang || ZiJiaYao == QiaoShi.YaoDingYi.JiaGang || TaJiaYao == QiaoShi.YaoDingYi.DaMingGang)
+            if (ziJiaYao == QiaoShi.YaoDingYi.AnGang || ziJiaYao == QiaoShi.YaoDingYi.JiaGang || taJiaYao == QiaoShi.YaoDingYi.DaMingGang)
             {
                 return;
             }
             // 記録 流局数(四家立直や四開槓で流局の場合はカウントしない)
-            for (int i = ZiMoFan + 1; i < ZiMoFan + QiaoShis.Count; i++)
+            for (int i = ziMoFan + 1; i < ziMoFan + MaQiao.qiaoShis.Count; i++)
             {
-                QiaoShi shi = QiaoShis[i % QiaoShis.Count];
-                shi.JiLu.liuJuShu++;
+                QiaoShi shi = MaQiao.qiaoShis[i % MaQiao.qiaoShis.Count];
+                shi.jiLu.liuJuShu++;
             }
 
             // 形式聴牌計算
             int xingTingShu = 0;
-            foreach (QiaoShi shi in QiaoShis)
+            foreach (QiaoShi shi in MaQiao.qiaoShis)
             {
-                if (shi.XingTing)
+                if (shi.xingTing)
                 {
                     xingTingShu++;
                     // 記録 聴牌数
-                    shi.JiLu.tingPaiShu++;
+                    shi.jiLu.tingPaiShu++;
                 }
                 else
                 {
                     // 記録 不聴数
-                    shi.JiLu.buTingShu++;
+                    shi.jiLu.buTingShu++;
                 }
             }
-            if (xingTingShu == QiaoShis.Count || xingTingShu == 0)
+            if (xingTingShu == MaQiao.qiaoShis.Count || xingTingShu == 0)
             {
                 return;
             }
-            foreach (QiaoShi shi in QiaoShis)
+            foreach (QiaoShi shi in MaQiao.qiaoShis)
             {
-                if (shi.XingTing)
+                if (shi.xingTing)
                 {
                     shi.DianBangJiSuan(3000 / xingTingShu);
                 }
                 else
                 {
-                    shi.DianBangJiSuan(-3000 / (QiaoShis.Count - xingTingShu));
+                    shi.DianBangJiSuan(-3000 / (MaQiao.qiaoShis.Count - xingTingShu));
                 }
             }
         }
 
         // 供託計算
-        internal static void DianGiSuanGongTuo()
+        public void DianGiSuanGongTuo()
         {
             int cuHe = 1;
-            for (int i = ZiMoFan + 1; i < ZiMoFan + QiaoShis.Count; i++)
+            for (int i = ziMoFan + 1; i < ziMoFan + MaQiao.qiaoShis.Count; i++)
             {
-                QiaoShi shi = QiaoShis[i % QiaoShis.Count];
-                if (shi.CuHeSheng != "")
+                QiaoShi shi = MaQiao.qiaoShis[i % MaQiao.qiaoShis.Count];
+                if (shi.cuHeSheng != "")
                 {
                     cuHe = -1;
                 }
             }
-            if (ZiJiaYao == QiaoShi.YaoDingYi.ZiMo || cuHe == -1 || TaJiaYao == QiaoShi.YaoDingYi.RongHe)
+            if (ziJiaYao == QiaoShi.YaoDingYi.ZiMo || cuHe == -1 || taJiaYao == QiaoShi.YaoDingYi.RongHe)
             {
-                GongTuo = 0;
+                gongTuo = 0;
             }
         }
 
         // 錯和
-        internal static void CuHe(int jia)
+        public void CuHe(int jia)
         {
-            if (jia == Qin)
+            if (jia == qin)
             {
                 // 親
-                QiaoShis[jia].DianBangJiSuan(-12000);
-                for (int i = jia + 1; i < jia + QiaoShis.Count; i++)
+                MaQiao.qiaoShis[jia].DianBangJiSuan(-12000);
+                for (int i = jia + 1; i < jia + MaQiao.qiaoShis.Count; i++)
                 {
-                    int taJia = i % QiaoShis.Count;
-                    QiaoShis[taJia].DianBangJiSuan(12000 / (QiaoShis.Count - 1));
+                    int taJia = i % MaQiao.qiaoShis.Count;
+                    MaQiao.qiaoShis[taJia].DianBangJiSuan(12000 / (MaQiao.qiaoShis.Count - 1));
                 }
             }
             else
             {
                 // 子
-                QiaoShis[jia].DianBangJiSuan(-8000);
-                for (int i = jia + 1; i < jia + QiaoShis.Count; i++)
+                MaQiao.qiaoShis[jia].DianBangJiSuan(-8000);
+                for (int i = jia + 1; i < jia + MaQiao.qiaoShis.Count; i++)
                 {
-                    int taJia = i % QiaoShis.Count;
+                    int taJia = i % MaQiao.qiaoShis.Count;
                     int dian;
-                    if (taJia == Qin)
+                    if (taJia == qin)
                     {
                         dian = 4000;
                     }
@@ -467,22 +494,22 @@ namespace Assets.Scripts.Gongtong
                     {
                         dian = 2000;
                     }
-                    if (QiaoShis.Count == 3)
+                    if (MaQiao.qiaoShis.Count == 3)
                     {
                         dian += 1000;
                     }
-                    QiaoShis[taJia].DianBangJiSuan(dian);
+                    MaQiao.qiaoShis[taJia].DianBangJiSuan(dian);
                 }
             }
-            CuHeFan = jia;
+            cuHeFan = jia;
         }
 
         // 箱判定
-        internal static bool XiangPanDing()
+        public bool XiangPanDing()
         {
-            foreach (QiaoShi shi in QiaoShis)
+            foreach (QiaoShi shi in MaQiao.qiaoShis)
             {
-                if (shi.DianBang <= 0)
+                if (shi.dianBang <= 0)
                 {
                     return true;
                 }
@@ -491,14 +518,21 @@ namespace Assets.Scripts.Gongtong
         }
 
         // 場変更
-        private static void ChangBianGeng()
+        private void ChangBianGeng()
         {
             feng++;
-            if (feng >= Pai.FengPaiDingYi.Length)
+            if (feng >= Pai.FENG_PAI_DING_YI.Length)
             {
                 feng = 0;
             }
-            ChangFeng = Pai.FengPaiDingYi[feng];
+            changFeng = Pai.FENG_PAI_DING_YI[feng];
         }
+    }
+
+    [Serializable]
+    public class RongHeFan
+    {
+        public int fan;
+        public int index;
     }
 }

@@ -1,21 +1,18 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    internal class YakudaJunji : QiaoJiXie
+    public class YakudaJunji : QiaoJiXie
     {
-        internal const string MING_QIAN = "役田順字";
-        internal YakudaJunji() : base(MING_QIAN)
+        public const string MING_QIAN = "役田順字";
+        public YakudaJunji() : base(MING_QIAN)
         {
-            nao = new()
-            {
-                { XingGe.XUAN_SHANG, 50 },
-                { XingGe.YI_PAI, 90 },
-                { XingGe.SHUN_ZI, 90 },
-                { XingGe.KE_ZI, 30 },
-                { XingGe.LI_ZHI, 40 },
-                { XingGe.MING, 50 },
-                { XingGe.RAN, 60 },
-                { XingGe.TAO, 50 },
-            };
+            naos[(int)XingGe.XUAN_SHANG].score = 50;
+            naos[(int)XingGe.YI_PAI].score = 90;
+            naos[(int)XingGe.SHUN_ZI].score = 90;
+            naos[(int)XingGe.KE_ZI].score = 30;
+            naos[(int)XingGe.LI_ZHI].score = 40;
+            naos[(int)XingGe.MING].score = 50;
+            naos[(int)XingGe.RAN].score = 60;
+            naos[(int)XingGe.TAO].score = 50;
         }
     }
 }

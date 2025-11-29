@@ -1,37 +1,34 @@
-using Assets.Scripts.Gongtong;
+using Assets.Scripts.Maqiao;
 
 namespace Assets.Scripts.Sikao.Shi
 {
     // 効率雀士
-    internal class QiaoXiaoLu : QiaoJiXie
+    public class QiaoXiaoLu : QiaoJiXie
     {
-        internal const string MING_QIAN = "効率雀士";
-        internal QiaoXiaoLu() : base(MING_QIAN)
+        public const string MING_QIAN = "効率雀士";
+        public QiaoXiaoLu() : base(MING_QIAN)
         {
-            nao = new()
-            {
-                { XingGe.XUAN_SHANG, 50 },
-                { XingGe.YI_PAI, 50 },
-                { XingGe.SHUN_ZI, 50 },
-                { XingGe.KE_ZI, 50 },
-                { XingGe.LI_ZHI, 50 },
-                { XingGe.MING, 50 },
-                { XingGe.RAN, 50 },
-                { XingGe.TAO, 50 },
-            };
+            naos[(int)XingGe.XUAN_SHANG].score = 50;
+            naos[(int)XingGe.YI_PAI].score = 50;
+            naos[(int)XingGe.SHUN_ZI].score = 50;
+            naos[(int)XingGe.KE_ZI].score = 50;
+            naos[(int)XingGe.LI_ZHI].score = 50;
+            naos[(int)XingGe.MING].score = 50;
+            naos[(int)XingGe.RAN].score = 50;
+            naos[(int)XingGe.TAO].score = 50;
         }
 
         // 思考自家
-        internal override void SiKaoZiJia()
+        public override void SiKaoZiJia()
         {
             int tingPaiShu = 0;
-            foreach (QiaoShi shi in Chang.QiaoShis)
+            foreach (QiaoShi shi in MaQiao.qiaoShis)
             {
-                if (shi.Player)
+                if (shi.player)
                 {
                     continue;
                 }
-                if (shi.LiZhi || shi.FuLuPai.Count >= 3 || (Pai.CanShanPaiShu() <= XiangTingShu * 4))
+                if (shi.liZhi || shi.fuLuPais.Count >= 3 || (MaQiao.pai.CanShanPaiShu() <= xiangTingShu * 4))
                 {
                     tingPaiShu++;
                 }
@@ -40,9 +37,9 @@ namespace Assets.Scripts.Sikao.Shi
             {
                 // 有効牌数計算
                 YouXiaoPaiShuJiSuan();
-                for (int i = 0; i < ShouPai.Count; i++)
+                for (int i = 0; i < shouPai.Count; i++)
                 {
-                    ShouPaiDian[i] -= YouXiaoPaiShu[i] * 10;
+                    shouPaiDian[i] -= youXiaoPaiShu[i] * 10;
                 }
             }
 
