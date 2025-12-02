@@ -22,6 +22,8 @@ namespace Assets.Scripts.Maqiao
     // 麻雀
     public class MaQiao : MonoBehaviour
     {
+        private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
+
         // イベント
         public enum Event
         {
@@ -71,6 +73,11 @@ namespace Assets.Scripts.Maqiao
         private static readonly float PLAYER_PAI_SCALE_LANDSCAPE = 1.2f;
         // プレイヤー名
         private static readonly string PLAYER_NAME = "プレイヤー";
+
+        // プレイ中データディレクトリ名
+        private static readonly string GAME_DATA_DIR_NAME = "GameData";
+        // 設定・プレイヤーディレクトリ名
+        private static readonly string SETTING_PLAYER_DATA_DIR_NAME = "SettingPlayerData";
         // 設定ファイル名
         private static readonly string SHE_DING_FILE_NAME = "SheDing";
         // ルールファイル名
@@ -190,6 +197,7 @@ namespace Assets.Scripts.Maqiao
         private Button goMingWu;
         private Button goDianCha;
         private Button goSetting;
+        private Button goCamera;
         private Button goScore;
         private Button goGuiZe;
         private Button goBackDuiJuZhongLe;
@@ -303,30 +311,38 @@ namespace Assets.Scripts.Maqiao
                 TakamiNozomu.MING_QIAN => JsonUtility.FromJson<TakamiNozomu>(jsonText),
                 _ => JsonUtility.FromJson<QiaoJiXie>(jsonText),
             };
-            shi.jiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText($"{Application.persistentDataPath}/{mingQian}.json"));
+            shi.jiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME, $"{mingQian}.json")));
             qiaoShis.Add(shi);
         }
 
         // データ書込
         private void WriteData()
         {
-            File.WriteAllText($"{Application.persistentDataPath}/{CHANG_FILE_NAME}.json", JsonUtility.ToJson(chang));
-            File.WriteAllText($"{Application.persistentDataPath}/{PAI_FILE_NAME}.json", JsonUtility.ToJson(pai));
+            string directory = Path.Combine(Application.persistentDataPath, GAME_DATA_DIR_NAME);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(Path.Combine(directory, $"{CHANG_FILE_NAME}.json"), JsonUtility.ToJson(chang));
+            File.WriteAllText(Path.Combine(directory, $"{PAI_FILE_NAME}.json"), JsonUtility.ToJson(pai));
             for (int i = 0; i < 4; i++)
             {
-                File.Delete($"{Application.persistentDataPath}/{QIAO_SHI_FILE_NAME}{i}.json");
+                File.Delete(Path.Combine(directory, $"{QIAO_SHI_FILE_NAME}{i}.json"));
             }
             for (int i = 0; i < qiaoShis.Count; i++)
             {
-                File.WriteAllText($"{Application.persistentDataPath}/{QIAO_SHI_FILE_NAME}{i}.json", JsonUtility.ToJson(qiaoShis[i]));
+                File.WriteAllText(Path.Combine(directory, $"{QIAO_SHI_FILE_NAME}{i}.json"), JsonUtility.ToJson(qiaoShis[i]));
             }
         }
 
         // データ読込
         private void LoadData()
         {
+            string directory = Path.Combine(Application.persistentDataPath, GAME_DATA_DIR_NAME);
+
             // 場の読込
-            string changFilePath = $"{Application.persistentDataPath}/{CHANG_FILE_NAME}.json";
+            string changFilePath = Path.Combine(directory, $"{CHANG_FILE_NAME}.json");
             if (File.Exists(changFilePath))
             {
                 chang = JsonUtility.FromJson<Chang>(File.ReadAllText(changFilePath));
@@ -339,7 +355,7 @@ namespace Assets.Scripts.Maqiao
                 };
             }
             // 牌の読込
-            string paiFilePath = $"{Application.persistentDataPath}/{PAI_FILE_NAME}.json";
+            string paiFilePath = Path.Combine(directory, $"{PAI_FILE_NAME}.json");
             if (File.Exists(paiFilePath))
             {
                 pai = JsonUtility.FromJson<Pai>(File.ReadAllText(paiFilePath));
@@ -352,7 +368,7 @@ namespace Assets.Scripts.Maqiao
             qiaoShis = new();
             for (int i = 0; i < 4; i++)
             {
-                string qiaoShiFilePath = $"{Application.persistentDataPath}/{QIAO_SHI_FILE_NAME}{i}.json";
+                string qiaoShiFilePath = Path.Combine(directory, $"{QIAO_SHI_FILE_NAME}{i}.json");
                 if (File.Exists(qiaoShiFilePath))
                 {
                     string jsonText = File.ReadAllText(qiaoShiFilePath);
@@ -366,11 +382,13 @@ namespace Assets.Scripts.Maqiao
         // データ削除
         private void DeleteData()
         {
-            File.Delete($"{Application.persistentDataPath}/{CHANG_FILE_NAME}.json");
-            File.Delete($"{Application.persistentDataPath}/{PAI_FILE_NAME}.json");
+            string directory = Path.Combine(Application.persistentDataPath, GAME_DATA_DIR_NAME);
+
+            File.Delete(Path.Combine(directory, $"{CHANG_FILE_NAME}.json"));
+            File.Delete(Path.Combine(directory, $"{PAI_FILE_NAME}.json"));
             for (int i = 0; i < 4; i++)
             {
-                File.Delete($"{Application.persistentDataPath}/{QIAO_SHI_FILE_NAME}{i}.json");
+                File.Delete(Path.Combine(directory, $"{QIAO_SHI_FILE_NAME}{i}.json"));
             }
         }
 
@@ -386,7 +404,8 @@ namespace Assets.Scripts.Maqiao
 
             // 設定の読込
             Debug.Log(Application.persistentDataPath);
-            string sheDingFilePath = $"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json";
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            string sheDingFilePath = Path.Combine(directory, $"{SHE_DING_FILE_NAME}.json");
             if (File.Exists(sheDingFilePath))
             {
                 sheDing = JsonUtility.FromJson<SheDing>(File.ReadAllText(sheDingFilePath));
@@ -396,7 +415,7 @@ namespace Assets.Scripts.Maqiao
                 sheDing = new SheDing();
             }
             // ルールの読込
-            string guiZeFilePath = $"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json";
+            string guiZeFilePath = Path.Combine(directory, $"{GUI_ZE_FILE_NAME}.json");
             if (File.Exists(guiZeFilePath))
             {
                 guiZe = JsonUtility.FromJson<GuiZe>(File.ReadAllText(guiZeFilePath));
@@ -489,6 +508,81 @@ namespace Assets.Scripts.Maqiao
             DrawDataScrollView();
             // ルール画面
             DrawGuiZeScrollView();
+            // カメラボタン
+            goCamera = GameObject.Find("Camera").GetComponent<Button>();
+            goCamera.transform.SetSiblingIndex(20);
+            goCamera.onClick.AddListener(() => StartCoroutine(CaptureAndFlash()));
+            RectTransform rtCamera = goCamera.GetComponent<RectTransform>();
+            rtCamera.localScale *= scale.x * 1.2f;
+            rtCamera.anchorMin = rtCamera.anchorMax = new Vector2(0, 1);
+            rtCamera.pivot = new Vector2(0, 1);
+            rtCamera.anchoredPosition = new Vector2(paiWidth * 6f, 0);
+        }
+
+        // 画面キャプチャー・フラッシュ
+        private IEnumerator CaptureAndFlash()
+        {
+            yield return new WaitForEndOfFrame();
+
+            string directory = GetDownloadFolderPath();
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            string timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+            string fileName = $"screenshot-{timestamp}.png";
+            string filePath = Path.Combine(directory, fileName);
+            ScreenCapture.CaptureScreenshot(filePath);
+
+            StartCoroutine(FlashCoroutine());
+        }
+
+        private string GetDownloadFolderPath()
+        {
+            string path = "";
+#if UNITY_ANDROID
+            path = "/storage/emulated/0/Download";
+#elif UNITY_IOS
+            path = Path.Combine(Application.persistentDataPath, "Downloads");
+#elif UNITY_STANDALONE_WIN
+            path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Downloads");
+#elif UNITY_STANDALONE_OSX
+            path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Downloads");
+#else
+            path = Path.Combine(Application.persistentDataPath, "Screenshot");
+#endif
+            return path;
+        }
+
+        // 画面フラッシュ
+        private IEnumerator FlashCoroutine()
+        {
+            GameObject goFlash = new("FlashImage");
+            goFlash.transform.SetParent(goCanvas.transform, false);
+
+            Image img = goFlash.AddComponent<Image>();
+            img.color = new Color(1, 1, 1, 0);
+
+            RectTransform rect = img.rectTransform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            img.color = new Color(1, 1, 1, 1);
+
+            yield return _waitForSeconds0_1;
+
+            float alpha = 1f;
+            while (alpha > 0)
+            {
+                alpha -= Time.deltaTime * 5f;
+                img.color = new Color(1, 1, 1, alpha);
+                yield return null;
+            }
+
+            Destroy(goFlash);
         }
 
         // scale設定
@@ -700,7 +794,12 @@ namespace Assets.Scripts.Maqiao
                 T newValue = toggleValue(getValue());
                 setValue(toggleValue(getValue()));
                 button.GetComponentInChildren<TextMeshProUGUI>().text = getText(newValue);
-                File.WriteAllText($"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json", JsonUtility.ToJson(sheDing));
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                File.WriteAllText(Path.Combine(directory, $"{SHE_DING_FILE_NAME}.json"), JsonUtility.ToJson(sheDing));
                 switch (chang.eventStatus)
                 {
                     case Event.PEI_PAI:
@@ -715,7 +814,8 @@ namespace Assets.Scripts.Maqiao
         // 設定オプションのリセット
         private void ResetSheDing()
         {
-            string filePath = $"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json";
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            string filePath = Path.Combine(directory, $"{SHE_DING_FILE_NAME}.json");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -812,14 +912,15 @@ namespace Assets.Scripts.Maqiao
         // 全員の記録リセット
         private void ResetJiLu()
         {
-            string filePath = $"{Application.persistentDataPath}/{PLAYER_NAME}.json";
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            string filePath = Path.Combine(directory, $"{PLAYER_NAME}.json");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
             foreach (KeyValuePair<string, bool> kvp in qiaoShiMingQian)
             {
-                filePath = $"{Application.persistentDataPath}/{kvp.Key}.json";
+                filePath = Path.Combine(directory, $"{kvp.Key}.json");
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
@@ -969,7 +1070,12 @@ namespace Assets.Scripts.Maqiao
         private void OnClickScoreQiaoShi(string mingQian)
         {
             QiaoShi shi = GetQiaoShi(mingQian, false);
-            string filePath = $"{Application.persistentDataPath}/{mingQian}.json";
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            string filePath = Path.Combine(directory, $"{mingQian}.json");
             if (File.Exists(filePath))
             {
                 shi.jiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
@@ -1035,7 +1141,12 @@ namespace Assets.Scripts.Maqiao
 
         private void WriteJiLu(string ming, JiLu jiLu)
         {
-            File.WriteAllText($"{Application.persistentDataPath}/{ming}.json", JsonUtility.ToJson(jiLu));
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            File.WriteAllText(Path.Combine(directory, $"{ming}.json"), JsonUtility.ToJson(jiLu));
 
             foreach (QiaoShi shi in qiaoShis)
             {
@@ -1144,7 +1255,12 @@ namespace Assets.Scripts.Maqiao
             {
                 guiZe.chiPaiShu = guiZe.chiPaiShu[0] == 0 ? new int[] { 1, 1, 1 } : new int[] { 0, 0, 0 };
                 text.text = guiZe.chiPaiShu[0] == 0 ? chiPaiShuText[0] : chiPaiShuText[1];
-                File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(guiZe));
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                File.WriteAllText(Path.Combine(directory, $"{GUI_ZE_FILE_NAME}.json"), JsonUtility.ToJson(guiZe));
             });
             DrawToggleGuiZe(() => guiZe.jiuZhongJiuPaiLianZhuang, v => guiZe.jiuZhongJiuPaiLianZhuang = v, new string[] { "九種九牌無し", "九種九牌は流局（親連荘）", "九種九牌は流局（親流れ）" }, new Vector2(x, y -= offset));
             DrawToggleGuiZe(() => guiZe.siJiaLiZhiLianZhuang, v => guiZe.siJiaLiZhiLianZhuang = v, new string[] { "四家立直は続行", "四家立直は流局（親連荘）", "四家立直は流局（親流れ）" }, new Vector2(x, y -= offset));
@@ -1182,7 +1298,12 @@ namespace Assets.Scripts.Maqiao
                 bool newValue = !getValue();
                 setValue(newValue);
                 text.text = newValue ? textOnOff[0] : textOnOff[1];
-                File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(guiZe));
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                File.WriteAllText(Path.Combine(directory, $"{GUI_ZE_FILE_NAME}.json"), JsonUtility.ToJson(guiZe));
             });
         }
         private void DrawToggleGuiZe(Func<int> getValue, Action<int> setValue, string[] textOnOff, Vector2 xy)
@@ -1198,14 +1319,20 @@ namespace Assets.Scripts.Maqiao
                 int newValue = (getValue() + 1) % textOnOff.Length;
                 setValue(newValue);
                 text.text = textOnOff[newValue];
-                File.WriteAllText($"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json", JsonUtility.ToJson(guiZe));
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                File.WriteAllText(Path.Combine(directory, $"{GUI_ZE_FILE_NAME}.json"), JsonUtility.ToJson(guiZe));
             });
         }
 
         // ルールリセット
         private void ResetGuiZe()
         {
-            string filePath = $"{Application.persistentDataPath}/{GUI_ZE_FILE_NAME}.json";
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            string filePath = Path.Combine(directory, $"{GUI_ZE_FILE_NAME}.json");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -1806,7 +1933,12 @@ namespace Assets.Scripts.Maqiao
                 {
                     sheDing.mingWu = !sheDing.mingWu;
                     goMingWu.GetComponentInChildren<TextMeshProUGUI>().text = sheDing.mingWu ? labelMingWu[0] : labelMingWu[1];
-                    File.WriteAllText($"{Application.persistentDataPath}/{SHE_DING_FILE_NAME}.json", JsonUtility.ToJson(sheDing));
+                    string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+                    File.WriteAllText(Path.Combine(directory, $"{SHE_DING_FILE_NAME}.json"), JsonUtility.ToJson(sheDing));
                 });
             }
             float x = paiWidth * 8f;
@@ -2120,7 +2252,8 @@ namespace Assets.Scripts.Maqiao
             // 記録の読込
             foreach (QiaoShi shi in qiaoShis)
             {
-                string filePath = $"{Application.persistentDataPath}/{shi.mingQian}.json";
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                string filePath = Path.Combine(directory, $"{shi.mingQian}.json");
                 if (File.Exists(filePath))
                 {
                     shi.jiLu = JsonUtility.FromJson<JiLu>(File.ReadAllText(filePath));
@@ -2175,7 +2308,12 @@ namespace Assets.Scripts.Maqiao
                 shi.jiLu.naoTao = qjx.naos[(int)QiaoShi.XingGe.TAO].score;
             }
 
-            File.WriteAllText($"{Application.persistentDataPath}/{shi.mingQian}.json", JsonUtility.ToJson(shi.jiLu));
+            string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            File.WriteAllText(Path.Combine(directory, $"{shi.mingQian}.json"), JsonUtility.ToJson(shi.jiLu));
         }
 
         // 【ゲーム】親決
@@ -4074,7 +4212,7 @@ namespace Assets.Scripts.Maqiao
                 }
                 if (ziJiaList.Count > 0)
                 {
-                    File.WriteAllText($"{dirPathZiJia}/ZiJia_{timestamp}.json", JsonConvert.SerializeObject(ziJiaList, Formatting.None));
+                    File.WriteAllText(Path.Combine(dirPathZiJia, $"ZiJia_{timestamp}.json"), JsonConvert.SerializeObject(ziJiaList, Formatting.None));
                 }
 
                 string dirPathTaJia = Path.Combine(dirPath, "TaJia");
@@ -4084,7 +4222,7 @@ namespace Assets.Scripts.Maqiao
                 }
                 if (taJiaList.Count > 0)
                 {
-                    File.WriteAllText($"{dirPathTaJia}/TaJia_{timestamp}.json", JsonConvert.SerializeObject(taJiaList, Formatting.None));
+                    File.WriteAllText(Path.Combine(dirPathTaJia, $"TaJia_{timestamp}.json"), JsonConvert.SerializeObject(taJiaList, Formatting.None));
                 }
             }
             for (int i = 0; i < qiaoShis.Count; i++)
@@ -4151,7 +4289,12 @@ namespace Assets.Scripts.Maqiao
             {
                 // 記録 対局数
                 shi.jiLu.duiJuShu++;
-                File.WriteAllText($"{Application.persistentDataPath}/{shi.mingQian}.json", JsonUtility.ToJson(shi.jiLu));
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                File.WriteAllText(Path.Combine(directory, $"{shi.mingQian}.json"), JsonUtility.ToJson(shi.jiLu));
             }
 
             yield return Pause(ForwardMode.FAST_FORWARD);
@@ -4280,7 +4423,12 @@ namespace Assets.Scripts.Maqiao
                         shi.jiLu.shunWei4++;
                         break;
                 }
-                File.WriteAllText($"{Application.persistentDataPath}/{shi.mingQian}.json", JsonUtility.ToJson(shi.jiLu));
+                string directory = Path.Combine(Application.persistentDataPath, SETTING_PLAYER_DATA_DIR_NAME);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                File.WriteAllText(Path.Combine(directory, $"{shi.mingQian}.json"), JsonUtility.ToJson(shi.jiLu));
             }
 
             chang.banZhuangShu++;
@@ -4618,7 +4766,7 @@ namespace Assets.Scripts.Maqiao
             if (type == LogType.Exception)
             {
                 string exceptionDirName = "Exception";
-                string exceptionDirPath = $"{Application.persistentDataPath}/{exceptionDirName}";
+                string exceptionDirPath = Path.Combine(Application.persistentDataPath, exceptionDirName);
                 Directory.CreateDirectory(exceptionDirPath);
                 DirectoryInfo dir = new(exceptionDirPath);
                 foreach (FileInfo file in dir.GetFiles())
@@ -4626,11 +4774,11 @@ namespace Assets.Scripts.Maqiao
                     file.Delete();
                 }
 
-                File.Move($"{Application.persistentDataPath}/{CHANG_FILE_NAME}.json", $"{Application.persistentDataPath}/{exceptionDirName}/{CHANG_FILE_NAME}.json");
-                File.Move($"{Application.persistentDataPath}/{PAI_FILE_NAME}.json", $"{Application.persistentDataPath}/{exceptionDirName}/{PAI_FILE_NAME}.json");
+                File.Move(Path.Combine(Application.persistentDataPath, GAME_DATA_DIR_NAME, $"{CHANG_FILE_NAME}.json"), Path.Combine(exceptionDirPath, $"{CHANG_FILE_NAME}.json"));
+                File.Move(Path.Combine(Application.persistentDataPath, GAME_DATA_DIR_NAME, $"{PAI_FILE_NAME}.json"), Path.Combine(Application.persistentDataPath, exceptionDirName, $"{PAI_FILE_NAME}.json"));
                 for (int i = 0; i < 4; i++)
                 {
-                    File.Move($"{Application.persistentDataPath}/{QIAO_SHI_FILE_NAME}{i}.json", $"{Application.persistentDataPath}/{exceptionDirName}/{QIAO_SHI_FILE_NAME}{i}.json");
+                    File.Move(Path.Combine(Application.persistentDataPath, GAME_DATA_DIR_NAME, $"{QIAO_SHI_FILE_NAME}{i}.json"), Path.Combine(Application.persistentDataPath, exceptionDirName, $"{QIAO_SHI_FILE_NAME}{i}.json"));
                 }
             }
         }
