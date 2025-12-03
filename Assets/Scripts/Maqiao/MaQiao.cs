@@ -2550,15 +2550,13 @@ namespace Assets.Scripts.Maqiao
             // 洗牌
             pai.XiPai();
             // 積込
-            //List<List<int>> jiRuPai = new()
-            //{
-            //    new() { 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x07, 0x07, 0x31, 0x31, 0x31, 0x31, 0x32, 0x32 },
-            //    //new() { 0x31, 0x31, 0x31, 0x32, 0x32, 0x32, 0x33, 0x33, 0x33, 0x34, 0x34, 0x34 },
-            //    //new() { 0x31, 0x32 },
-            //    //new() { 0x33 },
-            //    //new() { 0x34 }
-            //};
-            //qiaoPai.JiRu(w, jiRuPai);
+            // List<List<int>> jiRuPai = new()
+            // {
+            //    new() { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x31, 0x31, 0x31, 0x37 },
+            //    new() { 0x37, 0x37 },
+            //    new() { 0x37 },
+            // };
+            // pai.JiRu(w, jiRuPai);
 
             // 洗牌嶺上
             pai.XiPaiLingShang();
@@ -3860,7 +3858,7 @@ namespace Assets.Scripts.Maqiao
         // 【描画】声
         private void DrawSheng(int jia, QiaoShi.YaoDingYi yao)
         {
-            if (yao == QiaoShi.YaoDingYi.Wu || ((yao == QiaoShi.YaoDingYi.Chi || yao == QiaoShi.YaoDingYi.RongHe) && chang.isTaJiaYaoDraw))
+            if (yao == QiaoShi.YaoDingYi.Wu || ((yao == QiaoShi.YaoDingYi.Chi || yao == QiaoShi.YaoDingYi.Bing || yao == QiaoShi.YaoDingYi.DaMingGang || yao == QiaoShi.YaoDingYi.RongHe) && chang.isTaJiaYaoDraw))
             {
                 return;
             }
