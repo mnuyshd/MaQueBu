@@ -22,7 +22,7 @@ namespace Assets.Scripts.Maqiao
     // 麻雀
     public class MaQiao : MonoBehaviour
     {
-        private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
+        private static readonly WaitForSeconds _waitForSeconds0_1 = new(0.1f);
 
         // イベント
         public enum Event
@@ -524,7 +524,7 @@ namespace Assets.Scripts.Maqiao
         {
             yield return new WaitForEndOfFrame();
 
-            string directory = GetDownloadFolderPath();
+            string directory = Path.Combine(Application.persistentDataPath, "Screenshot");
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -536,23 +536,6 @@ namespace Assets.Scripts.Maqiao
             ScreenCapture.CaptureScreenshot(filePath);
 
             StartCoroutine(FlashCoroutine());
-        }
-
-        private string GetDownloadFolderPath()
-        {
-            string path = "";
-#if UNITY_ANDROID
-            path = "/storage/emulated/0/Download";
-#elif UNITY_IOS
-            path = Path.Combine(Application.persistentDataPath, "Downloads");
-#elif UNITY_STANDALONE_WIN
-            path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Downloads");
-#elif UNITY_STANDALONE_OSX
-            path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Downloads");
-#else
-            path = Path.Combine(Application.persistentDataPath, "Screenshot");
-#endif
-            return path;
         }
 
         // 画面フラッシュ
@@ -572,7 +555,7 @@ namespace Assets.Scripts.Maqiao
 
             img.color = new Color(1, 1, 1, 1);
 
-            yield return _waitForSeconds0_1;
+            yield return new WaitForSeconds(0.1f);
 
             float alpha = 1f;
             while (alpha > 0)
@@ -4144,6 +4127,10 @@ namespace Assets.Scripts.Maqiao
                             shi.jiLu.yiShu[yiFan.yi]++;
                         }
                     }
+                    if (shi.fanShuJi >= 13)
+                    {
+                        shi.jiLu.yiManShu[(int)QiaoShi.YiManDingYi.ShuYiMan]++;
+                    }
                 }
             }
             else
@@ -4163,6 +4150,10 @@ namespace Assets.Scripts.Maqiao
                             ResizeYiShu(shi);
                             shi.jiLu.yiShu[yiFan.yi]++;
                         }
+                    }
+                    if (shi.fanShuJi >= 13)
+                    {
+                        shi.jiLu.yiManShu[(int)QiaoShi.YiManDingYi.ShuYiMan]++;
                     }
                 }
             }

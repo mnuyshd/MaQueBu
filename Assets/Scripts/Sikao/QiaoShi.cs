@@ -117,6 +117,8 @@ namespace Assets.Scripts.Sikao
         // 役満
         public enum YiManDingYi
         {
+            // 数え役満
+            ShuYiMan,
             // 天和
             TianHe,
             // 地和
@@ -174,6 +176,7 @@ namespace Assets.Scripts.Sikao
         // 役満名
         public static readonly Dictionary<YiManDingYi, string> YiManMing = new()
         {
+            { YiManDingYi.ShuYiMan, "数え役満" },
             { YiManDingYi.TianHe, "天和" },
             { YiManDingYi.DeHe, "地和" },
             { YiManDingYi.GuoShiWuShuang, "国士無双" },
@@ -307,7 +310,7 @@ namespace Assets.Scripts.Sikao
 
         // 得点役
         public static readonly string[] DeDianYi = new string[] {
-            "", "", "", "", "", "満貫", "跳満", "跳満", "倍満", "倍満", "倍満", "三倍満", "三倍満", "役満"
+            "", "", "", "", "", "満貫", "跳満", "跳満", "倍満", "倍満", "倍満", "三倍満", "三倍満", "数え役満"
         };
 
         protected enum Ting
