@@ -1,18 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Assets.Scripts.Maqiao;
+using UnityEngine;
+
+using Assets.Scripts.Gongtong;
 
 namespace Assets.Scripts.Sikao
 {
     // 機械雀士
-    public class QiaoJiXie : QiaoShi
+    public class QueJiXie : QueShi
     {
         // 脳
         private int[] shouPaiDianShu;
 
         // コンストラクタ
-        public QiaoJiXie(string mingQian) : base(mingQian)
+        public QueJiXie(string mingQian) : base(mingQian)
         {
             naos.Add(new Nao { xingGe = XingGe.XUAN_SHANG, score = 50 });
             naos.Add(new Nao { xingGe = XingGe.YI_PAI, score = 50 });
@@ -26,14 +28,19 @@ namespace Assets.Scripts.Sikao
             shouPaiDianShu = new int[14];
         }
 
+        public override QueShi GetQueShi(string jsonText)
+        {
+            return (QueShi)JsonUtility.FromJson(jsonText, GetType());
+        }
+
         // 点差
         private int DianCha()
         {
             // 最高得点
             int zuiGaoDingBang = 0;
-            for (int i = 0; i < MaQiao.qiaoShis.Count; i++)
+            for (int i = 0; i < MaQue.Instance.queShis.Count; i++)
             {
-                QiaoShi shi = MaQiao.qiaoShis[i];
+                QueShi shi = MaQue.Instance.queShis[i];
                 if (shi.dianBang > zuiGaoDingBang)
                 {
                     zuiGaoDingBang = shi.dianBang;
@@ -55,7 +62,7 @@ namespace Assets.Scripts.Sikao
                 return;
             }
 
-            if (MaQiao.guiZe.jiuZhongJiuPaiLianZhuang > 0 && jiuZhongJiuPai)
+            if (GuiZe.Instance.jiuZhongJiuPaiLianZhuang > 0 && jiuZhongJiuPai)
             {
                 int dian = DianCha() / 1000;
                 if (naos[(int)XingGe.YI_PAI].score + dian < 50)
@@ -109,7 +116,7 @@ namespace Assets.Scripts.Sikao
                                 continue;
                             }
                         }
-                        dian += yuXiangDian[i] * MaQiao.pai.CanShu(gongKaiPaiShu[i]);
+                        dian += yuXiangDian[i] * Pai.Instance.CanShu(gongKaiPaiShu[i]);
                     }
                 }
                 shouPaiDian[w] -= dian / (naos[(int)XingGe.TAO].score == 0 ? 1 : naos[(int)XingGe.TAO].score);
@@ -155,7 +162,7 @@ namespace Assets.Scripts.Sikao
                 }
                 else if (minDian == shouPaiDian[i])
                 {
-                    int p = sp & QIAO_PAI;
+                    int p = sp & QUE_PAI;
                     int s = Math.Abs(5 - (sp & SHU_PAI));
                     if (p >= 0x30 || maxShu < s)
                     {
@@ -173,7 +180,7 @@ namespace Assets.Scripts.Sikao
                 {
                     foreach (int pai in pais)
                     {
-                        heLePaiShu += MaQiao.pai.CanShu(gongKaiPaiShu[pai]);
+                        heLePaiShu += Pai.Instance.CanShu(gongKaiPaiShu[pai]);
                     }
                 }
             }
@@ -186,16 +193,16 @@ namespace Assets.Scripts.Sikao
                     {
                         // 点差
                         int dian = DianCha() / 1000;
-                        dian += MaQiao.pai.CanShanPaiShu();
+                        dian += Pai.Instance.CanShanPaiShu();
                         if (naos[(int)XingGe.LI_ZHI].score + dian >= 100)
                         {
                             ziJiaYao = YaoDingYi.LiZhi;
                         }
-                        if (naos[(int)XingGe.LI_ZHI].score / 10 * heLePaiShu >= 50 - MaQiao.pai.CanShanPaiShu())
+                        if (naos[(int)XingGe.LI_ZHI].score / 10 * heLePaiShu >= 50 - Pai.Instance.CanShanPaiShu())
                         {
                             ziJiaYao = YaoDingYi.LiZhi;
                         }
-                        if (MaQiao.guiZe.kaiLiZhi)
+                        if (GuiZe.Instance.kaiLiZhi)
                         {
                             if (heLePaiShu * (naos[(int)XingGe.LI_ZHI].score / 5) + dian >= 100)
                             {
@@ -299,7 +306,7 @@ namespace Assets.Scripts.Sikao
         // 開立直確認
         private bool IsKaiLiZhi()
         {
-            foreach (QiaoShi shi in MaQiao.qiaoShis)
+            foreach (QueShi shi in MaQue.Instance.queShis)
             {
                 if (shi.feng == feng)
                 {
@@ -347,7 +354,7 @@ namespace Assets.Scripts.Sikao
 
             // 危険度
             int weiXian = 0;
-            foreach (QiaoShi shi in MaQiao.qiaoShis)
+            foreach (QueShi shi in MaQue.Instance.queShis)
             {
                 if (shi.player)
                 {
@@ -423,7 +430,7 @@ namespace Assets.Scripts.Sikao
             }
             if (wei >= 0)
             {
-                int p = shouPai[bingPaiWei[0][0]] & QIAO_PAI;
+                int p = shouPai[bingPaiWei[0][0]] & QUE_PAI;
                 int yiPai = YiPaiPanDing(p);
                 if (yiPai > 0)
                 {
@@ -487,7 +494,7 @@ namespace Assets.Scripts.Sikao
                 {
                     minDian += 100 - naos[(int)XingGe.MING].score;
                 }
-                int p = shouPai[chiPaiWei[0][0]] & QIAO_PAI;
+                int p = shouPai[chiPaiWei[0][0]] & QUE_PAI;
                 if (se != (p & SE_PAI))
                 {
                     minDian += naos[(int)XingGe.RAN].score;
@@ -546,7 +553,7 @@ namespace Assets.Scripts.Sikao
             {
                 return wei;
             }
-            int p = shouPai[wei] & QIAO_PAI;
+            int p = shouPai[wei] & QUE_PAI;
             for (int i = 0; i < shouPai.Count; i++)
             {
                 if (p == shouPai[i])
@@ -570,7 +577,7 @@ namespace Assets.Scripts.Sikao
             (int se, int maxShu) = SeSuan();
 
             // 安全度
-            foreach (QiaoShi shi in MaQiao.qiaoShis)
+            foreach (QueShi shi in MaQue.Instance.queShis)
             {
                 if (shi.feng == feng)
                 {
@@ -586,7 +593,7 @@ namespace Assets.Scripts.Sikao
                     {
                         for (int k = 0; k < shouPai.Count; k++)
                         {
-                            int sp = shouPai[k] & QIAO_PAI;
+                            int sp = shouPai[k] & QUE_PAI;
                             if (dp == sp)
                             {
                                 shouPaiDian[k] += 2000;
@@ -596,19 +603,19 @@ namespace Assets.Scripts.Sikao
                 }
                 else
                 {
-                    if (shi.liZhi || shi.fuLuPais.Count >= 3 || (MaQiao.pai.CanShanPaiShu() <= xiangTingShu * 4))
+                    if (shi.liZhi || shi.fuLuPais.Count >= 3 || (Pai.Instance.CanShanPaiShu() <= xiangTingShu * 4))
                     {
                         // 得点掛率
                         float taoDian = naos[(int)XingGe.TAO].score / 50;
                         // 一発警戒
                         taoDian *= shi.yiFa ? naos[(int)XingGe.TAO].score / 25 : 1;
                         // 親警戒
-                        taoDian *= shi.feng == MaQiao.chang.qin ? naos[(int)XingGe.TAO].score / 25 : 1;
+                        taoDian *= shi.feng == Chang.Instance.qin ? naos[(int)XingGe.TAO].score / 25 : 1;
                         // シャンテン数分 降り気味
                         taoDian *= (xiangTingShu > 0 ? xiangTingShu : 1) * naos[(int)XingGe.TAO].score / 50;
                         for (int j = 0; j < shouPai.Count; j++)
                         {
-                            int p = shouPai[j] & QIAO_PAI;
+                            int p = shouPai[j] & QUE_PAI;
                             int s = p & SHU_PAI;
                             // 安全点
                             int anQuanDian = 0;
@@ -670,7 +677,7 @@ namespace Assets.Scripts.Sikao
             for (int i = 0; i < shouPai.Count; i++)
             {
                 int sp = shouPai[i];
-                int p = sp & QIAO_PAI;
+                int p = sp & QUE_PAI;
                 foreach (int stp in shiTiPai)
                 {
                     if (p == stp)
@@ -736,7 +743,7 @@ namespace Assets.Scripts.Sikao
                     int k = 3;
                     for (int j = 0; j < shouPai.Count; j++)
                     {
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i)
                         {
                             if (k > 0)
@@ -781,7 +788,7 @@ namespace Assets.Scripts.Sikao
                     int k = 2;
                     for (int j = 0; j < shouPai.Count; j++)
                     {
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && k > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.KE_ZI].score / 3;
@@ -810,7 +817,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score;
@@ -854,7 +861,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score / 3;
@@ -886,7 +893,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score / 4;
@@ -919,7 +926,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score / 5;
@@ -956,7 +963,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score;
@@ -1000,7 +1007,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score / 3;
@@ -1032,7 +1039,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score / 4;
@@ -1065,7 +1072,7 @@ namespace Assets.Scripts.Sikao
                         {
                             continue;
                         }
-                        int p = shouPai[j] & QIAO_PAI;
+                        int p = shouPai[j] & QUE_PAI;
                         if (p == i && s0 > 0)
                         {
                             shouPaiDian[j] += naos[(int)XingGe.SHUN_ZI].score / 5;
@@ -1090,7 +1097,7 @@ namespace Assets.Scripts.Sikao
             // 孤立牌への加減点
             for (int i = 0; i < shouPai.Count; i++)
             {
-                int p = shouPai[i] & QIAO_PAI;
+                int p = shouPai[i] & QUE_PAI;
                 if (p >= ZI_PAI || shouPaiDian[i] > 0)
                 {
                     continue;

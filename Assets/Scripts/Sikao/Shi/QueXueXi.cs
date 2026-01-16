@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Assets.Scripts.Sikao.Shi
 {
     // 学習雀士
-    public class QiaoXueXi : QiaoJiXie
+    public class QueXueXi : QueJiXie
     {
 #if DEV
         private const string HOST_URL = "http://127.0.0.1:10000/";
@@ -17,7 +17,7 @@ namespace Assets.Scripts.Sikao.Shi
         private const string HOST_URL = "https://maquiaobu-api.onrender.com/";
 #endif
         public const string MING_QIAN = "学習雀士";
-        public QiaoXueXi() : base(MING_QIAN)
+        public QueXueXi() : base(MING_QIAN)
         {
             waiBuSikao = true;
         }
@@ -130,7 +130,7 @@ namespace Assets.Scripts.Sikao.Shi
                 ziJiaXuanZe = shouPai.Count - 1;
                 for (int i = 0; i < shouPai.Count; i++)
                 {
-                    if ((shouPai[i] & QIAO_PAI) == paiOrIndex)
+                    if ((shouPai[i] & QUE_PAI) == paiOrIndex)
                     {
                         ziJiaXuanZe = PaiXuanZe(i);
                         break;

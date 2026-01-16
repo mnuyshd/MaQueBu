@@ -1,8 +1,31 @@
+using UnityEngine;
+
 namespace Assets.Scripts.Gongtong
 {
     // 規則
-    public class GuiZe
+    [DefaultExecutionOrder(1)]
+    public class GuiZe : MonoBehaviour
     {
+        public static GuiZe Instance;
+
+        public void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                Init();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void Init()
+        {
+        }
+
         // 半荘戦
         public bool banZhuang = true;
         // 喰断

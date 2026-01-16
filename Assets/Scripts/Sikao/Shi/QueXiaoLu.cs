@@ -1,12 +1,12 @@
-using Assets.Scripts.Maqiao;
+using Assets.Scripts.Gongtong;
 
 namespace Assets.Scripts.Sikao.Shi
 {
     // 効率雀士
-    public class QiaoXiaoLu : QiaoJiXie
+    public class QueXiaoLu : QueJiXie
     {
         public const string MING_QIAN = "効率雀士";
-        public QiaoXiaoLu() : base(MING_QIAN)
+        public QueXiaoLu() : base(MING_QIAN)
         {
             naos[(int)XingGe.XUAN_SHANG].score = 50;
             naos[(int)XingGe.YI_PAI].score = 50;
@@ -22,13 +22,13 @@ namespace Assets.Scripts.Sikao.Shi
         public override void SiKaoZiJia()
         {
             int tingPaiShu = 0;
-            foreach (QiaoShi shi in MaQiao.qiaoShis)
+            foreach (QueShi shi in MaQue.Instance.queShis)
             {
                 if (shi.player)
                 {
                     continue;
                 }
-                if (shi.liZhi || shi.fuLuPais.Count >= 3 || (MaQiao.pai.CanShanPaiShu() <= xiangTingShu * 4))
+                if (shi.liZhi || shi.fuLuPais.Count >= 3 || (Pai.Instance.CanShanPaiShu() <= xiangTingShu * 4))
                 {
                     tingPaiShu++;
                 }

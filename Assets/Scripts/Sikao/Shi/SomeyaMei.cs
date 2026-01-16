@@ -1,6 +1,6 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    public class SomeyaMei : QiaoJiXie
+    public class SomeyaMei : QueJiXie
     {
         public const string MING_QIAN = "染谷鳴";
         public SomeyaMei() : base(MING_QIAN)

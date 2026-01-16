@@ -1,6 +1,6 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    public class KouzuTorako : QiaoJiXie
+    public class KouzuTorako : QueJiXie
     {
         public const string MING_QIAN = "河津虎子";
         public KouzuTorako() : base(MING_QIAN)

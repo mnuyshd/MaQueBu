@@ -1,6 +1,6 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    public class TakamiNozomu : QiaoJiXie
+    public class TakamiNozomu : QueJiXie
     {
         public const string MING_QIAN = "高見望";
         public TakamiNozomu() : base(MING_QIAN)

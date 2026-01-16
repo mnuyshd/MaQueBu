@@ -1,8 +1,26 @@
-namespace Assets.Scripts.Maqiao
+using UnityEngine;
+
+namespace Assets.Scripts.Gongtong
 {
     // 設定
-    public class SheDing
+    [DefaultExecutionOrder(1)]
+    public class SheDing : MonoBehaviour
     {
+        public static SheDing Instance;
+
+        public void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
         // 鳴無し
         public bool mingWu = false;
         // 立直後自動

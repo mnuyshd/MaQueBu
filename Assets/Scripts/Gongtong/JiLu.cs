@@ -1,4 +1,4 @@
-namespace Assets.Scripts.Maqiao
+namespace Assets.Scripts.Gongtong
 {
     // 記録
     public class JiLu
@@ -56,8 +56,8 @@ namespace Assets.Scripts.Maqiao
         public int fangChongDian = 0;
 
         // 役満数
-        public int[] yiManShu = new int[Sikao.QiaoShi.YiManMing.Count];
+        public int[] yiManShu = new int[Sikao.QueShi.YiManMing.Count];
         // 役数
-        public int[] yiShu = new int[Sikao.QiaoShi.YiMing.Count];
+        public int[] yiShu = new int[Sikao.QueShi.YiMing.Count];
     }
 }

@@ -1,6 +1,6 @@
 namespace Assets.Scripts.Sikao.Shi
 {
-    public class HikitaMamoru : QiaoJiXie
+    public class HikitaMamoru : QueJiXie
     {
         public const string MING_QIAN = "引田守";
         public HikitaMamoru() : base(MING_QIAN)

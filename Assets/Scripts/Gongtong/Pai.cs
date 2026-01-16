@@ -1,14 +1,36 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-
 using Assets.Scripts.Sikao;
-using Assets.Scripts.Maqiao;
 
 namespace Assets.Scripts.Gongtong
 {
     // 牌
-    public class Pai
+    [DefaultExecutionOrder(1)]
+    public class Pai : MonoBehaviour
     {
+        public static Pai Instance;
+
+        public void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                Init();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void Init()
+        {
+            goXuanShangPai = new Button[5];
+            goLiXuanShangPai = new Button[5];
+        }
+
         // 牌定義
         private static readonly int[] PAI4_DING_YI = new int[] {
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
@@ -22,7 +44,7 @@ namespace Assets.Scripts.Gongtong
             0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
             0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37
         };
-        public int[] qiaoPai = PAI4_DING_YI;
+        public int[] quePai = PAI4_DING_YI;
 
         // 赤牌定義
         public static int[] CHI_PAI_DING_YI = new int[] { 0x05, 0x15, 0x25 };
@@ -31,7 +53,7 @@ namespace Assets.Scripts.Gongtong
         // 緑一色牌定義
         public static int[] LU_YI_SE_PAI_DING_YI = new int[] { 0x22, 0x23, 0x24, 0x26, 0x28, 0x36 };
         // 紅孔雀牌定義
-        public static int[] GONG_KONG_QIAO_PAI_DING_YI = new int[] { 0x21, 0x25, 0x27, 0x29, 0x37 };
+        public static int[] GONG_KONG_QUE_PAI_DING_YI = new int[] { 0x21, 0x25, 0x27, 0x29, 0x37 };
         // 風牌定義
         public static int[] FENG_PAI_DING_YI = new int[] { 0x31, 0x32, 0x33, 0x34 };
         // 懸賞牌定義
@@ -65,13 +87,6 @@ namespace Assets.Scripts.Gongtong
         // 海底
         public bool haiDi;
 
-        // コンストラクタ
-        public Pai()
-        {
-            goXuanShangPai = new Button[5];
-            goLiXuanShangPai = new Button[5];
-        }
-
         // 状態
         public void ZhuangTai(State state)
         {
@@ -85,12 +100,12 @@ namespace Assets.Scripts.Gongtong
         // 洗牌
         public void XiPai()
         {
-            qiaoPai = MaQiao.qiaoShis.Count == 3 ? PAI3_DING_YI : PAI4_DING_YI;
+            quePai = MaQue.Instance.queShis.Count == 3 ? PAI3_DING_YI : PAI4_DING_YI;
             shanPai = new();
             // 山牌
             for (int i = 0; i < 4; i++)
             {
-                foreach (int p in qiaoPai)
+                foreach (int p in quePai)
                 {
                     shanPai.Add(p);
                 }
@@ -99,20 +114,20 @@ namespace Assets.Scripts.Gongtong
             for (int i = 0; i < CHI_PAI_DING_YI.Length; i++)
             {
                 int cp = CHI_PAI_DING_YI[i];
-                for (int j = 0; j < MaQiao.guiZe.chiPaiShu[i]; j++)
+                for (int j = 0; j < GuiZe.Instance.chiPaiShu[i]; j++)
                 {
                     for (int k = 0; k < shanPai.Count; k++)
                     {
                         int p = shanPai[k];
                         if (cp == p)
                         {
-                            shanPai[k] += QiaoShi.CHI_PAI;
+                            shanPai[k] += QueShi.CHI_PAI;
                             break;
                         }
                     }
                 }
             }
-            MaQiao.chang.Shuffle(shanPai, 30000);
+            Chang.Instance.Shuffle(shanPai, 30000);
 
         }
 
@@ -159,11 +174,11 @@ namespace Assets.Scripts.Gongtong
                             int wei;
                             if (j < 12)
                             {
-                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % MaQiao.qiaoShis.Count * 4);
+                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % MaQue.Instance.queShis.Count * 4);
                             }
                             else
                             {
-                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % MaQiao.qiaoShis.Count);
+                                wei = SHAN_PAI_ZI_MO_WEI[j] + ((jia + i) % MaQue.Instance.queShis.Count);
                             }
                             (shanPai[k], shanPai[wei]) = (shanPai[wei], shanPai[k]);
                             shanPaiC[wei] = 0xff;
@@ -260,12 +275,12 @@ namespace Assets.Scripts.Gongtong
             {
                 return false;
             }
-            foreach (QiaoShi shi in MaQiao.qiaoShis)
+            foreach (QueShi shi in MaQue.Instance.queShis)
             {
                 int gang = 0;
                 foreach (FuLuPai fuLuPai in shi.fuLuPais)
                 {
-                    if (fuLuPai.yao == QiaoShi.YaoDingYi.AnGang || fuLuPai.yao == QiaoShi.YaoDingYi.JiaGang || fuLuPai.yao == QiaoShi.YaoDingYi.DaMingGang)
+                    if (fuLuPai.yao == QueShi.YaoDingYi.AnGang || fuLuPai.yao == QueShi.YaoDingYi.JiaGang || fuLuPai.yao == QueShi.YaoDingYi.DaMingGang)
                     {
                         gang++;
                     }
